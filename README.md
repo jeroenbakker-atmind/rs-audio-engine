@@ -13,6 +13,8 @@ cargo run --example experiment
 
 ## FM Synthesis
 
+> See `audio-engine-fm` folder
+
 The experiment uses the next structure.
 
 ```mermaid
@@ -61,6 +63,5 @@ classDiagram
     Instrument *--> Operators: operators
     Instrument *--> Algorithm: algorithm
     Operator *--> Waveform: waveform
-
 
 ```
