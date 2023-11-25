@@ -23,11 +23,11 @@ fn sample_tone(sample_time: f32) -> f32 {
                 level: 1.0,
                 envelope: Envelope {
                     delay: 0.0,
-                    attack: 0.2,
-                    hold: 0.0,
-                    decay: 0.1,
-                    sustain: 0.8,
-                    release: 0.0,
+                    attack: 0.5,
+                    hold: 0.5,
+                    decay: 0.5,
+                    sustain: 0.6,
+                    release: 1.0,
                 },
             },
             b: Operator {
@@ -41,8 +41,9 @@ fn sample_tone(sample_time: f32) -> f32 {
         },
         algorithm: Algorithm::BModulatesA,
     };
+    let note_off = if sample_time > 6.0 { Some(6.0) } else { None };
 
-    instrument.sample(sample_time, None, frequency, &NO_USER_DATA)
+    instrument.sample(sample_time, note_off, frequency, &NO_USER_DATA)
 }
 
 fn main() -> Result<(), ()> {

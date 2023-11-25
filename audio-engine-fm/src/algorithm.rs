@@ -8,6 +8,9 @@ pub enum Algorithm {
     /// Output carrier
     A,
 
+    /// Output carriers A and B
+    AB,
+
     // B modulates carrier A
     BModulatesA,
 }
@@ -25,6 +28,15 @@ impl SampleGenerator for Algorithm {
             Algorithm::A => user_data
                 .a
                 .sample(note_time, note_off, frequency, &NO_USER_DATA),
+            Algorithm::AB => {
+                (user_data
+                    .a
+                    .sample(note_time, note_off, frequency, &NO_USER_DATA)
+                    + user_data
+                        .b
+                        .sample(note_time, note_off, frequency, &NO_USER_DATA))
+                    / 2.0
+            }
             Algorithm::BModulatesA => user_data.a.sample(
                 note_time,
                 note_off,

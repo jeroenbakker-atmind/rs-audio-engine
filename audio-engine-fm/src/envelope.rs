@@ -35,7 +35,7 @@ impl Envelope {
     pub fn level(&self, note_time: Time, note_off: Option<Time>) -> f32 {
         if let Some(note_off) = note_off {
             let value = self.level(note_off, None);
-            let interp = (note_time - note_off) / note_off;
+            let interp = (note_time - note_off) / self.release;
             (value * (1.0 - interp)).max(0.0)
         } else if note_time < self.delay {
             0.0
