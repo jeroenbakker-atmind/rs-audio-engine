@@ -1,8 +1,4 @@
-use cpal::{
-    traits::{DeviceTrait, HostTrait, StreamTrait},
-    Sample,
-};
-use rs_audio_engine::{
+use audio_engine_fm::{
     algorithm::Algorithm,
     envelope::Envelope,
     instrument::Instrument,
@@ -11,8 +7,12 @@ use rs_audio_engine::{
     waveform::Waveform,
     Time,
 };
+use cpal::{
+    traits::{DeviceTrait, HostTrait, StreamTrait},
+    Sample,
+};
 
-fn song_sample(sample_time: f32) -> f32 {
+fn sample_tone(sample_time: f32) -> f32 {
     let frequency = 437.0;
 
     let instrument = Instrument {
@@ -47,27 +47,21 @@ fn song_sample(sample_time: f32) -> f32 {
 
 fn main() -> Result<(), ()> {
     let host = cpal::default_host();
-
     let device = host.default_output_device().unwrap();
-    println!("Output device: {}", device.name().unwrap());
-
     let config = device.default_output_config().unwrap();
-    println!("Default output config: {:?}", config);
 
-    beep(&device, &config.into())
+    play_tone(&device, &config.into())
 }
 
-fn beep(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), ()> {
+fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), ()> {
     let sample_rate = config.sample_rate.0 as f32;
     let channels = config.channels as usize;
 
-    // Produce a sinusoid of maximum amplitude.
     let mut sample_num = 0_u64;
     let mut next_value = move || {
         sample_num += 1;
         let sample_time = sample_num as Time / sample_rate;
-
-        song_sample(sample_time)
+        sample_tone(sample_time)
     };
 
     let err_fn = |err| eprintln!("an error occurred on stream: {}", err);

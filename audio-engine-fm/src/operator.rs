@@ -1,6 +1,6 @@
 use crate::{
     envelope::Envelope,
-    sample::{NoUserData, SampleGenerator},
+    sample::{NoUserData, SampleGenerator, NO_USER_DATA},
     waveform::Waveform,
     Level, Time,
 };
@@ -20,6 +20,12 @@ impl Default for Operator {
             rate: 1.0,
             level: 0.0,
         }
+    }
+}
+
+impl Operator {
+    pub fn modulate(&self, note_time: Time, note_off: Option<Time>, frequency: f32) -> f32 {
+        frequency + self.sample(note_time, note_off, frequency, &NO_USER_DATA)
     }
 }
 

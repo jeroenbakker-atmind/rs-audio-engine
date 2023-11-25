@@ -1,16 +1,13 @@
-[package]
-name = "rs-audio-engine"
-version = "0.1.0"
-edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace]
+members = [
+    "audio-engine-fm"
+]
 
-[lib]
-name="rs_audio_engine"
-path="src/lib.rs"
+resolver = "2"
 
-[dependencies]
-cpal = "*"
+[profile.dev]
+lto = false
 
-[[examples]]
-name="experiment"
+[profile.release]
+lto = true

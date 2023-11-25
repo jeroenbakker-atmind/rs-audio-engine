@@ -5,7 +5,10 @@ use crate::{
 };
 
 pub enum Algorithm {
+    /// Output carrier
     A,
+
+    // B modulates carrier A
     BModulatesA,
 }
 
@@ -25,10 +28,7 @@ impl SampleGenerator for Algorithm {
             Algorithm::BModulatesA => user_data.a.sample(
                 note_time,
                 note_off,
-                frequency
-                    + user_data
-                        .b
-                        .sample(note_time, note_off, frequency, &NO_USER_DATA),
+                user_data.b.modulate(note_time, note_off, frequency),
                 &NO_USER_DATA,
             ),
         }

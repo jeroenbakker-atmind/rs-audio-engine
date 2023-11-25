@@ -11,6 +11,8 @@ crash.
 cargo run --example experiment
 ```
 
+## FM Synthesis
+
 The experiment uses the next structure.
 
 ```mermaid
@@ -25,6 +27,7 @@ classDiagram
         rate: f32
 
         sample()
+        modulate()
     }
     class Envelope {
         delay: Time

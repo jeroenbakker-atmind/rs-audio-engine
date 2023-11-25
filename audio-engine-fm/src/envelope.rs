@@ -1,5 +1,8 @@
 use crate::{Level, Time};
 
+/// Music Envelope.
+///
+/// Describes how sound changes over time.
 pub struct Envelope {
     /// Time to delay before the attack starts
     pub delay: Time,
