@@ -6,6 +6,7 @@ pub struct Operator {
     pub envelope: Envelope,
     pub rate: f32,
     pub level: Level,
+    pub phase: PhaseTime,
 }
 
 impl Default for Operator {
@@ -15,6 +16,7 @@ impl Default for Operator {
             envelope: Envelope::default(),
             rate: 1.0,
             level: 0.0,
+            phase: PhaseTime::default(),
         }
     }
 }
@@ -37,10 +39,12 @@ impl Operator {
         frequency: f32,
         state: &mut OperatorNoteState,
     ) -> f32 {
-        self.waveform
-            .sample_and_advance(&mut state.phase_time, frequency * self.rate, 44100.0)
+        let result = self.waveform.sample(&(state.phase_time + self.phase))
             * self.envelope.level(note_time, note_off)
-            * self.level
+            * self.level;
+        self.waveform
+            .advance(&mut state.phase_time, frequency, 44100.0);
+        result
     }
 }
 

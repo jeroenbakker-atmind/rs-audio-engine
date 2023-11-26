@@ -1,3 +1,4 @@
+use audio_engine_common::phase_time::PhaseTime;
 use audio_engine_fm::{
     algorithm::Algorithm,
     envelope::Envelope,
@@ -32,18 +33,20 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
                 level: 1.0,
                 envelope: Envelope {
                     delay: 0.0,
-                    attack: 0.5,
-                    hold: 0.5,
-                    decay: 0.5,
-                    sustain: 0.6,
+                    attack: 0.1,
+                    hold: 0.0,
+                    decay: 0.1,
+                    sustain: 0.7,
                     release: 1.0,
                 },
+                phase: PhaseTime::default(),
             },
             b: Operator {
                 waveform: Waveform::Sine,
-                rate: 0.02,
-                level: 127.0,
+                rate: 2.0,
+                level: 32.0,
                 envelope: Envelope::default(),
+                phase: PhaseTime { time: 0.25 },
             },
             c: Operator::default(),
             d: Operator::default(),

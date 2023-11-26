@@ -1,6 +1,6 @@
-use std::ops::AddAssign;
+use std::ops::{Add, AddAssign};
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub struct PhaseTime {
     pub time: f32,
 }
@@ -16,5 +16,14 @@ impl PhaseTime {
 impl AddAssign for PhaseTime {
     fn add_assign(&mut self, other: Self) {
         self.time = (self.time + 1.0 + other.time).fract()
+    }
+}
+
+impl Add for PhaseTime {
+    type Output = Self;
+    fn add(self, other: Self) -> Self::Output {
+        PhaseTime {
+            time: (self.time + 1.0 + other.time).fract(),
+        }
     }
 }

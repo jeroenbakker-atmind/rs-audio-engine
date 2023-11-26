@@ -21,14 +21,7 @@ impl Waveform {
         }
     }
 
-    pub fn sample_and_advance(
-        &self,
-        phase_time: &mut PhaseTime,
-        frequency: f32,
-        sample_rate: f32,
-    ) -> f32 {
-        let result = self.sample(phase_time);
+    pub fn advance(&self, phase_time: &mut PhaseTime, frequency: f32, sample_rate: f32) {
         *phase_time += PhaseTime::delta_phase_time(frequency, sample_rate);
-        result
     }
 }
