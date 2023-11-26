@@ -1,7 +1,6 @@
 use crate::{
     algorithm::Algorithm,
-    operator::Operators,
-    sample::{NoUserData, SampleGenerator},
+    operator::{Operators, OperatorsNoteState},
 };
 
 pub struct Instrument {
@@ -9,16 +8,25 @@ pub struct Instrument {
     pub algorithm: Algorithm,
 }
 
-impl SampleGenerator for Instrument {
-    type U = NoUserData;
-    fn sample(
+impl Instrument {
+    pub fn sample(
         &self,
         note_time: crate::Time,
         note_off: Option<crate::Time>,
         frequency: f32,
-        _user_data: &Self::U,
+        state: &mut InstrumentNoteState,
     ) -> f32 {
-        self.algorithm
-            .sample(note_time, note_off, frequency, &self.operators)
+        self.algorithm.sample(
+            note_time,
+            note_off,
+            frequency,
+            &self.operators,
+            &mut state.operators,
+        )
     }
+}
+
+#[derive(Default)]
+pub struct InstrumentNoteState {
+    pub operators: OperatorsNoteState,
 }

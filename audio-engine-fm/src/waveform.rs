@@ -1,7 +1,4 @@
-use crate::{
-    sample::{NoUserData, SampleGenerator},
-    Time,
-};
+use audio_engine_common::phase_time::PhaseTime;
 
 pub enum Waveform {
     Sine,
@@ -9,27 +6,29 @@ pub enum Waveform {
     Saw,
 }
 
-impl SampleGenerator for Waveform {
-    type U = NoUserData;
-
-    fn sample(
-        &self,
-        note_time: Time,
-        _note_off: Option<Time>,
-        frequency: f32,
-        _user_data: &Self::U,
-    ) -> f32 {
-        let block_time = (note_time * frequency) % 1.0;
+impl Waveform {
+    pub fn sample(&self, phase_time: &PhaseTime) -> f32 {
         match self {
-            Waveform::Sine => (block_time * std::f32::consts::TAU).sin(),
+            Waveform::Sine => (phase_time.time * std::f32::consts::TAU).sin(),
             Waveform::Block => {
-                if block_time < 0.5 {
+                if phase_time.time < 0.5 {
                     -1.0
                 } else {
                     1.0
                 }
             }
-            Waveform::Saw => block_time * 2.0 - 1.0,
+            Waveform::Saw => phase_time.time * 2.0 - 1.0,
         }
+    }
+
+    pub fn sample_and_advance(
+        &self,
+        phase_time: &mut PhaseTime,
+        frequency: f32,
+        sample_rate: f32,
+    ) -> f32 {
+        let result = self.sample(phase_time);
+        *phase_time += PhaseTime::delta_phase_time(frequency, sample_rate);
+        result
     }
 }

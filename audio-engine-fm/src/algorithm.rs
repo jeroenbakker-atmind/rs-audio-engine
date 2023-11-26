@@ -1,6 +1,5 @@
 use crate::{
-    operator::Operators,
-    sample::{SampleGenerator, NO_USER_DATA},
+    operator::{Operators, OperatorsNoteState},
     Time,
 };
 
@@ -15,33 +14,37 @@ pub enum Algorithm {
     BModulatesA,
 }
 
-impl SampleGenerator for Algorithm {
-    type U = Operators;
-    fn sample(
+impl Algorithm {
+    pub fn sample(
         &self,
         note_time: Time,
         note_off: Option<Time>,
         frequency: f32,
-        user_data: &Self::U,
+        operators: &Operators,
+        operator_states: &mut OperatorsNoteState,
     ) -> f32 {
         match self {
-            Algorithm::A => user_data
-                .a
-                .sample(note_time, note_off, frequency, &NO_USER_DATA),
-            Algorithm::AB => {
-                (user_data
+            Algorithm::A => {
+                operators
                     .a
-                    .sample(note_time, note_off, frequency, &NO_USER_DATA)
-                    + user_data
+                    .sample(note_time, note_off, frequency, &mut operator_states.a)
+            }
+            Algorithm::AB => {
+                (operators
+                    .a
+                    .sample(note_time, note_off, frequency, &mut operator_states.a)
+                    + operators
                         .b
-                        .sample(note_time, note_off, frequency, &NO_USER_DATA))
+                        .sample(note_time, note_off, frequency, &mut operator_states.b))
                     / 2.0
             }
-            Algorithm::BModulatesA => user_data.a.sample(
+            Algorithm::BModulatesA => operators.a.sample(
                 note_time,
                 note_off,
-                user_data.b.modulate(note_time, note_off, frequency),
-                &NO_USER_DATA,
+                operators
+                    .b
+                    .modulate(note_time, note_off, frequency, &mut operator_states.b),
+                &mut operator_states.a,
             ),
         }
     }

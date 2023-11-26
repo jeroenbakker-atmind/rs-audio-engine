@@ -1,18 +1,12 @@
 [package]
-name = "audio-engine-fm"
+name = "audio-engine-notes"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name="audio_engine_fm"
+name="audio_engine_notes"
 path="src/lib.rs"
 
 [dependencies]
-cpal = "*"
-
-audio-engine-common = {path="../audio-engine-common"}
-
-[[examples]]
-name="experiment"

@@ -1,6 +1,8 @@
 
 [workspace]
 members = [
+    "audio-engine-common",
+    "audio-engine-notes",
     "audio-engine-fm"
 ]
 

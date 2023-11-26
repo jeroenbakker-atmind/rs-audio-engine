@@ -2,7 +2,6 @@ pub mod algorithm;
 pub mod envelope;
 pub mod instrument;
 pub mod operator;
-pub mod sample;
 pub mod waveform;
 
 pub type Time = f32;
