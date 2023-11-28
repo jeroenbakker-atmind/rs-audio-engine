@@ -39,12 +39,10 @@ impl Operator {
         frequency: f32,
         state: &mut OperatorNoteState,
     ) -> f32 {
-        let result = self.waveform.sample(&(state.phase_time + self.phase))
-            * self.envelope.level(note_time, note_off)
-            * self.level;
+        let result = self.waveform.sample(&(state.phase_time + self.phase));
         self.waveform
             .advance(&mut state.phase_time, frequency, 44100.0);
-        result
+        result * self.envelope.level(note_time, note_off) * self.level
     }
 }
 

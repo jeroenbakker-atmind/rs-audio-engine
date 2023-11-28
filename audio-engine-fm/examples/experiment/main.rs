@@ -51,7 +51,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
             c: Operator::default(),
             d: Operator::default(),
         },
-        algorithm: Algorithm::BModulatesA,
+        algorithm: Algorithm::A,
     };
     let mut instrument_state = InstrumentNoteState::default();
     let frequency = 437.0;
