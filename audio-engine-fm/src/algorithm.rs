@@ -1,3 +1,5 @@
+use audio_engine_common::envelope::Envelope;
+
 use crate::{
     operator::{Operators, OperatorsNoteState},
     Time,
@@ -15,14 +17,17 @@ pub enum Algorithm {
 }
 
 impl Algorithm {
-    pub fn sample(
+    pub fn sample<E>(
         &self,
         note_time: Time,
         note_off: Option<Time>,
         frequency: f32,
-        operators: &Operators,
+        operators: &Operators<E>,
         operator_states: &mut OperatorsNoteState,
-    ) -> f32 {
+    ) -> f32
+    where
+        E: Envelope,
+    {
         match self {
             Algorithm::A => {
                 operators

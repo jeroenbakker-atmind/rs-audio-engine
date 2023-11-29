@@ -53,6 +53,7 @@ version = "0.1.0"
 name = "audio-engine-sequencer"
 version = "0.1.0"
 dependencies = [
+ "audio-engine-common",
  "audio-engine-fm",
 ]
 

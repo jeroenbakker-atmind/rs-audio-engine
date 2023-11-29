@@ -1,7 +1,9 @@
-use audio_engine_common::phase_time::PhaseTime;
+use audio_engine_common::{
+    envelope::attack_hold_decay_sustain_release::AttackHoldDecaySustainRelease,
+    phase_time::PhaseTime,
+};
 use audio_engine_fm::{
     algorithm::Algorithm,
-    envelope::Envelope,
     instrument::{Instrument, InstrumentNoteState},
     operator::{Operator, Operators},
     waveform::Waveform,
@@ -25,13 +27,13 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
     let channels = config.channels as usize;
 
     let mut sample_num = 0_u64;
-    let instrument = Instrument {
-        operators: Operators {
+    let instrument = Instrument::<AttackHoldDecaySustainRelease> {
+        operators: Operators::<AttackHoldDecaySustainRelease> {
             a: Operator {
                 waveform: Waveform::Sine,
                 rate: 1.0,
                 level: 1.0,
-                envelope: Envelope {
+                envelope: AttackHoldDecaySustainRelease {
                     delay: 0.0,
                     attack: 0.1,
                     hold: 0.0,
@@ -45,7 +47,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
                 waveform: Waveform::Sine,
                 rate: 2.0,
                 level: 32.0,
-                envelope: Envelope::default(),
+                envelope: AttackHoldDecaySustainRelease::default(),
                 phase: PhaseTime { time: 0.25 },
             },
             c: Operator::default(),

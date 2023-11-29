@@ -1,5 +1,4 @@
 pub mod algorithm;
-pub mod envelope;
 pub mod instrument;
 pub mod operator;
 pub mod waveform;

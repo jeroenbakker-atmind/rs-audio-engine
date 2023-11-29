@@ -1,14 +1,22 @@
+use audio_engine_common::envelope::Envelope;
+
 use crate::{
     algorithm::Algorithm,
     operator::{Operators, OperatorsNoteState},
 };
 
-pub struct Instrument {
-    pub operators: Operators,
+pub struct Instrument<E>
+where
+    E: Envelope,
+{
+    pub operators: Operators<E>,
     pub algorithm: Algorithm,
 }
 
-impl Instrument {
+impl<E> Instrument<E>
+where
+    E: Envelope,
+{
     pub fn sample(
         &self,
         note_time: crate::Time,

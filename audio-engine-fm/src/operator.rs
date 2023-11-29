@@ -1,19 +1,25 @@
-use crate::{envelope::Envelope, waveform::Waveform, Level, Time};
-use audio_engine_common::phase_time::PhaseTime;
+use crate::{waveform::Waveform, Level, Time};
+use audio_engine_common::{envelope::Envelope, phase_time::PhaseTime};
 
-pub struct Operator {
+pub struct Operator<E>
+where
+    E: Envelope,
+{
     pub waveform: Waveform,
-    pub envelope: Envelope,
+    pub envelope: E,
     pub rate: f32,
     pub level: Level,
     pub phase: PhaseTime,
 }
 
-impl Default for Operator {
+impl<E> Default for Operator<E>
+where
+    E: Envelope + Default,
+{
     fn default() -> Self {
         Operator {
             waveform: Waveform::Sine,
-            envelope: Envelope::default(),
+            envelope: E::default(),
             rate: 1.0,
             level: 0.0,
             phase: PhaseTime::default(),
@@ -21,7 +27,10 @@ impl Default for Operator {
     }
 }
 
-impl Operator {
+impl<E> Operator<E>
+where
+    E: Envelope,
+{
     pub fn modulate(
         &self,
         note_time: Time,
@@ -46,11 +55,14 @@ impl Operator {
     }
 }
 
-pub struct Operators {
-    pub a: Operator,
-    pub b: Operator,
-    pub c: Operator,
-    pub d: Operator,
+pub struct Operators<E>
+where
+    E: Envelope,
+{
+    pub a: Operator<E>,
+    pub b: Operator<E>,
+    pub c: Operator<E>,
+    pub d: Operator<E>,
 }
 
 #[derive(Default)]
