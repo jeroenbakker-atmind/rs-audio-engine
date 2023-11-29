@@ -1,4 +1,4 @@
-use audio_engine_common::phase_time::PhaseTime;
+use crate::phase_time::PhaseTime;
 
 pub enum Waveform {
     Sine,

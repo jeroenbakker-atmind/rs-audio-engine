@@ -1,12 +1,11 @@
 use audio_engine_common::{
-    envelope::attack_hold_decay_sustain_release::AttackHoldDecaySustainRelease,
-    phase_time::PhaseTime,
+    envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
+    phase_time::PhaseTime, waveform::Waveform,
 };
 use audio_engine_fm::{
     algorithm::Algorithm,
     instrument::{Instrument, InstrumentNoteState},
     operator::{Operator, Operators},
-    waveform::Waveform,
     Time,
 };
 use cpal::{
@@ -27,13 +26,13 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
     let channels = config.channels as usize;
 
     let mut sample_num = 0_u64;
-    let instrument = Instrument::<AttackHoldDecaySustainRelease> {
-        operators: Operators::<AttackHoldDecaySustainRelease> {
+    let instrument = Instrument::<DelayAttackHoldDecaySustainRelease> {
+        operators: Operators::<DelayAttackHoldDecaySustainRelease> {
             a: Operator {
                 waveform: Waveform::Sine,
                 rate: 1.0,
                 level: 1.0,
-                envelope: AttackHoldDecaySustainRelease {
+                envelope: DelayAttackHoldDecaySustainRelease {
                     delay: 0.0,
                     attack: 0.1,
                     hold: 0.0,
@@ -44,16 +43,16 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
                 phase: PhaseTime::default(),
             },
             b: Operator {
-                waveform: Waveform::Sine,
+                waveform: Waveform::Triangle,
                 rate: 2.0,
-                level: 32.0,
-                envelope: AttackHoldDecaySustainRelease::default(),
+                level: 64.0,
+                envelope: DelayAttackHoldDecaySustainRelease::default(),
                 phase: PhaseTime { time: 0.25 },
             },
             c: Operator::default(),
             d: Operator::default(),
         },
-        algorithm: Algorithm::A,
+        algorithm: Algorithm::BModulatesA,
     };
     let mut instrument_state = InstrumentNoteState::default();
     let frequency = 437.0;

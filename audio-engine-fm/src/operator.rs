@@ -1,5 +1,7 @@
-use crate::{waveform::Waveform, Level, Time};
-use audio_engine_common::{envelope::Envelope, phase_time::PhaseTime};
+use crate::Time;
+use audio_engine_common::{
+    envelope::Envelope, level::Level, phase_time::PhaseTime, waveform::Waveform,
+};
 
 pub struct Operator<E>
 where

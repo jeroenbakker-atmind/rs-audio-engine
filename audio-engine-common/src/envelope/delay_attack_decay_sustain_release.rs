@@ -5,7 +5,7 @@ use super::Envelope;
 /// Music Envelope.
 ///
 /// Describes how sound changes over time.
-pub struct AttackDecaySustainRelease {
+pub struct DelayAttackDecaySustainRelease {
     /// Time to delay before the attack starts
     pub delay: NoteTime,
     /// Time to go from 0 to max (1.0)
@@ -18,9 +18,9 @@ pub struct AttackDecaySustainRelease {
     pub release: NoteTime,
 }
 
-impl Default for AttackDecaySustainRelease {
+impl Default for DelayAttackDecaySustainRelease {
     fn default() -> Self {
-        AttackDecaySustainRelease {
+        DelayAttackDecaySustainRelease {
             delay: 0.0,
             attack: 0.0,
             decay: 0.0,
@@ -30,13 +30,17 @@ impl Default for AttackDecaySustainRelease {
     }
 }
 
-impl Envelope for AttackDecaySustainRelease {
+impl Envelope for DelayAttackDecaySustainRelease {
     fn level(&self, note_time: NoteTime, note_off: Option<NoteTime>) -> Level {
         if let Some(note_off) = note_off {
-            let value = self.level(note_off, None);
-            let interp = (note_time - note_off) / self.release;
-            (value * (1.0 - interp)).max(0.0)
-        } else if note_time < self.delay {
+            if note_time < note_off {
+                let value = self.level(note_off, None);
+                let interp = (note_time - note_off) / self.release;
+                return (value * (1.0 - interp)).max(0.0);
+            }
+        }
+
+        if note_time < self.delay {
             0.0
         } else if note_time < self.delay + self.attack {
             (note_time - self.delay) / self.attack
