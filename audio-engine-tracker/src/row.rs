@@ -9,3 +9,15 @@ pub struct Row {
 }
 
 pub type RowID = ID<Row>;
+
+impl Row {
+    pub fn init(&mut self, string: &str) {
+        //"--- -- --"
+
+        //"C#4 01 80"
+        //"--- -- 50" //only chnage level
+        //"REL -- --"
+        //"OFF -- --"
+
+    }
+}

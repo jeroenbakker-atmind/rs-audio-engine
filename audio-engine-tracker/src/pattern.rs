@@ -1,6 +1,9 @@
 use audio_engine_common::id::{GetID, ID};
 
-use crate::row::{Row, RowID};
+use crate::{
+    event::Event,
+    row::{Row, RowID},
+};
 
 #[derive(Copy, Clone)]
 pub struct Pattern {
@@ -23,5 +26,14 @@ impl GetID<Row> for Pattern {
             RowID::Index(index) => Some(&self.rows[index as usize]),
             _ => None,
         }
+    }
+}
+
+impl Pattern {
+    pub fn init(&mut self, strings: &[&str]) {
+        for (string, row) in strings.iter().zip(self.rows.iter_mut()) {
+            row.init(string);
+        }
+        self.rows[strings.len()].event = Some(Event::PatternEnd);
     }
 }
