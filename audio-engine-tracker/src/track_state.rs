@@ -1,4 +1,4 @@
-use audio_engine_common::note_time::NoteTime;
+use audio_engine_common::{level::Level, note_time::NoteTime};
 use audio_engine_sequencer::instrument::InstrumentID;
 
 pub struct TrackState {
@@ -10,6 +10,7 @@ pub struct TrackState {
     pub frequency: f32,
     pub note_on: Option<NoteTime>,
     pub note_off: Option<NoteTime>,
+    pub level: Level,
 }
 
 impl Default for TrackState {
@@ -21,6 +22,7 @@ impl Default for TrackState {
             frequency: 0.0,
             note_on: None,
             note_off: None,
+            level: 0.0,
         }
     }
 }

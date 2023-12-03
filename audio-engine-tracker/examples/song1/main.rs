@@ -59,7 +59,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         .unwrap();
     stream.play().unwrap();
 
-    std::thread::sleep(std::time::Duration::from_millis(10000));
+    std::thread::sleep(std::time::Duration::from_millis(16000));
 
     Ok(())
 }
@@ -72,7 +72,7 @@ fn create_song() -> Song {
             ChromaticNote::new(ChromaticTone::C, 4),
             InstrumentID::from(0),
         )),
-        level: Some(0.7),
+        level: Some(1.0),
     };
     song.patterns[0].rows[4] = Row {
         event: Some(Event::NoteOn(
@@ -86,7 +86,7 @@ fn create_song() -> Song {
             ChromaticNote::new(ChromaticTone::E, 4),
             InstrumentID::from(0),
         )),
-        level: Some(0.7),
+        level: Some(1.0),
     };
     song.patterns[0].rows[12] = Row {
         event: Some(Event::NoteOn(
@@ -100,10 +100,117 @@ fn create_song() -> Song {
         level: None,
     };
 
+    song.patterns[1].rows[0] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::E, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(1.0),
+    };
+    song.patterns[1].rows[4] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::F, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(0.5),
+    };
+    song.patterns[1].rows[8] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::G, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(1.0),
+    };
+    song.patterns[1].rows[16] = Row {
+        event: Some(Event::PatternEnd),
+        level: None,
+    };
+
+    song.patterns[2].rows[0] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::G, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(1.0),
+    };
+    song.patterns[2].rows[2] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::A, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(0.5),
+    };
+    song.patterns[2].rows[4] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::G, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(0.7),
+    };
+    song.patterns[2].rows[6] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::F, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(0.5),
+    };
+    song.patterns[2].rows[8] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::E, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(1.0),
+    };
+    song.patterns[2].rows[12] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::C, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(0.5),
+    };
+    song.patterns[2].rows[16] = Row {
+        event: Some(Event::PatternEnd),
+        level: None,
+    };
+
+    song.patterns[3].rows[0] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::C, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(1.0),
+    };
+    song.patterns[3].rows[4] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::G, 3),
+            InstrumentID::from(0),
+        )),
+        level: Some(0.5),
+    };
+    song.patterns[3].rows[8] = Row {
+        event: Some(Event::NoteOn(
+            ChromaticNote::new(ChromaticTone::C, 4),
+            InstrumentID::from(0),
+        )),
+        level: Some(1.0),
+    };
+    song.patterns[3].rows[16] = Row {
+        event: Some(Event::PatternEnd),
+        level: None,
+    };
+
     song.phrases[0].patterns[0] = PatternID::from(0);
     song.phrases[0].patterns[1] = PatternID::from(0);
+    song.phrases[0].patterns[2] = PatternID::from(1);
+    song.phrases[0].patterns[3] = PatternID::from(1);
+
+    song.phrases[1].patterns[0] = PatternID::from(2);
+    song.phrases[1].patterns[1] = PatternID::from(2);
+    song.phrases[1].patterns[2] = PatternID::from(3);
+    song.phrases[1].patterns[3] = PatternID::from(3);
 
     song.tracks[0].phrases[0] = PhraseID::from(0);
+    song.tracks[0].phrases[1] = PhraseID::from(1);
 
     song.instruments[0] = create_fm_basic_sine_instrument();
 
