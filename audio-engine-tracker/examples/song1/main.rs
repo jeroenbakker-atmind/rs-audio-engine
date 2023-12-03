@@ -27,6 +27,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         frequency: sample_rate,
     };
     let samples = tracker.render();
+    let duration = samples.len() as u64 * 10000 / 44100;
     println!("Finished rendering");
 
     let mut sample_num = 0;
@@ -59,7 +60,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         .unwrap();
     stream.play().unwrap();
 
-    std::thread::sleep(std::time::Duration::from_millis(16000));
+    std::thread::sleep(std::time::Duration::from_millis(duration));
 
     Ok(())
 }
