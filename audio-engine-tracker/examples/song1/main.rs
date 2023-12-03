@@ -13,22 +13,24 @@ fn main() -> Result<(), ()> {
     let device = host.default_output_device().unwrap();
     let config = device.default_output_config().unwrap();
 
-    play_tone(&device, &config.into())
+    let song = create_song();
+
+    play_song(&device, &config.into(), song)
 }
 
-fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), ()> {
+fn play_song(device: &cpal::Device, config: &cpal::StreamConfig, song: Song) -> Result<(), ()> {
     let sample_rate = config.sample_rate.0 as f32;
     let channels = config.channels as usize;
 
-    println!("Start rendering");
     let mut tracker = Tracker {
-        song: create_song(),
+        song,
         song_state: SongState::default(),
         frequency: sample_rate,
     };
+    println!("Start rendering");
     let samples = tracker.render();
-    let duration = samples.len() as u64 * 10000 / 44100;
     println!("Finished rendering");
+    let song_duration = samples.len() as u64 * 1000 / 44100;
 
     let mut sample_num = 0;
 
@@ -60,13 +62,16 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         .unwrap();
     stream.play().unwrap();
 
-    std::thread::sleep(std::time::Duration::from_millis(duration));
+    std::thread::sleep(std::time::Duration::from_millis(song_duration));
 
     Ok(())
 }
 
 fn create_song() -> Song {
-    let mut song = Song::default();
+    let mut song = Song {
+        speed: 136.0,
+        ..Song::default()
+    };
 
     song.patterns[0].rows[0] = Row {
         event: Some(Event::NoteOn(

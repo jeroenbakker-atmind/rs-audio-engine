@@ -22,7 +22,6 @@ impl Tracker {
             result.push(sample);
             song_time += 1.0 / self.frequency;
         }
-        println!("Song duration: {}", song_time);
 
         result
     }
