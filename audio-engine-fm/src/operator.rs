@@ -3,6 +3,7 @@ use audio_engine_common::{
     envelope::Envelope, level::Level, phase_time::PhaseTime, waveform::Waveform,
 };
 
+#[derive(Clone)]
 pub struct Operator<E>
 where
     E: Envelope,
@@ -57,6 +58,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct Operators<E>
 where
     E: Envelope,
@@ -67,9 +69,32 @@ where
     pub d: Operator<E>,
 }
 
+impl<E> Copy for Operator<E> where E: Envelope + Copy {}
+impl<E> Copy for Operators<E> where E: Envelope + Copy {}
+
+impl<E> Default for Operators<E>
+where
+    E: Envelope + Default,
+{
+    fn default() -> Self {
+        Operators {
+            a: Operator::<E>::default(),
+            b: Operator::<E>::default(),
+            c: Operator::<E>::default(),
+            d: Operator::<E>::default(),
+        }
+    }
+}
+
 #[derive(Default)]
 pub struct OperatorNoteState {
     pub phase_time: PhaseTime,
+}
+
+impl OperatorNoteState {
+    pub fn reset(&mut self) {
+        self.phase_time = PhaseTime::default();
+    }
 }
 
 #[derive(Default)]
@@ -78,4 +103,13 @@ pub struct OperatorsNoteState {
     pub b: OperatorNoteState,
     pub c: OperatorNoteState,
     pub d: OperatorNoteState,
+}
+
+impl OperatorsNoteState {
+    pub fn reset(&mut self) {
+        self.a.reset();
+        self.b.reset();
+        self.c.reset();
+        self.d.reset();
+    }
 }

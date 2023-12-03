@@ -1,7 +1,7 @@
 //! Music notes is a rust library for using musical notes on a data-level.
-//! 
+//!
 //! ## History
-//! 
+//!
 
 mod chromatic;
 mod note;

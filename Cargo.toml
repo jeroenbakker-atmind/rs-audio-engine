@@ -3,9 +3,14 @@
 members = [
     "audio-engine-common",
     "audio-engine-notes",
-    "audio-engine-sequencer",
 
     "audio-engine-fm",
+    "audio-engine-sample",
+    "audio-engine-instruments",
+
+    "audio-engine-sequencer",
+    "audio-engine-tracker",
+    "audio-engine-player",
 ]
 
 resolver = "2"

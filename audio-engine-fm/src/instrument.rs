@@ -5,9 +5,10 @@ use crate::{
     operator::{Operators, OperatorsNoteState},
 };
 
+#[derive(Copy, Clone)]
 pub struct Instrument<E>
 where
-    E: Envelope,
+    E: Envelope + Copy + Clone,
 {
     pub operators: Operators<E>,
     pub algorithm: Algorithm,
@@ -15,7 +16,7 @@ where
 
 impl<E> Instrument<E>
 where
-    E: Envelope,
+    E: Envelope + Copy,
 {
     pub fn sample(
         &self,
@@ -37,4 +38,10 @@ where
 #[derive(Default)]
 pub struct InstrumentNoteState {
     pub operators: OperatorsNoteState,
+}
+
+impl InstrumentNoteState {
+    pub fn reset(&mut self) {
+        self.operators.reset();
+    }
 }

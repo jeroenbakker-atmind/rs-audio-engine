@@ -62,3 +62,22 @@ impl From<ChromaticTone> for u8 {
         }
     }
 }
+
+impl ChromaticTone {
+    pub fn frequency(&self) -> f32 {
+        match self {
+            ChromaticTone::C => 261.63,
+            ChromaticTone::CSharp => 277.18,
+            ChromaticTone::D => 293.66,
+            ChromaticTone::DSharp => 311.13,
+            ChromaticTone::E => 329.63,
+            ChromaticTone::F => 349.23,
+            ChromaticTone::FSharp => 369.99,
+            ChromaticTone::G => 392.00,
+            ChromaticTone::GSharp => 415.30,
+            ChromaticTone::A => 440.00,
+            ChromaticTone::ASharp => 466.16,
+            ChromaticTone::B => 493.88,
+        }
+    }
+}

@@ -1,6 +1,8 @@
 use crate::phase_time::PhaseTime;
 
+#[derive(Default, Copy, Clone)]
 pub enum Waveform {
+    #[default]
     Sine,
     Triangle,
     Square,

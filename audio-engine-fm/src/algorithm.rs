@@ -5,8 +5,10 @@ use crate::{
     Time,
 };
 
+#[derive(Default, Copy, Clone)]
 pub enum Algorithm {
     /// Output carrier
+    #[default]
     A,
 
     /// Output carriers A and B

@@ -1,5 +1,5 @@
 [package]
-name = "audio-engine-fm"
+name = "audio-engine-sample"
 version = "0.1.0"
 edition = "2021"
 

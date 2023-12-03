@@ -49,8 +49,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
                 envelope: DelayAttackHoldDecaySustainRelease::default(),
                 phase: PhaseTime { time: 0.25 },
             },
-            c: Operator::default(),
-            d: Operator::default(),
+            ..Operators::default()
         },
         algorithm: Algorithm::BModulatesA,
     };

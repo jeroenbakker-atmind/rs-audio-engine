@@ -7,3 +7,23 @@ impl Default for ChromaticNote {
         ChromaticNote::new(ChromaticTone::C, 4)
     }
 }
+
+impl ChromaticNote {
+    pub fn multiplier(&self) -> f32 {
+        match self.octave {
+            0 => 1.0 / 16.0,
+            1 => 1.0 / 8.0,
+            2 => 1.0 / 4.0,
+            3 => 1.0 / 2.0,
+            4 => 1.0,
+            5 => 2.0,
+            6 => 4.0,
+            7 => 8.0,
+            8 => 16.0,
+            _ => 1.0,
+        }
+    }
+    pub fn frequency(&self) -> f32 {
+        self.tone.frequency() * self.multiplier()
+    }
+}
