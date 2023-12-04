@@ -16,3 +16,4 @@ audio-engine-notes = {path="../audio-engine-notes"}
 audio-engine-instruments = {path="../audio-engine-instruments"}
 
 cpal = "*"
+hex = "*"

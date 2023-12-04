@@ -1,9 +1,6 @@
 use audio_engine_instruments::fm::basic::sine::create_fm_basic_sine_instrument;
-use audio_engine_notes::{ChromaticNote, ChromaticTone};
-use audio_engine_sequencer::instrument::InstrumentID;
 use audio_engine_tracker::{
-    event::Event, pattern::PatternID, phrase::PhraseID, row::Row, song::Song,
-    song_state::SongState, tracker::Tracker,
+    pattern::PatternID, phrase::PhraseID, song::Song, song_state::SongState, tracker::Tracker,
 };
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -72,138 +69,80 @@ fn create_song() -> Song {
         speed: 136.0,
         ..Song::default()
     };
+    song.patterns[0].init(&[
+        "C 4 00 FF",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "D 4 00 80",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "E 4 00 FF",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "C 4 00 80",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+    ]);
+    song.patterns[1].init(&[
+        "E 4 00 FF",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "F 4 00 80",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "G 4 00 FF",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+    ]);
 
-    song.patterns[0].rows[0] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::C, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(1.0),
-    };
-    song.patterns[0].rows[4] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::D, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(0.5),
-    };
-    song.patterns[0].rows[8] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::E, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(1.0),
-    };
-    song.patterns[0].rows[12] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::C, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(0.5),
-    };
-    song.patterns[0].rows[16] = Row {
-        event: Some(Event::PatternEnd),
-        level: None,
-    };
+    song.patterns[2].init(&[
+        "G 4 00 FF",
+        "--- -- --",
+        "A 4 00 80",
+        "--- -- --",
+        "G 4 00 80",
+        "--- -- --",
+        "F 4 00 80",
+        "--- -- --",
+        "E 4 00 FF",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "C 4 00 FF",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+    ]);
 
-    song.patterns[1].rows[0] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::E, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(1.0),
-    };
-    song.patterns[1].rows[4] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::F, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(0.5),
-    };
-    song.patterns[1].rows[8] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::G, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(1.0),
-    };
-    song.patterns[1].rows[16] = Row {
-        event: Some(Event::PatternEnd),
-        level: None,
-    };
-
-    song.patterns[2].rows[0] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::G, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(1.0),
-    };
-    song.patterns[2].rows[2] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::A, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(0.5),
-    };
-    song.patterns[2].rows[4] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::G, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(0.7),
-    };
-    song.patterns[2].rows[6] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::F, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(0.5),
-    };
-    song.patterns[2].rows[8] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::E, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(1.0),
-    };
-    song.patterns[2].rows[12] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::C, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(0.5),
-    };
-    song.patterns[2].rows[16] = Row {
-        event: Some(Event::PatternEnd),
-        level: None,
-    };
-
-    song.patterns[3].rows[0] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::C, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(1.0),
-    };
-    song.patterns[3].rows[4] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::G, 3),
-            InstrumentID::from(0),
-        )),
-        level: Some(0.5),
-    };
-    song.patterns[3].rows[8] = Row {
-        event: Some(Event::NoteOn(
-            ChromaticNote::new(ChromaticTone::C, 4),
-            InstrumentID::from(0),
-        )),
-        level: Some(1.0),
-    };
-    song.patterns[3].rows[16] = Row {
-        event: Some(Event::PatternEnd),
-        level: None,
-    };
+    song.patterns[3].init(&[
+        "C 4 00 FF",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "G 3 00 80",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "C 4 00 FF",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+    ]);
 
     song.phrases[0].patterns[0] = PatternID::from(0);
     song.phrases[0].patterns[1] = PatternID::from(0);
