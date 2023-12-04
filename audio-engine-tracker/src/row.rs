@@ -61,19 +61,12 @@ impl Row {
                 } else {
                     panic!();
                 };
-                let octave = 4;
+                let octave = note_str[2..3].parse::<u8>().unwrap();
                 self.event = Some(Event::NoteOn(
                     ChromaticNote::new(tone, octave),
                     instrument_id,
                 ));
             }
         }
-
-        //"--- -- --"
-
-        //"C#4 01 80"
-        //"--- -- 50" //only chnage level
-        //"REL -- --"
-        //"OFF -- --"
     }
 }
