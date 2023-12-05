@@ -1,6 +1,7 @@
 use audio_engine_common::{level::Level, note_time::NoteTime};
 use audio_engine_sequencer::instrument::InstrumentID;
 
+#[derive(Copy, Clone)]
 pub struct TrackState {
     /// Row index calculated from the speed from the start of the playback.
     pub global_row_index: u32,

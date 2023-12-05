@@ -36,4 +36,15 @@ impl Pattern {
         }
         self.rows[strings.len()].event = Some(Event::PatternEnd);
     }
+
+    pub fn count_rows(&self) -> u32 {
+        let mut row_count = 0;
+        for row in &self.rows {
+            if let Some(Event::PatternEnd) = row.event {
+                return row_count;
+            }
+            row_count += 1;
+        }
+        row_count
+    }
 }

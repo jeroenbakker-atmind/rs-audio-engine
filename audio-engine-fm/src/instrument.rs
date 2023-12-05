@@ -35,7 +35,7 @@ where
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub struct InstrumentNoteState {
     pub operators: OperatorsNoteState,
 }

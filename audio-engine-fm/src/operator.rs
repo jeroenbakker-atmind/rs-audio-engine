@@ -86,7 +86,7 @@ where
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub struct OperatorNoteState {
     pub phase_time: PhaseTime,
 }
@@ -97,7 +97,7 @@ impl OperatorNoteState {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub struct OperatorsNoteState {
     pub a: OperatorNoteState,
     pub b: OperatorNoteState,
