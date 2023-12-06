@@ -8,8 +8,8 @@ pub enum Waveform {
     Square,
     /// A saw waveform
     ///
-    /// Saw(false): increasing slope
-    /// Saw(true): decreasing slope
+    /// Saw(false): ramp up/increasing slope
+    /// Saw(true): ramp down/decreasing slope
     Saw(bool),
     Pulse(f32),
 }
@@ -41,10 +41,12 @@ impl Waveform {
                 }
             }
             Waveform::Saw(inverse) => {
+                let sample = phase_time.time * 2.0 - 1.0;
+
                 if *inverse {
-                    1.0 - (phase_time.time) * 2.0 - 1.0
+                    1.0 - sample
                 } else {
-                    phase_time.time * 2.0 - 1.0
+                    sample
                 }
             }
         }
