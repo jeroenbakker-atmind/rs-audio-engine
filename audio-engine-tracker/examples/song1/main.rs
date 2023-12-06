@@ -1,4 +1,4 @@
-use audio_engine_instruments::fm::basic::saw_ramp_up::create_fm_basic_saw_ramp_up_instrument;
+use audio_engine_instruments::InstrumentLibrary;
 use audio_engine_tracker::{song::Song, song_state::SongState, tracker::Tracker};
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -168,7 +168,7 @@ fn create_song() -> Song {
     song.tracks[0x00].init(&["00", "01"]);
     song.tracks[0x01].init(&["FE", "00", "01"]);
 
-    song.instruments[0] = create_fm_basic_saw_ramp_up_instrument();
+    song.instruments[0] = InstrumentLibrary::FmBasicWaveformSawRampUp.create();
 
     song
 }
