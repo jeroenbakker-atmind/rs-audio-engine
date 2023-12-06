@@ -4,7 +4,7 @@ use audio_engine_common::{
 };
 use audio_engine_fm::instrument::{Instrument as FMInstrument, InstrumentNoteState};
 
-#[derive(Default, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub enum Instrument {
     #[default]
     None,

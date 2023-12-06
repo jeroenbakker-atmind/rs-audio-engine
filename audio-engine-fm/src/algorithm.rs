@@ -5,7 +5,7 @@ use crate::{
     Time,
 };
 
-#[derive(Default, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub enum Algorithm {
     /// Output carrier
     #[default]

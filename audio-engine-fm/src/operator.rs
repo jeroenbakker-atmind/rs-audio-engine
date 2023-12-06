@@ -3,7 +3,7 @@ use audio_engine_common::{
     envelope::Envelope, level::Level, phase_time::PhaseTime, waveform::Waveform,
 };
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Operator<E>
 where
     E: Envelope,
@@ -58,7 +58,7 @@ where
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Operators<E>
 where
     E: Envelope,

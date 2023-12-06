@@ -5,7 +5,7 @@ use super::Envelope;
 /// Music Envelope.
 ///
 /// Describes how sound changes over time.
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct DelayAttackHoldDecaySustainRelease {
     /// Time to delay before the attack starts
     pub delay: NoteTime,

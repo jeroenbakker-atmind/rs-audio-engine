@@ -17,6 +17,7 @@ impl Tracker {
         let mut result = Vec::default();
 
         let mut song_time = 0.0;
+        self.song_state.init(&self.song);
 
         while let Some(sample) = sample_song(&self.song, &mut self.song_state, song_time) {
             result.push(sample);
@@ -32,7 +33,6 @@ pub fn sample_song(song: &Song, song_state: &mut SongState, song_time: SongTime)
 
     const ROWS_PER_BEAT: f32 = 4.0;
     const SECONDS_PER_MINUTE: f32 = 60.0;
-    song_state.init(song);
 
     let beats_per_second = song.speed / SECONDS_PER_MINUTE;
     let global_row_index = (song_time * beats_per_second * ROWS_PER_BEAT) as u32;
@@ -117,6 +117,9 @@ where
 
 fn apply_row(track_state: &mut TrackState, song_time: SongTime, global_row_index: u32, row: &Row) {
     let is_new_row = assign_if_different(&mut track_state.global_row_index, &global_row_index);
+    // if is_new_row {
+    //     println!("{}", row);
+    // }
     match (row.event, is_new_row) {
         (Some(Event::NoteOn(note, instrument_id)), true) => {
             track_state.note_on = Some(song_time);

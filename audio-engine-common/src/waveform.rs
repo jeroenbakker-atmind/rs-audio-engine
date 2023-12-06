@@ -1,6 +1,6 @@
 use crate::phase_time::PhaseTime;
 
-#[derive(Default, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub enum Waveform {
     #[default]
     Sine,

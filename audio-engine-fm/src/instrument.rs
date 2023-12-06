@@ -5,7 +5,7 @@ use crate::{
     operator::{Operators, OperatorsNoteState},
 };
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Instrument<E>
 where
     E: Envelope + Copy + Clone,

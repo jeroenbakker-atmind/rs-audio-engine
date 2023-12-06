@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign};
 
-#[derive(Default, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct PhaseTime {
     pub time: f32,
 }
