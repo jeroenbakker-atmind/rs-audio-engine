@@ -3,6 +3,6 @@ use audio_engine_sequencer::instrument::Instrument;
 
 use super::create_fm_waveform_instrument;
 
-pub fn create_fm_basic_sine_instrument() -> Instrument {
-    create_fm_waveform_instrument(Waveform::Sine)
+pub fn create_fm_basic_saw_ramp_down_instrument() -> Instrument {
+    create_fm_waveform_instrument(Waveform::Saw(true))
 }
