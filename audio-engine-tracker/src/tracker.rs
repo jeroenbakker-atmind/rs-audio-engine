@@ -117,32 +117,28 @@ where
 
 fn apply_row(track_state: &mut TrackState, song_time: SongTime, global_row_index: u32, row: &Row) {
     let is_new_row = assign_if_different(&mut track_state.global_row_index, &global_row_index);
-    // if is_new_row {
-    //     println!("{}", row);
-    // }
-    match (row.event, is_new_row) {
-        (Some(Event::NoteOn(note, instrument_id)), true) => {
-            track_state.note_on = Some(song_time);
-            track_state.instrument_id = instrument_id;
-            track_state.frequency = note.frequency();
-            track_state.instrument_note_state.reset();
-        }
-        (Some(Event::NoteRelease), true) => {
-            track_state.note_off = Some(song_time);
-        }
-        (Some(Event::NoteOff), true) => {
-            track_state.note_on = None;
-            track_state.note_off = None;
-            track_state.instrument_id = InstrumentID::NotSet;
+    if is_new_row {
+        //     println!("{}", row);
+        match row.event {
+            Some(Event::NoteOn(note, instrument_id)) => {
+                track_state.note_on = Some(song_time);
+                track_state.instrument_id = instrument_id;
+                track_state.frequency = note.frequency();
+                track_state.instrument_note_state.reset();
+            }
+            Some(Event::NoteRelease) => {
+                track_state.note_off = Some(song_time);
+            }
+            Some(Event::NoteOff) => {
+                track_state.note_on = None;
+                track_state.note_off = None;
+                track_state.instrument_id = InstrumentID::NotSet;
+            }
+            Some(Event::Empty) | Some(Event::PatternEnd) | None => {}
         }
 
-        _ => {}
-    }
-
-    match (row.level, is_new_row) {
-        (Some(level), true) => {
+        if let Some(level) = row.level {
             track_state.level = level;
         }
-        _ => {}
     }
 }

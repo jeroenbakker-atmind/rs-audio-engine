@@ -1,7 +1,5 @@
-use audio_engine_instruments::fm::basic::sine::create_fm_basic_sine_instrument;
-use audio_engine_tracker::{
-    pattern::PatternID, phrase::PhraseID, song::Song, song_state::SongState, tracker::Tracker,
-};
+use audio_engine_instruments::fm::basic::saw_ramp_up::create_fm_basic_saw_ramp_up_instrument;
+use audio_engine_tracker::{song::Song, song_state::SongState, tracker::Tracker};
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 
@@ -69,7 +67,7 @@ fn create_song() -> Song {
         speed: 136.0,
         ..Song::default()
     };
-    song.patterns[0].init(&[
+    song.patterns[0x00].init(&[
         "C 4 00 FF",
         "--- -- --",
         "--- -- --",
@@ -87,7 +85,7 @@ fn create_song() -> Song {
         "--- -- --",
         "--- -- --",
     ]);
-    song.patterns[1].init(&[
+    song.patterns[0x01].init(&[
         "E 4 00 FF",
         "--- -- --",
         "--- -- --",
@@ -106,7 +104,7 @@ fn create_song() -> Song {
         "--- -- --",
     ]);
 
-    song.patterns[2].init(&[
+    song.patterns[0x02].init(&[
         "G 4 00 FF",
         "--- -- --",
         "A 4 00 80",
@@ -125,7 +123,7 @@ fn create_song() -> Song {
         "--- -- --",
     ]);
 
-    song.patterns[3].init(&[
+    song.patterns[0x03].init(&[
         "C 4 00 FF",
         "--- -- --",
         "--- -- --",
@@ -144,20 +142,33 @@ fn create_song() -> Song {
         "--- -- --",
     ]);
 
-    song.phrases[0].patterns[0] = PatternID::from(0);
-    song.phrases[0].patterns[1] = PatternID::from(0);
-    song.phrases[0].patterns[2] = PatternID::from(1);
-    song.phrases[0].patterns[3] = PatternID::from(1);
+    song.patterns[0xfe].init(&[
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+        "--- -- --",
+    ]);
 
-    song.phrases[1].patterns[0] = PatternID::from(2);
-    song.phrases[1].patterns[1] = PatternID::from(2);
-    song.phrases[1].patterns[2] = PatternID::from(3);
-    song.phrases[1].patterns[3] = PatternID::from(3);
+    song.phrases[0x00].init(&["00", "00", "01", "01"]);
+    song.phrases[0x01].init(&["02", "02", "03", "03"]);
+    song.phrases[0xFE].init(&["FE", "FE"]);
 
-    song.tracks[0].phrases[0] = PhraseID::from(0);
-    song.tracks[0].phrases[1] = PhraseID::from(1);
+    song.tracks[0x00].init(&["00", "01"]);
+    song.tracks[0x01].init(&["FE", "00", "01"]);
 
-    song.instruments[0] = create_fm_basic_sine_instrument();
+    song.instruments[0] = create_fm_basic_saw_ramp_up_instrument();
 
     song
 }

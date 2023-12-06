@@ -1,4 +1,4 @@
-use std::fmt::{format, Display, Write};
+use std::fmt::{Display, Write};
 
 use audio_engine_common::{id::ID, level::Level};
 use audio_engine_notes::{ChromaticNote, ChromaticTone};

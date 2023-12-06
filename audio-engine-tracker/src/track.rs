@@ -12,3 +12,13 @@ impl Default for Track {
         }
     }
 }
+
+impl Track {
+    pub fn init(&mut self, strings: &[&str]) {
+        for (string, phrase) in strings.iter().zip(self.phrases.iter_mut()) {
+            let pattern_index = hex::decode(string).unwrap()[0];
+            *phrase = PhraseID::from(pattern_index);
+        }
+        self.phrases[strings.len()] = PhraseID::NotSet;
+    }
+}

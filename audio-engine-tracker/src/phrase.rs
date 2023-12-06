@@ -8,3 +8,13 @@ pub struct Phrase {
 }
 
 pub type PhraseID = ID<Phrase>;
+
+impl Phrase {
+    pub fn init(&mut self, strings: &[&str]) {
+        for (string, pattern) in strings.iter().zip(self.patterns.iter_mut()) {
+            let pattern_index = hex::decode(string).unwrap()[0];
+            *pattern = PatternID::from(pattern_index);
+        }
+        self.patterns[strings.len()] = PatternID::NotSet;
+    }
+}
