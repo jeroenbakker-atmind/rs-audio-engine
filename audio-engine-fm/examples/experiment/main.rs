@@ -6,6 +6,7 @@ use audio_engine_fm::{
     algorithm::Algorithm,
     instrument::{Instrument, InstrumentNoteState},
     operator::{Operator, Operators},
+    operator_frequency::{RATED_1, RATED_2},
     Time,
 };
 use cpal::{
@@ -30,7 +31,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         operators: Operators::<DelayAttackHoldDecaySustainRelease> {
             a: Operator {
                 waveform: Waveform::Sine,
-                rate: 1.0,
+                frequency: RATED_1,
                 level: 1.0,
                 envelope: DelayAttackHoldDecaySustainRelease {
                     delay: 0.0,
@@ -44,7 +45,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
             },
             b: Operator {
                 waveform: Waveform::Triangle,
-                rate: 2.0,
+                frequency: RATED_2,
                 level: 64.0,
                 ..Operator::default()
             },

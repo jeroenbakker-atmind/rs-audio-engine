@@ -6,6 +6,7 @@ use audio_engine_fm::{
     algorithm::Algorithm,
     instrument::Instrument as FMInstrument,
     operator::{Operator, Operators},
+    operator_frequency::RATED_1,
 };
 use audio_engine_sequencer::instrument::Instrument;
 
@@ -20,7 +21,7 @@ fn create_fm_waveform_instrument(waveform: Waveform) -> Instrument {
         operators: Operators::<DelayAttackHoldDecaySustainRelease> {
             a: Operator {
                 waveform,
-                rate: 1.0,
+                frequency: RATED_1,
                 level: 1.0,
                 envelope: DelayAttackHoldDecaySustainRelease {
                     delay: 0.0,

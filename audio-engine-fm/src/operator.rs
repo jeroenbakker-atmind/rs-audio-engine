@@ -1,4 +1,7 @@
-use crate::Time;
+use crate::{
+    operator_frequency::{OperatorFrequency, RATED_1},
+    Time,
+};
 use audio_engine_common::{
     envelope::Envelope, level::Level, phase_time::PhaseTime, waveform::Waveform,
 };
@@ -11,7 +14,7 @@ where
     pub enable: bool,
     pub waveform: Waveform,
     pub envelope: E,
-    pub rate: f32,
+    pub frequency: OperatorFrequency,
     pub level: Level,
     pub phase: PhaseTime,
 }
@@ -25,7 +28,7 @@ where
             enable: true,
             waveform: Waveform::Sine,
             envelope: E::default(),
-            rate: 1.0,
+            frequency: RATED_1,
             level: 0.0,
             phase: PhaseTime::default(),
         }
@@ -60,8 +63,11 @@ where
         }
 
         let result = self.waveform.sample(&(state.phase_time + self.phase));
-        self.waveform
-            .advance(&mut state.phase_time, note_pitch, sample_rate);
+        self.waveform.advance(
+            &mut state.phase_time,
+            self.frequency.apply(note_pitch),
+            sample_rate,
+        );
         result * self.envelope.level(note_time, note_off) * self.level
     }
 }
