@@ -168,7 +168,7 @@ fn create_song() -> Song {
     song.tracks[0x00].init(&["00", "01"]);
     song.tracks[0x01].init(&["FE", "00", "01"]);
 
-    song.instruments[0] = InstrumentLibrary::FmBasicWaveformSawRampUp.create();
+    song.instruments[0] = InstrumentLibrary::FmWIP.create();
 
     song
 }
