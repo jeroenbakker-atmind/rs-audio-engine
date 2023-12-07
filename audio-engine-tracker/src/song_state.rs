@@ -1,6 +1,7 @@
 use audio_engine_common::id::GetID;
 
 use crate::{
+    bars_per_beat::BarsPerBeat,
     pattern::PatternID,
     pattern_state::{PatternState, PatternStates},
     phrase::PhraseID,
@@ -13,6 +14,9 @@ pub struct SongState {
     pub tracks: [TrackState; 8],
     pub patterns: PatternStates,
     pub phrases: PhraseStates,
+
+    /// Actual rows per beat
+    pub rows_per_beat: BarsPerBeat,
 }
 
 impl Default for SongState {
@@ -21,6 +25,7 @@ impl Default for SongState {
             tracks: [TrackState::default(); 8],
             patterns: [PatternState::default(); 255],
             phrases: [PhraseState::default(); 255],
+            rows_per_beat: 4.0,
         }
     }
 }
@@ -46,6 +51,8 @@ impl SongState {
             }
             state.row_len = row_len;
         }
+
+        self.rows_per_beat = song.initial_speed;
     }
 
     pub fn get_phrase_row_len(&self, phrase_id: PhraseID) -> u32 {

@@ -9,6 +9,8 @@ use crate::{
 pub struct Tracker {
     pub song: Song,
     pub song_state: SongState,
+
+    /// Output sample rate/frequency in hz (44100.0)
     pub frequency: f32,
 }
 
@@ -31,18 +33,17 @@ impl Tracker {
 pub fn sample_song(song: &Song, song_state: &mut SongState, song_time: SongTime) -> Option<f32> {
     let mut result = None;
 
-    const ROWS_PER_BEAT: f32 = 4.0;
     const SECONDS_PER_MINUTE: f32 = 60.0;
 
     let beats_per_second = song.speed / SECONDS_PER_MINUTE;
-    let global_row_index = (song_time * beats_per_second * ROWS_PER_BEAT) as u32;
+    let global_row_index = (song_time * beats_per_second * song_state.rows_per_beat) as u32;
 
     for track_id in 0..8 {
         let track = &song.tracks[track_id];
         if let Some(row) = calc_track_position(song_state, song, track, global_row_index) {
             let track_state = &mut song_state.tracks[track_id];
             apply_row(track_state, song_time, global_row_index, row);
-            let track_result = sample_track(song, track_state, song_time);
+            let track_result = sample_track(song, track, track_state, song_time);
             match (result, track_result) {
                 (_, None) => {}
                 (None, Some(sample)) => result = Some(sample),
@@ -56,7 +57,12 @@ pub fn sample_song(song: &Song, song_state: &mut SongState, song_time: SongTime)
     result
 }
 
-pub fn sample_track(song: &Song, track_state: &mut TrackState, song_time: SongTime) -> Option<f32> {
+pub fn sample_track(
+    song: &Song,
+    track: &Track,
+    track_state: &mut TrackState,
+    song_time: SongTime,
+) -> Option<f32> {
     if let Some(instrument) = song.get(track_state.instrument_id) {
         let note_time = song_time - track_state.note_on.unwrap();
         let note_off = track_state.note_off.map(|note_off| song_time - note_off);
@@ -66,7 +72,7 @@ pub fn sample_track(song: &Song, track_state: &mut TrackState, song_time: SongTi
             track_state.frequency,
             &mut track_state.instrument_note_state,
         );
-        Some(instrument_sample * track_state.level)
+        Some(instrument_sample * track.level * track_state.level)
     } else {
         Some(0.0)
     }

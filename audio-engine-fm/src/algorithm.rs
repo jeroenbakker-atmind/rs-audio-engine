@@ -72,7 +72,7 @@ impl Algorithm {
                     operators
                         .c
                         .sample(note_time, note_off, d_result, &mut operator_states.c);
-                a_result + b_result + c_result
+                (a_result + b_result + c_result) / 3.0
             }
         }
     }

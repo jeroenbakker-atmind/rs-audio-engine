@@ -167,6 +167,8 @@ fn create_song() -> Song {
 
     song.tracks[0x00].init(&["00", "01"]);
     song.tracks[0x01].init(&["FE", "00", "01"]);
+    song.tracks[0x00].level = 0.6;
+    song.tracks[0x01].level = 0.4;
 
     song.instruments[0] = InstrumentLibrary::FmWIP.create();
 

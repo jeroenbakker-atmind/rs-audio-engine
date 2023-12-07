@@ -1,3 +1,4 @@
+pub mod bars_per_beat;
 pub mod event;
 pub mod pattern;
 pub mod pattern_state;

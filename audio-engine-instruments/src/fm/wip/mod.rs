@@ -57,7 +57,7 @@ pub fn create_fm_wip_instrument() -> Instrument {
             d: Operator {
                 waveform: Waveform::Sine,
                 rate: 1.0,
-                level: 1.0,
+                level: 128.0,
                 envelope: DelayAttackHoldDecaySustainRelease {
                     delay: 0.0,
                     attack: 0.0,

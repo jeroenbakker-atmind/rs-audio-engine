@@ -1,13 +1,17 @@
+use audio_engine_common::level::Level;
+
 use crate::phrase::PhraseID;
 
 #[derive(Copy, Clone)]
 pub struct Track {
+    pub level: Level,
     pub phrases: [PhraseID; 255],
 }
 
 impl Default for Track {
     fn default() -> Self {
         Self {
+            level: 1.0,
             phrases: [PhraseID::default(); 255],
         }
     }
