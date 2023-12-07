@@ -59,7 +59,13 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
     let mut next_value = move || {
         sample_num += 1;
         let sample_time = sample_num as Time / sample_rate;
-        instrument.sample(sample_time, None, frequency, &mut instrument_state)
+        instrument.sample(
+            sample_time,
+            None,
+            frequency,
+            sample_rate,
+            &mut instrument_state,
+        )
     };
 
     let err_fn = |err| eprintln!("an error occurred on stream: {}", err);
