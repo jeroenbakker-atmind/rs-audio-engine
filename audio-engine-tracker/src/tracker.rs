@@ -11,7 +11,7 @@ pub struct Tracker {
     pub song_state: SongState,
 
     /// Output sample rate/frequency in hz (44100.0)
-    pub frequency: f32,
+    pub sample_rate: f32,
 }
 
 impl Tracker {
@@ -21,16 +21,26 @@ impl Tracker {
         let mut song_time = 0.0;
         self.song_state.init(&self.song);
 
-        while let Some(sample) = sample_song(&self.song, &mut self.song_state, song_time) {
+        while let Some(sample) = sample_song(
+            &self.song,
+            &mut self.song_state,
+            song_time,
+            self.sample_rate,
+        ) {
             result.push(sample);
-            song_time += 1.0 / self.frequency;
+            song_time += 1.0 / self.sample_rate;
         }
 
         result
     }
 }
 
-pub fn sample_song(song: &Song, song_state: &mut SongState, song_time: SongTime) -> Option<f32> {
+pub fn sample_song(
+    song: &Song,
+    song_state: &mut SongState,
+    song_time: SongTime,
+    sample_rate: f32,
+) -> Option<f32> {
     let mut result = None;
 
     const SECONDS_PER_MINUTE: f32 = 60.0;
@@ -43,7 +53,7 @@ pub fn sample_song(song: &Song, song_state: &mut SongState, song_time: SongTime)
         if let Some(row) = calc_track_position(song_state, song, track, global_row_index) {
             let track_state = &mut song_state.tracks[track_id];
             apply_row(track_state, song_time, global_row_index, row);
-            let track_result = sample_track(song, track, track_state, song_time);
+            let track_result = sample_track(song, track, track_state, song_time, sample_rate);
             match (result, track_result) {
                 (_, None) => {}
                 (None, Some(sample)) => result = Some(sample),
@@ -62,6 +72,7 @@ pub fn sample_track(
     track: &Track,
     track_state: &mut TrackState,
     song_time: SongTime,
+    sample_rate: f32,
 ) -> Option<f32> {
     if let Some(instrument) = song.get(track_state.instrument_id) {
         let note_time = song_time - track_state.note_on.unwrap();
@@ -70,6 +81,7 @@ pub fn sample_track(
             note_time,
             note_off,
             track_state.frequency,
+            sample_rate,
             &mut track_state.instrument_note_state,
         );
         Some(instrument_sample * track.level * track_state.level)

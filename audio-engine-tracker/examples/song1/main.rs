@@ -20,12 +20,12 @@ fn play_song(device: &cpal::Device, config: &cpal::StreamConfig, song: Song) -> 
     let mut tracker = Tracker {
         song,
         song_state: SongState::default(),
-        frequency: sample_rate,
+        sample_rate,
     };
     println!("Start rendering");
     let samples = tracker.render();
     println!("Finished rendering");
-    let song_duration = samples.len() as u64 * 1000 / 44100;
+    let song_duration = samples.len() as u64 * 1000 / sample_rate as u64;
 
     let mut sample_num = 0;
 

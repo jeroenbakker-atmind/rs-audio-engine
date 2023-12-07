@@ -27,6 +27,7 @@ impl Algorithm {
         note_time: Time,
         note_off: Option<Time>,
         frequency: f32,
+        sample_rate: f32,
         operators: &Operators<E>,
         operator_states: &mut OperatorsNoteState,
     ) -> f32
@@ -34,44 +35,70 @@ impl Algorithm {
         E: Envelope,
     {
         match self {
-            Algorithm::A => {
-                operators
-                    .a
-                    .sample(note_time, note_off, frequency, &mut operator_states.a)
-            }
+            Algorithm::A => operators.a.sample(
+                note_time,
+                note_off,
+                frequency,
+                sample_rate,
+                &mut operator_states.a,
+            ),
             Algorithm::AB => {
-                operators
-                    .a
-                    .sample(note_time, note_off, frequency, &mut operator_states.a)
-                    + operators
-                        .b
-                        .sample(note_time, note_off, frequency, &mut operator_states.b)
+                operators.a.sample(
+                    note_time,
+                    note_off,
+                    frequency,
+                    sample_rate,
+                    &mut operator_states.a,
+                ) + operators.b.sample(
+                    note_time,
+                    note_off,
+                    frequency,
+                    sample_rate,
+                    &mut operator_states.b,
+                )
             }
             Algorithm::BModulatesA => operators.a.sample(
                 note_time,
                 note_off,
-                operators
-                    .b
-                    .modulate(note_time, note_off, frequency, &mut operator_states.b),
+                operators.b.modulate(
+                    note_time,
+                    note_off,
+                    frequency,
+                    sample_rate,
+                    &mut operator_states.b,
+                ),
+                sample_rate,
                 &mut operator_states.a,
             ),
             Algorithm::DModulatesABC => {
-                let d_result =
-                    operators
-                        .d
-                        .modulate(note_time, note_off, frequency, &mut operator_states.d);
-                let a_result =
-                    operators
-                        .a
-                        .sample(note_time, note_off, d_result, &mut operator_states.a);
-                let b_result =
-                    operators
-                        .b
-                        .sample(note_time, note_off, d_result, &mut operator_states.b);
-                let c_result =
-                    operators
-                        .c
-                        .sample(note_time, note_off, d_result, &mut operator_states.c);
+                let d_result = operators.d.modulate(
+                    note_time,
+                    note_off,
+                    frequency,
+                    sample_rate,
+                    &mut operator_states.d,
+                );
+                let a_result = operators.a.sample(
+                    note_time,
+                    note_off,
+                    d_result,
+                    sample_rate,
+                    &mut operator_states.a,
+                );
+                let b_result = operators.b.sample(
+                    note_time,
+                    note_off,
+                    d_result,
+                    sample_rate,
+                    &mut operator_states.b,
+                );
+                let c_result = operators.c.sample(
+                    note_time,
+                    note_off,
+                    d_result,
+                    sample_rate,
+                    &mut operator_states.c,
+                );
                 (a_result + b_result + c_result) / 3.0
             }
         }
