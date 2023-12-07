@@ -1,6 +1,6 @@
 use audio_engine_common::{
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
-    phase_time::PhaseTime, waveform::Waveform,
+    waveform::Waveform,
 };
 use audio_engine_fm::{
     algorithm::Algorithm,
@@ -40,14 +40,13 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
                     sustain: 0.7,
                     release: 1.0,
                 },
-                phase: PhaseTime::default(),
+                ..Operator::default()
             },
             b: Operator {
                 waveform: Waveform::Triangle,
                 rate: 2.0,
                 level: 64.0,
-                envelope: DelayAttackHoldDecaySustainRelease::default(),
-                phase: PhaseTime { time: 0.25 },
+                ..Operator::default()
             },
             ..Operators::default()
         },

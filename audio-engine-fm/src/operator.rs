@@ -8,6 +8,7 @@ pub struct Operator<E>
 where
     E: Envelope,
 {
+    pub enable: bool,
     pub waveform: Waveform,
     pub envelope: E,
     pub rate: f32,
@@ -21,6 +22,7 @@ where
 {
     fn default() -> Self {
         Operator {
+            enable: true,
             waveform: Waveform::Sine,
             envelope: E::default(),
             rate: 1.0,
@@ -53,6 +55,10 @@ where
         sample_rate: f32,
         state: &mut OperatorNoteState,
     ) -> f32 {
+        if !self.enable {
+            return 0.0;
+        }
+
         let result = self.waveform.sample(&(state.phase_time + self.phase));
         self.waveform
             .advance(&mut state.phase_time, frequency, sample_rate);

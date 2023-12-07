@@ -1,6 +1,6 @@
 use audio_engine_common::{
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
-    phase_time::PhaseTime, waveform::Waveform,
+    waveform::Waveform,
 };
 use audio_engine_fm::{
     algorithm::Algorithm,
@@ -30,7 +30,7 @@ fn create_fm_waveform_instrument(waveform: Waveform) -> Instrument {
                     sustain: 0.7,
                     release: 1.0,
                 },
-                phase: PhaseTime::default(),
+                ..Operator::default()
             },
             ..Operators::default()
         },
