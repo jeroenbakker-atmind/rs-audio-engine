@@ -3,7 +3,7 @@ use audio_engine_fm::{
     algorithm::Algorithm,
     instrument::Instrument as FMInstrument,
     operator::{Operator, Operators},
-    operator_frequency::{RATED_1, RATED_12, RATED_2, RATED_4},
+    operator_frequency::{RATED_1, RATED_2, RATED_4, RATED_8},
 };
 use audio_engine_sequencer::instrument::Instrument;
 
@@ -21,7 +21,7 @@ pub fn create_fm_wip_instrument() -> Instrument {
                 ..Operator::default()
             },
             c: Operator {
-                frequency: RATED_12,
+                frequency: RATED_8,
                 level: 1.0,
                 ..Operator::default()
             },

@@ -1,9 +1,6 @@
-use audio_engine_common::envelope::Envelope;
+use audio_engine_common::{envelope::Envelope, note_time::NoteTime};
 
-use crate::{
-    operator::{Operators, OperatorsNoteState},
-    Time,
-};
+use crate::operator::{Operators, OperatorsNoteState};
 
 #[derive(Debug, Default, Copy, Clone)]
 pub enum Algorithm {
@@ -24,8 +21,8 @@ pub enum Algorithm {
 impl Algorithm {
     pub fn sample<E>(
         &self,
-        note_time: Time,
-        note_off: Option<Time>,
+        note_time: NoteTime,
+        note_off: Option<NoteTime>,
         note_pitch: f32,
         sample_rate: f32,
         operators: &Operators<E>,

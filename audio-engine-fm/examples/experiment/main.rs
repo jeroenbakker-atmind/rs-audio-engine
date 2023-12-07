@@ -7,7 +7,6 @@ use audio_engine_fm::{
     instrument::{Instrument, InstrumentNoteState},
     operator::{Operator, Operators},
     operator_frequency::{RATED_1, RATED_2},
-    Time,
 };
 use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
@@ -58,7 +57,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
 
     let mut next_value = move || {
         sample_num += 1;
-        let sample_time = sample_num as Time / sample_rate;
+        let sample_time = sample_num as f32 / sample_rate;
         instrument.sample(
             sample_time,
             None,

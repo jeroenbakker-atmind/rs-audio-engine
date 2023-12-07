@@ -1,4 +1,4 @@
-use audio_engine_common::envelope::Envelope;
+use audio_engine_common::{envelope::Envelope, note_time::NoteTime};
 
 use crate::{
     algorithm::Algorithm,
@@ -20,8 +20,8 @@ where
 {
     pub fn sample(
         &self,
-        note_time: crate::Time,
-        note_off: Option<crate::Time>,
+        note_time: NoteTime,
+        note_off: Option<NoteTime>,
         note_pitch: f32,
         sample_rate: f32,
         state: &mut InstrumentNoteState,

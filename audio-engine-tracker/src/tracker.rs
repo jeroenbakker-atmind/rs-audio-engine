@@ -83,6 +83,7 @@ pub fn sample_track(
             track_state.note_pitch,
             sample_rate,
             &mut track_state.instrument_note_state,
+            &mut track_state.sample_note_state,
         );
         Some(instrument_sample * track.level * track_state.level)
     } else {
@@ -143,6 +144,7 @@ fn apply_row(track_state: &mut TrackState, song_time: SongTime, global_row_index
                 track_state.instrument_id = instrument_id;
                 track_state.note_pitch = note.pitch();
                 track_state.instrument_note_state.reset();
+                track_state.sample_note_state.reset();
             }
             Some(Event::NoteRelease) => {
                 track_state.note_off = Some(song_time);

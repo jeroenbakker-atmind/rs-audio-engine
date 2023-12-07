@@ -1,9 +1,7 @@
-use crate::{
-    operator_frequency::{OperatorFrequency, RATED_1},
-    Time,
-};
+use crate::operator_frequency::{OperatorFrequency, RATED_1};
 use audio_engine_common::{
-    envelope::Envelope, level::Level, phase_time::PhaseTime, waveform::Waveform,
+    envelope::Envelope, level::Level, note_time::NoteTime, phase_time::PhaseTime,
+    waveform::Waveform,
 };
 
 #[derive(Debug, Clone)]
@@ -41,8 +39,8 @@ where
 {
     pub fn modulate(
         &self,
-        note_time: Time,
-        note_off: Option<Time>,
+        note_time: NoteTime,
+        note_off: Option<NoteTime>,
         note_pitch: f32,
         sample_rate: f32,
         state: &mut OperatorNoteState,
@@ -52,8 +50,8 @@ where
 
     pub fn sample(
         &self,
-        note_time: Time,
-        note_off: Option<Time>,
+        note_time: NoteTime,
+        note_off: Option<NoteTime>,
         note_pitch: f32,
         sample_rate: f32,
         state: &mut OperatorNoteState,
