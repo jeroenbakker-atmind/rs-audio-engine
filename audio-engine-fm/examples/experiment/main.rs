@@ -53,7 +53,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         algorithm: Algorithm::BModulatesA,
     };
     let mut instrument_state = InstrumentNoteState::default();
-    let frequency = 437.0;
+    let note_pitch = 437.0;
 
     let mut next_value = move || {
         sample_num += 1;
@@ -61,7 +61,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         instrument.sample(
             sample_time,
             None,
-            frequency,
+            note_pitch,
             sample_rate,
             &mut instrument_state,
         )

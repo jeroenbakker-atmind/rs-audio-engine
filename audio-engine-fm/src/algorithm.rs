@@ -26,7 +26,7 @@ impl Algorithm {
         &self,
         note_time: Time,
         note_off: Option<Time>,
-        frequency: f32,
+        note_pitch: f32,
         sample_rate: f32,
         operators: &Operators<E>,
         operator_states: &mut OperatorsNoteState,
@@ -38,7 +38,7 @@ impl Algorithm {
             Algorithm::A => operators.a.sample(
                 note_time,
                 note_off,
-                frequency,
+                note_pitch,
                 sample_rate,
                 &mut operator_states.a,
             ),
@@ -46,13 +46,13 @@ impl Algorithm {
                 operators.a.sample(
                     note_time,
                     note_off,
-                    frequency,
+                    note_pitch,
                     sample_rate,
                     &mut operator_states.a,
                 ) + operators.b.sample(
                     note_time,
                     note_off,
-                    frequency,
+                    note_pitch,
                     sample_rate,
                     &mut operator_states.b,
                 )
@@ -63,7 +63,7 @@ impl Algorithm {
                 operators.b.modulate(
                     note_time,
                     note_off,
-                    frequency,
+                    note_pitch,
                     sample_rate,
                     &mut operator_states.b,
                 ),
@@ -74,7 +74,7 @@ impl Algorithm {
                 let d_result = operators.d.modulate(
                     note_time,
                     note_off,
-                    frequency,
+                    note_pitch,
                     sample_rate,
                     &mut operator_states.d,
                 );

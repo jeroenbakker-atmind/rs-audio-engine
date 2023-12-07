@@ -23,7 +23,7 @@ impl ChromaticNote {
             _ => 1.0,
         }
     }
-    pub fn frequency(&self) -> f32 {
-        self.tone.frequency() * self.multiplier()
+    pub fn pitch(&self) -> f32 {
+        self.tone.pitch_octave4() * self.multiplier()
     }
 }

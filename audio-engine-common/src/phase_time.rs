@@ -6,9 +6,9 @@ pub struct PhaseTime {
 }
 
 impl PhaseTime {
-    pub fn delta_phase_time(frequency: f32, sample_rate: f32) -> PhaseTime {
+    pub fn delta_phase_time(note_pitch: f32, sample_rate: f32) -> PhaseTime {
         PhaseTime {
-            time: (frequency / sample_rate).fract(),
+            time: (note_pitch / sample_rate).fract(),
         }
     }
 }

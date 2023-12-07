@@ -10,7 +10,7 @@ pub struct Tracker {
     pub song: Song,
     pub song_state: SongState,
 
-    /// Output sample rate/frequency in hz (44100.0)
+    /// Output sample rate in hz (44100.0)
     pub sample_rate: f32,
 }
 
@@ -80,7 +80,7 @@ pub fn sample_track(
         let instrument_sample = instrument.sample(
             note_time,
             note_off,
-            track_state.frequency,
+            track_state.note_pitch,
             sample_rate,
             &mut track_state.instrument_note_state,
         );
@@ -141,7 +141,7 @@ fn apply_row(track_state: &mut TrackState, song_time: SongTime, global_row_index
             Some(Event::NoteOn(note, instrument_id)) => {
                 track_state.note_on = Some(song_time);
                 track_state.instrument_id = instrument_id;
-                track_state.frequency = note.frequency();
+                track_state.note_pitch = note.pitch();
                 track_state.instrument_note_state.reset();
             }
             Some(Event::NoteRelease) => {

@@ -22,14 +22,14 @@ where
         &self,
         note_time: crate::Time,
         note_off: Option<crate::Time>,
-        frequency: f32,
+        note_pitch: f32,
         sample_rate: f32,
         state: &mut InstrumentNoteState,
     ) -> f32 {
         self.algorithm.sample(
             note_time,
             note_off,
-            frequency,
+            note_pitch,
             sample_rate,
             &self.operators,
             &mut state.operators,

@@ -40,18 +40,18 @@ where
         &self,
         note_time: Time,
         note_off: Option<Time>,
-        frequency: f32,
+        note_pitch: f32,
         sample_rate: f32,
         state: &mut OperatorNoteState,
     ) -> f32 {
-        frequency + self.sample(note_time, note_off, frequency, sample_rate, state)
+        note_pitch + self.sample(note_time, note_off, note_pitch, sample_rate, state)
     }
 
     pub fn sample(
         &self,
         note_time: Time,
         note_off: Option<Time>,
-        frequency: f32,
+        note_pitch: f32,
         sample_rate: f32,
         state: &mut OperatorNoteState,
     ) -> f32 {
@@ -61,7 +61,7 @@ where
 
         let result = self.waveform.sample(&(state.phase_time + self.phase));
         self.waveform
-            .advance(&mut state.phase_time, frequency, sample_rate);
+            .advance(&mut state.phase_time, note_pitch, sample_rate);
         result * self.envelope.level(note_time, note_off) * self.level
     }
 }

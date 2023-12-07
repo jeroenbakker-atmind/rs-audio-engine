@@ -52,7 +52,7 @@ impl Waveform {
         }
     }
 
-    pub fn advance(&self, phase_time: &mut PhaseTime, frequency: f32, sample_rate: f32) {
-        *phase_time += PhaseTime::delta_phase_time(frequency, sample_rate);
+    pub fn advance(&self, phase_time: &mut PhaseTime, note_pitch: f32, sample_rate: f32) {
+        *phase_time += PhaseTime::delta_phase_time(note_pitch, sample_rate);
     }
 }

@@ -8,7 +8,7 @@ pub struct TrackState {
 
     pub instrument_id: InstrumentID,
     pub instrument_note_state: audio_engine_fm::instrument::InstrumentNoteState,
-    pub frequency: f32,
+    pub note_pitch: f32,
     pub note_on: Option<NoteTime>,
     pub note_off: Option<NoteTime>,
     pub level: Level,
@@ -20,7 +20,7 @@ impl Default for TrackState {
             global_row_index: u32::MAX,
             instrument_id: InstrumentID::NotSet,
             instrument_note_state: audio_engine_fm::instrument::InstrumentNoteState::default(),
-            frequency: 0.0,
+            note_pitch: 0.0,
             note_on: None,
             note_off: None,
             level: 0.0,
