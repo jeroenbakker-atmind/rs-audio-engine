@@ -1,7 +1,7 @@
 use audio_engine_common::envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease;
 use audio_engine_fm::{
     algorithm::Algorithm,
-    instrument::Instrument as FMInstrument,
+    instrument::FMInstrument,
     operator::{Operator, Operators},
     operator_frequency::{RATED_1, RATED_2, RATED_4, RATED_8},
 };

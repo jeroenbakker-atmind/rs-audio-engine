@@ -4,7 +4,7 @@ use audio_engine_common::{
 };
 use audio_engine_fm::{
     algorithm::Algorithm,
-    instrument::Instrument as FMInstrument,
+    instrument::FMInstrument,
     operator::{Operator, Operators},
     operator_frequency::RATED_1,
 };

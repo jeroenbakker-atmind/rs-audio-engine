@@ -1,6 +1,7 @@
 use audio_engine_common::{level::Level, note_time::NoteTime};
-use audio_engine_sample::sample_note_state::SampleNoteState;
-use audio_engine_sequencer::instrument::InstrumentID;
+use audio_engine_sequencer::{
+    instrument::InstrumentID, instrument_note_state::InstrumentNoteState,
+};
 
 #[derive(Copy, Clone)]
 pub struct TrackState {
@@ -8,8 +9,7 @@ pub struct TrackState {
     pub global_row_index: u32,
 
     pub instrument_id: InstrumentID,
-    pub instrument_note_state: audio_engine_fm::instrument::InstrumentNoteState,
-    pub sample_note_state: SampleNoteState,
+    pub instrument_note_state: InstrumentNoteState,
     pub note_pitch: f32,
     pub note_on: Option<NoteTime>,
     pub note_off: Option<NoteTime>,
@@ -21,8 +21,7 @@ impl Default for TrackState {
         Self {
             global_row_index: u32::MAX,
             instrument_id: InstrumentID::NotSet,
-            instrument_note_state: audio_engine_fm::instrument::InstrumentNoteState::default(),
-            sample_note_state: SampleNoteState::default(),
+            instrument_note_state: InstrumentNoteState::default(),
             note_pitch: 0.0,
             note_on: None,
             note_off: None,

@@ -4,7 +4,7 @@ use audio_engine_common::{
 };
 use audio_engine_fm::{
     algorithm::Algorithm,
-    instrument::{Instrument, InstrumentNoteState},
+    instrument::{FMInstrument, FMInstrumentNoteState},
     operator::{Operator, Operators},
     operator_frequency::{RATED_1, RATED_2},
 };
@@ -26,7 +26,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
     let channels = config.channels as usize;
 
     let mut sample_num = 0_u64;
-    let instrument = Instrument::<DelayAttackHoldDecaySustainRelease> {
+    let instrument = FMInstrument::<DelayAttackHoldDecaySustainRelease> {
         operators: Operators::<DelayAttackHoldDecaySustainRelease> {
             a: Operator {
                 waveform: Waveform::Sine,
@@ -52,7 +52,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         },
         algorithm: Algorithm::BModulatesA,
     };
-    let mut instrument_state = InstrumentNoteState::default();
+    let mut instrument_state = FMInstrumentNoteState::default();
     let note_pitch = 437.0;
 
     let mut next_value = move || {

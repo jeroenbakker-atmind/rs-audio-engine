@@ -6,7 +6,7 @@ use crate::{
 };
 
 #[derive(Debug, Copy, Clone)]
-pub struct Instrument<E>
+pub struct FMInstrument<E>
 where
     E: Envelope + Copy + Clone,
 {
@@ -14,7 +14,7 @@ where
     pub algorithm: Algorithm,
 }
 
-impl<E> Instrument<E>
+impl<E> FMInstrument<E>
 where
     E: Envelope + Copy,
 {
@@ -24,7 +24,7 @@ where
         note_off: Option<NoteTime>,
         note_pitch: f32,
         sample_rate: f32,
-        state: &mut InstrumentNoteState,
+        state: &mut FMInstrumentNoteState,
     ) -> f32 {
         self.algorithm.sample(
             note_time,
@@ -38,11 +38,11 @@ where
 }
 
 #[derive(Default, Copy, Clone)]
-pub struct InstrumentNoteState {
+pub struct FMInstrumentNoteState {
     pub operators: OperatorsNoteState,
 }
 
-impl InstrumentNoteState {
+impl FMInstrumentNoteState {
     pub fn reset(&mut self) {
         self.operators.reset();
     }
