@@ -1,4 +1,4 @@
-use audio_engine_common::{id::GetID, song_time::SongTime};
+use audio_engine_common::{digital_sound::sound::Sound, id::GetID, song_time::SongTime};
 use audio_engine_sequencer::instrument::InstrumentID;
 
 use crate::{
@@ -18,17 +18,17 @@ impl Tracker {
     pub fn render(&mut self) -> Vec<f32> {
         let mut result = Vec::default();
 
-        let mut song_time = 0.0;
-        self.song_state.init(&self.song);
+        self.song_state = self.song.init_sound_state();
 
+        let mut sample_number = 0;
         while let Some(sample) = sample_song(
             &self.song,
             &mut self.song_state,
-            song_time,
+            sample_number as f32 / self.sample_rate,
             self.sample_rate,
         ) {
             result.push(sample);
-            song_time += 1.0 / self.sample_rate;
+            sample_number += 1;
         }
 
         result
@@ -55,10 +55,9 @@ pub fn sample_song(
             apply_row(song, track_state, song_time, global_row_index, row);
             let track_result = sample_track(song, track, track_state, song_time, sample_rate);
             match (result, track_result) {
-                (_, None) => {}
-                (None, Some(sample)) => result = Some(sample),
-                (Some(a), Some(b)) => {
-                    result = Some(a + b);
+                (None, sample) => result = Some(sample),
+                (Some(a), sample) => {
+                    result = Some(a + sample);
                 }
             }
         }
@@ -73,7 +72,7 @@ pub fn sample_track(
     track_state: &mut TrackState,
     song_time: SongTime,
     sample_rate: f32,
-) -> Option<f32> {
+) -> f32 {
     if let Some(instrument) = song.get(track_state.instrument_id) {
         let note_time = song_time - track_state.note_on.unwrap();
         let note_off = track_state.note_off.map(|note_off| song_time - note_off);
@@ -84,9 +83,9 @@ pub fn sample_track(
             sample_rate,
             &mut track_state.instrument_note_state,
         );
-        Some(instrument_sample * track.level * track_state.level)
+        instrument_sample * track.level * track_state.level
     } else {
-        Some(0.0)
+        0.0
     }
 }
 

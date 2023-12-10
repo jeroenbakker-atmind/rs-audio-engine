@@ -1,10 +1,13 @@
-use audio_engine_common::{beats_per_minute::BeatsPerMinute, id::GetID};
+use audio_engine_common::{
+    beats_per_minute::BeatsPerMinute, digital_sound::sound::Sound, id::GetID,
+};
 use audio_engine_sequencer::instrument::{Instrument, InstrumentID};
 
 use crate::{
     bars_per_beat::BarsPerBeat,
     pattern::{Pattern, PatternID},
     phrase::{Phrase, PhraseID},
+    song_state::SongState,
     track::Track,
 };
 
@@ -56,5 +59,26 @@ impl GetID<Instrument> for Song {
             InstrumentID::Index(index) => Some(&self.instruments[index as usize]),
             _ => None,
         }
+    }
+}
+
+impl Sound for Song {
+    type SoundState = SongState;
+
+    fn init_sound_state(&self) -> Self::SoundState {
+        let mut state = SongState::default();
+        state.init(self);
+        state
+    }
+
+    fn sample(
+            &self,
+            note_time: audio_engine_common::note_time::NoteTime,
+            note_off: Option<audio_engine_common::note_time::NoteTime>,
+            note_pitch: f32,
+            sample_rate: f32,
+            state: &mut Self::SoundState,
+        ) -> f32 {
+        0.0
     }
 }

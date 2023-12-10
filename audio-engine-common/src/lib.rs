@@ -1,4 +1,5 @@
 pub mod beats_per_minute;
+pub mod digital_sound;
 pub mod envelope;
 pub mod id;
 pub mod level;

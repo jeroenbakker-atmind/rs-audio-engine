@@ -1,4 +1,7 @@
-use crate::phase_time::PhaseTime;
+use crate::{
+    digital_sound::{sound::Sound, sound_state::SoundState},
+    phase_time::PhaseTime,
+};
 
 #[derive(Debug, Default, Copy, Clone)]
 pub enum Waveform {
@@ -14,12 +17,28 @@ pub enum Waveform {
     Pulse(f32),
 }
 
-impl Waveform {
-    pub fn sample(&self, phase_time: &PhaseTime) -> f32 {
-        match self {
-            Waveform::Sine => (phase_time.time * std::f32::consts::TAU).sin(),
+pub type WaveformState = PhaseTime;
+impl SoundState for WaveformState {}
+
+impl Sound for Waveform {
+    type SoundState = WaveformState;
+
+    fn init_sound_state(&self) -> Self::SoundState {
+        PhaseTime::default()
+    }
+
+    fn sample(
+        &self,
+        _note_time: crate::note_time::NoteTime,
+        _note_off: Option<crate::note_time::NoteTime>,
+        note_pitch: f32,
+        sample_rate: f32,
+        state: &mut Self::SoundState,
+    ) -> f32 {
+        let result = match self {
+            Waveform::Sine => (state.time * std::f32::consts::TAU).sin(),
             Waveform::Triangle => {
-                let shifted = *phase_time + PhaseTime { time: 0.25 };
+                let shifted = *state + PhaseTime { time: 0.25 };
                 if shifted.time < 0.5 {
                     -1.0 + shifted.time * 4.0
                 } else {
@@ -27,21 +46,21 @@ impl Waveform {
                 }
             }
             Waveform::Square => {
-                if phase_time.time < 0.5 {
+                if state.time < 0.5 {
                     -1.0
                 } else {
                     1.0
                 }
             }
             Waveform::Pulse(factor) => {
-                if phase_time.time < *factor {
+                if state.time < *factor {
                     -1.0
                 } else {
                     1.0
                 }
             }
             Waveform::Saw(inverse) => {
-                let sample = phase_time.time * 2.0 - 1.0;
+                let sample = state.time * 2.0 - 1.0;
 
                 if *inverse {
                     1.0 - sample
@@ -49,10 +68,8 @@ impl Waveform {
                     sample
                 }
             }
-        }
-    }
-
-    pub fn advance(&self, phase_time: &mut PhaseTime, note_pitch: f32, sample_rate: f32) {
-        *phase_time += PhaseTime::delta_phase_time(note_pitch, sample_rate);
+        };
+        *state += PhaseTime::delta_phase_time(note_pitch, sample_rate);
+        result
     }
 }

@@ -1,7 +1,7 @@
 use crate::operator_frequency::{OperatorFrequency, RATED_1};
 use audio_engine_common::{
-    envelope::Envelope, level::Level, note_time::NoteTime, phase_time::PhaseTime,
-    waveform::Waveform,
+    digital_sound::sound::Sound, envelope::Envelope, level::Level, note_time::NoteTime,
+    phase_time::PhaseTime, waveform::Waveform,
 };
 
 #[derive(Debug, Clone)]
@@ -59,12 +59,13 @@ where
         if !self.enable {
             return 0.0;
         }
-
-        let result = self.waveform.sample(&(state.phase_time + self.phase));
-        self.waveform.advance(
-            &mut state.phase_time,
-            self.frequency.apply(note_pitch),
+        // TODO: add phase when initializing the note_state
+        let result = self.waveform.sample(
+            note_time,
+            note_off,
+            note_pitch,
             sample_rate,
+            &mut state.phase_time,
         );
         result * self.envelope.level(note_time, note_off) * self.level
     }

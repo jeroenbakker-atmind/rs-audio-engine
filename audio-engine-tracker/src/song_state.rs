@@ -1,4 +1,4 @@
-use audio_engine_common::id::GetID;
+use audio_engine_common::{digital_sound::sound_state::SoundState, id::GetID};
 
 use crate::{
     bars_per_beat::BarsPerBeat,
@@ -71,3 +71,5 @@ impl SongState {
         }
     }
 }
+
+impl SoundState for SongState {}

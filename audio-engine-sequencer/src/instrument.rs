@@ -1,4 +1,5 @@
 use audio_engine_common::{
+    digital_sound::sound::Sound,
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease, id::ID,
     note_time::NoteTime,
 };
@@ -17,26 +18,35 @@ pub enum Instrument {
 
 pub type InstrumentID = ID<Instrument>;
 
-impl Instrument {
-    pub fn sample(
+impl Sound for Instrument {
+    type SoundState = InstrumentNoteState;
+    fn init_sound_state(&self) -> Self::SoundState {
+        match self {
+            Self::None => InstrumentNoteState::None,
+            Self::FM(fm) => InstrumentNoteState::FM(fm.init_sound_state()),
+            Self::Sample(sample) => InstrumentNoteState::Sample(sample.init_sound_state()),
+        }
+    }
+
+    fn sample(
         &self,
         note_time: NoteTime,
         note_off: Option<NoteTime>,
         note_pitch: f32,
         sample_rate: f32,
-        note_state: &mut InstrumentNoteState,
+        state: &mut Self::SoundState,
     ) -> f32 {
         match self {
             Instrument::FM(instrument) => {
-                if let InstrumentNoteState::FM(note_state) = note_state {
-                    instrument.sample(note_time, note_off, note_pitch, sample_rate, note_state)
+                if let InstrumentNoteState::FM(state) = state {
+                    instrument.sample(note_time, note_off, note_pitch, sample_rate, state)
                 } else {
                     0.0
                 }
             }
             Instrument::Sample(sample) => {
-                if let InstrumentNoteState::Sample(note_state) = note_state {
-                    sample.sample(note_time, note_off, note_pitch, sample_rate, note_state)
+                if let InstrumentNoteState::Sample(state) = state {
+                    sample.sample(note_time, note_off, note_pitch, sample_rate, state)
                 } else {
                     0.0
                 }

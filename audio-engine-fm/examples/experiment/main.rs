@@ -1,4 +1,5 @@
 use audio_engine_common::{
+    digital_sound::sound::Sound,
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
     waveform::Waveform,
 };

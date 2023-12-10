@@ -1,4 +1,8 @@
-use audio_engine_common::{envelope::Envelope, note_time::NoteTime};
+use audio_engine_common::{
+    digital_sound::{sound::Sound, sound_state::SoundState},
+    envelope::Envelope,
+    note_time::NoteTime,
+};
 
 use crate::{
     algorithm::Algorithm,
@@ -14,17 +18,23 @@ where
     pub algorithm: Algorithm,
 }
 
-impl<E> FMInstrument<E>
+impl<E> Sound for FMInstrument<E>
 where
     E: Envelope + Copy,
 {
-    pub fn sample(
+    type SoundState = FMInstrumentNoteState;
+
+    fn init_sound_state(&self) -> Self::SoundState {
+        Self::SoundState::default()
+    }
+
+    fn sample(
         &self,
         note_time: NoteTime,
         note_off: Option<NoteTime>,
         note_pitch: f32,
         sample_rate: f32,
-        state: &mut FMInstrumentNoteState,
+        state: &mut Self::SoundState,
     ) -> f32 {
         self.algorithm.sample(
             note_time,
@@ -42,8 +52,4 @@ pub struct FMInstrumentNoteState {
     pub operators: OperatorsNoteState,
 }
 
-impl FMInstrumentNoteState {
-    pub fn reset(&mut self) {
-        self.operators.reset();
-    }
-}
+impl SoundState for FMInstrumentNoteState {}
