@@ -7,3 +7,4 @@ pub mod note_time;
 pub mod phase_time;
 pub mod song_time;
 pub mod waveform;
+pub mod buffer;
