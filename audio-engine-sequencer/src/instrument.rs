@@ -27,20 +27,20 @@ impl Instrument {
         note_state: &mut InstrumentNoteState,
     ) -> f32 {
         match self {
-            Instrument::FM(instrument) => instrument.sample(
-                note_time,
-                note_off,
-                note_pitch,
-                sample_rate,
-                &mut note_state.fm_note_state,
-            ),
-            Instrument::Sample(sample) => sample.sample(
-                note_time,
-                note_off,
-                note_pitch,
-                sample_rate,
-                &mut note_state.sample_note_state,
-            ),
+            Instrument::FM(instrument) => {
+                if let InstrumentNoteState::FM(note_state) = note_state {
+                    instrument.sample(note_time, note_off, note_pitch, sample_rate, note_state)
+                } else {
+                    0.0
+                }
+            }
+            Instrument::Sample(sample) => {
+                if let InstrumentNoteState::Sample(note_state) = note_state {
+                    sample.sample(note_time, note_off, note_pitch, sample_rate, note_state)
+                } else {
+                    0.0
+                }
+            }
             Instrument::None => 0.0,
         }
     }
