@@ -5,7 +5,11 @@ where
     T: Sized,
 {
     pub data: Vec<T>,
+
+    /// Start of the ring buffer in the data attribute.
     pub start: usize,
+
+    /// End of the ring buffer in the data attribute.
     pub end: usize,
 }
 
@@ -61,8 +65,14 @@ impl<T> RingBuffer<T>
 where
     T: Sized + Default + Copy + AddAssign,
 {
+    pub fn with_capacity(capacity: usize) -> RingBuffer<T> {
+        let mut result = RingBuffer::<T>::default();
+        result.ensure_capacity(capacity);
+        result
+    }
+
     fn reserve(&mut self, capacity: usize) {
-        let mut new_data = Vec::<T>::with_capacity(capacity + 1);
+        let mut new_data = Vec::<T>::with_capacity(capacity);
         let len = self.len();
 
         for i in self.start..self.data.len() {
@@ -73,7 +83,7 @@ where
                 new_data.push(self.data[i]);
             }
         }
-        for _i in 0..=capacity - len {
+        for _i in 0..capacity - len {
             new_data.push(T::default());
         }
 
@@ -82,9 +92,9 @@ where
         self.end = len;
     }
 
-    fn ensure_capacity(&mut self, offset: usize) {
-        if self.capacity() <= offset {
-            self.reserve(offset.max(4))
+    pub fn ensure_capacity(&mut self, offset: usize) {
+        if self.capacity() < offset {
+            self.reserve(offset)
         }
     }
 
@@ -94,7 +104,7 @@ where
 
     /// Push a value into the ring buffer so that the value will be popped
     pub fn push(&mut self, offset: usize, value: T, operation: PushOperation) {
-        self.ensure_capacity(offset);
+        assert!(self.capacity() > offset);
         let offset = self.calc_offset(offset);
 
         operation.perform(value, &mut self.data[offset]);
@@ -132,121 +142,105 @@ mod test {
 
     #[test]
     fn pop_0() {
-        let mut buffer = RingBuffer::<i32>::default();
+        let mut buffer = RingBuffer::<i32>::with_capacity(5);
         assert_eq!(buffer.start, 0);
         assert_eq!(buffer.end, 0);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 0);
 
         buffer.push(0, 1, PushOperation::Add);
         assert_eq!(buffer.start, 0);
         assert_eq!(buffer.end, 1);
         assert_eq!(buffer.len(), 1);
-        assert_eq!(buffer.capacity(), 5);
 
         assert_eq!(buffer.pop(), Some(1));
         assert_eq!(buffer.start, 1);
         assert_eq!(buffer.end, 1);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 5);
 
         assert_eq!(buffer.pop(), None);
         assert_eq!(buffer.start, 1);
         assert_eq!(buffer.end, 1);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 5);
     }
 
     #[test]
     fn pop_0_multiple() {
-        let mut buffer = RingBuffer::<i32>::default();
+        let mut buffer = RingBuffer::<i32>::with_capacity(5);
         assert_eq!(buffer.start, 0);
         assert_eq!(buffer.end, 0);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 0);
 
+        buffer.ensure_capacity(5);
         buffer.push(0, 1, PushOperation::Add);
         assert_eq!(buffer.start, 0);
         assert_eq!(buffer.end, 1);
         assert_eq!(buffer.len(), 1);
-        assert_eq!(buffer.capacity(), 5);
 
         let result = buffer.pop();
         assert_eq!(result, Some(1));
         assert_eq!(buffer.start, 1);
         assert_eq!(buffer.end, 1);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 5);
 
         buffer.push(0, 1, PushOperation::Add);
         assert_eq!(buffer.start, 1);
         assert_eq!(buffer.end, 2);
         assert_eq!(buffer.len(), 1);
-        assert_eq!(buffer.capacity(), 5);
 
         let result = buffer.pop();
         assert_eq!(result, Some(1));
         assert_eq!(buffer.start, 2);
         assert_eq!(buffer.end, 2);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 5);
 
         buffer.push(0, 1, PushOperation::Add);
         assert_eq!(buffer.start, 2);
         assert_eq!(buffer.end, 3);
         assert_eq!(buffer.len(), 1);
-        assert_eq!(buffer.capacity(), 5);
 
         let result = buffer.pop();
         assert_eq!(result, Some(1));
         assert_eq!(buffer.start, 3);
         assert_eq!(buffer.end, 3);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 5);
 
         buffer.push(0, 1, PushOperation::Add);
         assert_eq!(buffer.start, 3);
         assert_eq!(buffer.end, 4);
         assert_eq!(buffer.len(), 1);
-        assert_eq!(buffer.capacity(), 5);
 
         let result = buffer.pop();
         assert_eq!(result, Some(1));
         assert_eq!(buffer.start, 4);
         assert_eq!(buffer.end, 4);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 5);
 
         buffer.push(0, 1, PushOperation::Add);
         assert_eq!(buffer.start, 4);
         assert_eq!(buffer.end, 0);
         assert_eq!(buffer.len(), 1);
-        assert_eq!(buffer.capacity(), 5);
 
         let result = buffer.pop();
         assert_eq!(result, Some(1));
         assert_eq!(buffer.start, 0);
         assert_eq!(buffer.end, 0);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 5);
 
         buffer.push(0, 1, PushOperation::Add);
         assert_eq!(buffer.start, 0);
         assert_eq!(buffer.end, 1);
         assert_eq!(buffer.len(), 1);
-        assert_eq!(buffer.capacity(), 5);
 
         let result = buffer.pop();
         assert_eq!(result, Some(1));
         assert_eq!(buffer.start, 1);
         assert_eq!(buffer.end, 1);
         assert_eq!(buffer.len(), 0);
-        assert_eq!(buffer.capacity(), 5);
     }
 
     #[test]
     fn pop_3() {
-        let mut buffer = RingBuffer::<i32>::default();
+        let mut buffer = RingBuffer::<i32>::with_capacity(5);
         buffer.push(3, 1, PushOperation::Add);
         assert_eq!(buffer.pop(), Some(0));
         assert_eq!(buffer.pop(), Some(0));
@@ -257,7 +251,7 @@ mod test {
 
     #[test]
     fn pop_or_default() {
-        let mut buffer = RingBuffer::<i32>::default();
+        let mut buffer = RingBuffer::<i32>::with_capacity(5);
         buffer.push(3, 1, PushOperation::Add);
         assert_eq!(buffer.pop_or_default(), 0);
         assert_eq!(buffer.pop_or_default(), 0);
