@@ -1,9 +1,5 @@
 use std::{collections::VecDeque, ops::AddAssign};
 
-// Use VecDeque
-
-//pub type RingBuffer<T> = VecDeque<T>;
-
 pub struct RingBuffer<T>
 where
     T: Sized,
@@ -66,7 +62,9 @@ where
 
     /// Push a value into the ring buffer so that the value will be popped
     pub fn push(&mut self, offset: usize, value: T, operation: PushOperation) {
-        unimplemented!("add elements that don't exist");
+        if self.data.len() < offset + 1 {
+            self.data.resize(offset + 1, T::default());
+        }
         operation.perform(value, self.data.get_mut(offset).unwrap());
     }
 
