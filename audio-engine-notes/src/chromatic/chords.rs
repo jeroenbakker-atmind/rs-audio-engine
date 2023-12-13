@@ -46,7 +46,7 @@ impl ChromaticChordType {
     }
 
     /// ```
-    /// use music_notes::*;
+    /// use audio_engine_notes::*;
     /// let notes = ChromaticChordType::Major.notes(ChromaticNote::new(ChromaticTone::C, 4));
     /// assert_eq!(notes, vec![ChromaticNote::new(ChromaticTone::C, 4), ChromaticNote::new(ChromaticTone::E, 4), ChromaticNote::new(ChromaticTone::G, 4)]);
     /// ```

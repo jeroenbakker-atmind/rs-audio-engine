@@ -182,7 +182,46 @@ There is also an instrument library (`audio-engine-instruments`) that collects
 instruments created in a sound library that can be easily loaded into as a
 tracker instrument.
 
-## Effects
+```mermaid
+mindmap
+    root((Instruments))
+        fm
+            basic
+                waveform
+                    Sine
+                    Triangle
+                    Square
+                    Saw ramp up
+                    Saw ramp down
+            wip
+        sample
+```
+
+`instruments.fm.wip` is the instrument that is currently under development
+When the idea is set to can be moved to an actual location in the instrument
+library.
+
+`instruments.sample` is currently unused, but when the sample instrument model if developed
+it will also be populated with some instruments.
+
+Loading an instrument from the library
+
+```rust
+use audio_engine_instruments::InstrumentLibrary;
+let instrument = InstrumentLibrary::FmBasicWaveformSine::create();
+```
+To receive a sample from the instrument use the `Sound` trait
+
+```rust
+use audio_engine_common::digital_sound::Sound;
+let sample_rate = 44100.0;
+let note_pitch = 437.0;
+
+let mut sound_state = instrument.init_sound_state();
+let sample = instrument.sample(0.0f, None, note_pitch, sample_rate, &mut sound_state);
+```
+
+## Effects (short term development)
 
 Effects are components that can change an audio signal. Being this abstract
 allows us to add effects in any level desired. Most likely some instrument
