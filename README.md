@@ -4,6 +4,12 @@ This all started with an experiment to see how FM synthesis works. Now it
 also has a basic DirtyWave M8 inspired tracker and is being extended with
 effects and samples as well.
 
+> **DEMO**: For a short demonstration playing a multi track children song.
+> ```sh
+> cargo run --example song1
+> ```
+> **NOTE**: Might not work on all platforms as the playback is still a hack
+
 Audio Engine will form the basic audio engine of a game project in development
 All steps in making the audio engine will be extensively documented with the
 issues that have been solved along the way.
