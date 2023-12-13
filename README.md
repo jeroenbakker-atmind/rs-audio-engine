@@ -13,7 +13,7 @@ cargo run --example experiment
 
 ## FM Synthesis
 
-> See `audio-engine-fm` folder
+> See `audio-engine-instrument-fm` folder
 
 The experiment uses the next structure.
 

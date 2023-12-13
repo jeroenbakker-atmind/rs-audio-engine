@@ -1,6 +1,6 @@
 use audio_engine_common::digital_sound::{sound::Sound, sound_state::SoundState};
-use audio_engine_fm::instrument::FMInstrumentNoteState;
-use audio_engine_sample::sample_note_state::SampleNoteState;
+use audio_engine_instrument_fm::instrument::FMInstrumentNoteState;
+use audio_engine_instrument_sample::sample_note_state::SampleNoteState;
 
 use crate::instrument::Instrument;
 

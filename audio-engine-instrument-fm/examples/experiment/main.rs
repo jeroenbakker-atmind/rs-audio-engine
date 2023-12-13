@@ -3,7 +3,7 @@ use audio_engine_common::{
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
     waveform::Waveform,
 };
-use audio_engine_fm::{
+use audio_engine_instrument_fm::{
     algorithm::Algorithm,
     instrument::{FMInstrument, FMInstrumentNoteState},
     operator::{Operator, Operators},

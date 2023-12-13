@@ -4,8 +4,8 @@ members = [
     "audio-engine-common",
     "audio-engine-notes",
 
-    "audio-engine-fm",
-    "audio-engine-sample",
+    "audio-engine-instrument-fm",
+    "audio-engine-instrument-sample",
     "audio-engine-instruments",
 
     "audio-engine-sequencer",

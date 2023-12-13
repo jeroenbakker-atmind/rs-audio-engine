@@ -3,8 +3,8 @@ use audio_engine_common::{
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease, id::ID,
     note_time::NoteTime,
 };
-use audio_engine_fm::instrument::FMInstrument;
-use audio_engine_sample::sample::Sample;
+use audio_engine_instrument_fm::instrument::FMInstrument;
+use audio_engine_instrument_sample::sample::Sample;
 
 use crate::instrument_note_state::InstrumentNoteState;
 

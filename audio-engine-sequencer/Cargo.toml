@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 audio-engine-common = {path="../audio-engine-common"}
-audio-engine-fm = {path="../audio-engine-fm"}
-audio-engine-sample = {path="../audio-engine-sample"}
+audio-engine-instrument-fm = {path="../audio-engine-instrument-fm"}
+audio-engine-instrument-sample = {path="../audio-engine-instrument-sample"}

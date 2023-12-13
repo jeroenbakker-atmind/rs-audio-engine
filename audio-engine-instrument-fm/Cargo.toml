@@ -1,12 +1,12 @@
 [package]
-name = "audio-engine-sample"
+name = "audio-engine-instrument-fm"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name="audio_engine_sample"
+name="audio_engine_instrument_fm"
 path="src/lib.rs"
 
 [dependencies]

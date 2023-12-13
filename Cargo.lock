@@ -38,7 +38,15 @@ name = "audio-engine-common"
 version = "0.1.0"
 
 [[package]]
-name = "audio-engine-fm"
+name = "audio-engine-instrument-fm"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-common",
+ "cpal",
+]
+
+[[package]]
+name = "audio-engine-instrument-sample"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
@@ -50,8 +58,8 @@ name = "audio-engine-instruments"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
- "audio-engine-fm",
- "audio-engine-sample",
+ "audio-engine-instrument-fm",
+ "audio-engine-instrument-sample",
  "audio-engine-sequencer",
  "cpal",
 ]
@@ -68,20 +76,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "audio-engine-sample"
-version = "0.1.0"
-dependencies = [
- "audio-engine-common",
- "cpal",
-]
-
-[[package]]
 name = "audio-engine-sequencer"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
- "audio-engine-fm",
- "audio-engine-sample",
+ "audio-engine-instrument-fm",
+ "audio-engine-instrument-sample",
 ]
 
 [[package]]
@@ -89,11 +89,9 @@ name = "audio-engine-tracker"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
- "audio-engine-fm",
  "audio-engine-instruments",
  "audio-engine-notes",
  "audio-engine-player",
- "audio-engine-sample",
  "audio-engine-sequencer",
  "cpal",
  "hex",
