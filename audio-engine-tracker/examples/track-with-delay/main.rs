@@ -163,14 +163,13 @@ fn create_song() -> Song {
 
     song.phrases[0x00].init(&["00", "00", "01", "01"]);
     song.phrases[0x01].init(&["02", "02", "03", "03"]);
-    song.phrases[0xFE].init(&["FE", "FE"]);
+    song.phrases[0xfe].init(&["FE", "FE", "FE", "FE"]);
 
-    song.tracks[0x00].init(&["00", "01"]);
-    song.tracks[0x01].init(&["FE", "00", "01"]);
+    song.tracks[0x00].init(&["00", "01", "FE"]);
     song.tracks[0x00].level = 0.6;
-    song.tracks[0x01].level = 0.4;
+    song.tracks[0x00].delay.is_enabled = true;
 
-    song.instruments[0] = InstrumentLibrary::FmWIP.create();
+    song.instruments[0] = InstrumentLibrary::FmBasicWaveformTriangle.create();
 
     song
 }

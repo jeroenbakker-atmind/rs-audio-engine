@@ -1,4 +1,5 @@
 use audio_engine_common::{digital_sound::sound::Sound, id::GetID, song_time::SongTime};
+use audio_engine_effect::effect::Effect;
 use audio_engine_sequencer::instrument::InstrumentID;
 
 use crate::{
@@ -73,7 +74,7 @@ pub fn sample_track(
     song_time: SongTime,
     sample_rate: f32,
 ) -> f32 {
-    if let Some(instrument) = song.get(track_state.instrument_id) {
+    let track_sample = if let Some(instrument) = song.get(track_state.instrument_id) {
         let note_time = song_time - track_state.note_on.unwrap();
         let note_off = track_state.note_off.map(|note_off| song_time - note_off);
         let instrument_sample = instrument.sample(
@@ -83,10 +84,19 @@ pub fn sample_track(
             sample_rate,
             &mut track_state.instrument_note_state,
         );
+
         instrument_sample * track.level * track_state.level
     } else {
         0.0
-    }
+    };
+
+    // Apply track effects.
+    let mut track_sample = [track_sample];
+    track
+        .delay
+        .effect_apply(&mut track_sample, sample_rate, &mut track_state.delay_state);
+
+    track_sample[0]
 }
 
 pub fn calc_track_position<'a>(

@@ -1,5 +1,6 @@
 use std::{collections::VecDeque, ops::AddAssign};
 
+#[derive(Debug, Clone)]
 pub struct RingBuffer<T>
 where
     T: Sized,
@@ -60,11 +61,15 @@ where
         }
     }
 
+    pub fn ensure_size(&mut self, size: usize) {
+        if self.data.len() < size {
+            self.data.resize(size, T::default());
+        }
+    }
+
     /// Push a value into the ring buffer so that the value will be popped
     pub fn push(&mut self, offset: usize, value: T, operation: PushOperation) {
-        if self.data.len() < offset + 1 {
-            self.data.resize(offset + 1, T::default());
-        }
+        self.ensure_size(offset + 1);
         operation.perform(value, self.data.get_mut(offset).unwrap());
     }
 

@@ -21,8 +21,17 @@ pub struct SongState {
 
 impl Default for SongState {
     fn default() -> Self {
-        Self {
-            tracks: [TrackState::default(); 8],
+        SongState {
+            tracks: [
+                TrackState::default(),
+                TrackState::default(),
+                TrackState::default(),
+                TrackState::default(),
+                TrackState::default(),
+                TrackState::default(),
+                TrackState::default(),
+                TrackState::default(),
+            ],
             patterns: [PatternState::default(); 255],
             phrases: [PhraseState::default(); 255],
             rows_per_beat: 4.0,

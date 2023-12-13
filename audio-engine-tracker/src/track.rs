@@ -1,4 +1,5 @@
 use audio_engine_common::level::Level;
+use audio_engine_effect_delay::delay::Delay;
 
 use crate::phrase::PhraseID;
 
@@ -6,6 +7,7 @@ use crate::phrase::PhraseID;
 pub struct Track {
     pub level: Level,
     pub phrases: [PhraseID; 255],
+    pub delay: Delay,
 }
 
 impl Default for Track {
@@ -13,6 +15,7 @@ impl Default for Track {
         Self {
             level: 1.0,
             phrases: [PhraseID::default(); 255],
+            delay: Delay::default(),
         }
     }
 }

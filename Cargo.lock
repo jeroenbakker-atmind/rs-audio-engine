@@ -38,6 +38,21 @@ name = "audio-engine-common"
 version = "0.1.0"
 
 [[package]]
+name = "audio-engine-effect"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-common",
+]
+
+[[package]]
+name = "audio-engine-effect-delay"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-common",
+ "audio-engine-effect",
+]
+
+[[package]]
 name = "audio-engine-instrument-fm"
 version = "0.1.0"
 dependencies = [
@@ -89,6 +104,8 @@ name = "audio-engine-tracker"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
+ "audio-engine-effect",
+ "audio-engine-effect-delay",
  "audio-engine-instruments",
  "audio-engine-notes",
  "audio-engine-player",

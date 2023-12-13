@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
         "fract"
+    ],
+    "rust-analyzer.linkedProjects": [
+        "./audio-engine-effect/Cargo.toml"
     ]
 }

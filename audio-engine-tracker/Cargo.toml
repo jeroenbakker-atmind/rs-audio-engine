@@ -12,6 +12,8 @@ audio-engine-player = {path="../audio-engine-player"}
 audio-engine-notes = {path="../audio-engine-notes"}
 
 audio-engine-instruments = {path="../audio-engine-instruments"}
+audio-engine-effect = {path="../audio-engine-effect"}
+audio-engine-effect-delay = {path="../audio-engine-effect-delay"}
 
 cpal = "*"
 hex = "*"

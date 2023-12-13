@@ -37,6 +37,8 @@ usage independent.
 | `audio-engine-instrument-fm`     | Instrument model for FM Syntesis              |
 | `audio-engine-instrument-sample` | Instrument model for tracker sample           |
 | `audio-engine-instruments`       | Instrument sound library                      |
+| `audio-engine-effect`            | Base data types for effects                   |
+| `audio-engine-effect-delay`      | Delay effect processor                        |
 | `audio-engine-sequencer`         | Base data types for sound and state tracking  |
 | `audio-engine-tracker`           | Dirtywave M8 inspired tracker                 |
 
