@@ -92,11 +92,25 @@ pub fn sample_track(
 
     // Apply track effects.
     let mut track_sample = [track_sample];
-    track
-        .delay
-        .effect_apply(&mut track_sample, sample_rate, &mut track_state.delay_state);
+    apply_track_effects(&mut track_sample, sample_rate, track, track_state);
 
     track_sample[0]
+}
+
+pub fn apply_track_effects(
+    track_samples: &mut [f32],
+    sample_rate: f32,
+    track: &Track,
+    track_state: &mut TrackState,
+) {
+    track
+        .delay
+        .effect_apply(track_samples, sample_rate, &mut track_state.delay_state);
+    track.distortion.effect_apply(
+        track_samples,
+        sample_rate,
+        &mut track_state.distortion_state,
+    );
 }
 
 pub fn calc_track_position<'a>(

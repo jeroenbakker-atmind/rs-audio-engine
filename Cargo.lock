@@ -53,6 +53,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "audio-engine-effect-distortion"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-common",
+ "audio-engine-effect",
+]
+
+[[package]]
 name = "audio-engine-instrument-fm"
 version = "0.1.0"
 dependencies = [
@@ -106,6 +114,7 @@ dependencies = [
  "audio-engine-common",
  "audio-engine-effect",
  "audio-engine-effect-delay",
+ "audio-engine-effect-distortion",
  "audio-engine-instruments",
  "audio-engine-notes",
  "audio-engine-player",

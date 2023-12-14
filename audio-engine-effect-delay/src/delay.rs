@@ -29,8 +29,6 @@ impl Effect for Delay {
         DelayState::default()
     }
 
-    fn effect_apply_parameters(&self, _effect_state: &mut Self::EffectState) {}
-
     fn effect_apply(
         &self,
         audio_buffer: &mut [f32],
@@ -74,7 +72,6 @@ mod test {
         let sample_rate = 4.0;
 
         let mut delay_state = delay.effect_create_state();
-        delay.effect_apply_parameters(&mut delay_state);
 
         for out_value in [1.0, 1.5, 1.75, 1.875] {
             for s in 0..4 {
@@ -97,7 +94,6 @@ mod test {
         let sample_rate = 4.0;
 
         let mut delay_state = delay.effect_create_state();
-        delay.effect_apply_parameters(&mut delay_state);
 
         let mut samples = in_samples;
         delay.effect_apply(&mut samples, sample_rate, &mut delay_state);

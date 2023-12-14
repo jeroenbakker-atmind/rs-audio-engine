@@ -5,8 +5,6 @@ pub trait Effect {
 
     fn effect_create_state(&self) -> Self::EffectState;
 
-    fn effect_apply_parameters(&self, effect_state: &mut Self::EffectState);
-
     /// Apply the effect to the given buffer
     fn effect_apply(
         &self,
