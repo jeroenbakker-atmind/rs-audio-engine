@@ -1,6 +1,9 @@
 use audio_engine_common::{envelope::Envelope, note_time::NoteTime};
 
-use crate::operator::{Operators, OperatorsNoteState};
+use crate::{
+    algorithm_compiled::CompiledAlgorithm,
+    operator::{Operators, OperatorsNoteState},
+};
 
 #[derive(Debug, Default, Copy, Clone)]
 pub enum Algorithm {
@@ -16,6 +19,15 @@ pub enum Algorithm {
 
     // D modulates Carrier A, B and C
     DModulatesABC,
+}
+
+impl Algorithm {
+    pub fn compile<E>(&self) -> CompiledAlgorithm<E>
+    where
+        E: Envelope,
+    {
+        unimplemented!()
+    }
 }
 
 impl Algorithm {
