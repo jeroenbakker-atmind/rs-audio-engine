@@ -104,7 +104,7 @@ impl CompiledAlgorithm {
                 result += note_state.stack[*index as usize];
             }
         }
-        // TODO: Unclear if we want to average and just add.
+        // TODO: Unclear if we want to average or just add and use envelopes?
         if !self.carrier_output.is_empty() {
             result /= self.carrier_output.len() as f32;
         }
