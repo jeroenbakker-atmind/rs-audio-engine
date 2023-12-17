@@ -1,4 +1,4 @@
-use audio_engine_common::{digital_sound::sound::Sound, id::GetID, song_time::SongTime};
+use audio_engine_common::{digital_sound::sound::Sound, song_time::SongTime};
 use audio_engine_effect::effect::Effect;
 use audio_engine_sequencer::instrument::InstrumentID;
 
@@ -74,7 +74,7 @@ pub fn sample_track(
     song_time: SongTime,
     sample_rate: f32,
 ) -> f32 {
-    let track_sample = if let Some(instrument) = song.get(track_state.instrument_id) {
+    let track_sample = if let Some(instrument) = song.get_instrument(track_state.instrument_id) {
         let note_time = song_time - track_state.note_on.unwrap();
         let note_off = track_state.note_off.map(|note_off| song_time - note_off);
         let instrument_sample = instrument.sample(
@@ -121,14 +121,14 @@ pub fn calc_track_position<'a>(
 ) -> Option<&'a Row> {
     let mut rows_left = global_row_index;
     for phrase_id in track.phrases {
-        if let Some(phrase) = song.get(phrase_id) {
+        if let Some(phrase) = song.get_phrase(phrase_id) {
             let phrase_row_count = song_state.get_phrase_row_len(phrase_id);
             if phrase_row_count <= rows_left {
                 rows_left -= phrase_row_count;
                 continue;
             }
             for pattern_id in phrase.patterns {
-                if let Some(pattern) = song.get(pattern_id) {
+                if let Some(pattern) = song.get_pattern(pattern_id) {
                     let pattern_row_count = song_state.get_pattern_row_len(pattern_id);
                     if pattern_row_count <= rows_left {
                         rows_left -= pattern_row_count;
@@ -171,7 +171,7 @@ fn apply_row(
                 track_state.note_on = Some(song_time);
                 track_state.instrument_id = instrument_id;
                 track_state.note_pitch = note.pitch();
-                let instrument = song.get(instrument_id);
+                let instrument = song.get_instrument(instrument_id);
                 track_state.instrument_note_state.reset(instrument);
             }
             Some(Event::NoteRelease) => {

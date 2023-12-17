@@ -1,26 +1,19 @@
 use audio_engine_common::{envelope::Envelope, id::ID, note_time::NoteTime};
 
-use crate::operator::{Operator, OperatorNoteState, Operators, OperatorsNoteState};
+use crate::operator::{OperatorID, OperatorNoteState, Operators};
 
-pub type OperatorID<E> = ID<Operator<E>>;
-
-pub struct ExecutionStep<E>
-where
-    E: Envelope,
-{
+#[derive(Debug, Default, Clone)]
+pub struct ExecutionStep {
     /// Add the list of values together forming the input.
     pub stack_in: Vec<StackID>,
     /// Operator to execute
-    pub operator: OperatorID<E>,
+    pub operator_index: OperatorID,
     /// Where to write the result of the operator.
     pub stack_out: StackID,
 }
 
-impl<E> ExecutionStep<E>
-where
-    E: Envelope,
-{
-    fn execute(
+impl ExecutionStep {
+    fn execute<E: Envelope>(
         &self,
         note_time: NoteTime,
         note_off: Option<NoteTime>,
@@ -29,32 +22,57 @@ where
         step_state: &mut OperatorNoteState,
         stack: &mut [f32],
     ) {
-        unimplemented!()
+        let note_pitch = self
+            .stack_in
+            .iter()
+            .filter_map(|s| {
+                if let StackID::Index(index) = s {
+                    Some(index)
+                } else {
+                    None
+                }
+            })
+            .map(|s| stack[*s as usize])
+            .sum::<f32>();
+        if let Some(operator) = operators.get_operator(self.operator_index) {
+            if let StackID::Index(index) = self.stack_out {
+                let result =
+                    operator.sample(note_time, note_off, note_pitch, sample_rate, step_state);
+                stack[index as usize] = result;
+            }
+        }
     }
 }
 
-pub type ExecutionStepID<E> = ID<ExecutionStep<E>>;
-pub type StackID = ID<f32>;
+pub type ExecutionStepID = ID;
+pub type StackID = ID;
 
-pub struct CompiledAlgorithm<E>
-where
-    E: Envelope,
-{
-    pub execution_steps: Vec<ExecutionStep<E>>,
+#[derive(Debug, Default, Clone)]
+pub struct CompiledAlgorithm {
+    pub execution_steps: Vec<ExecutionStep>,
     pub stack_size: usize,
     pub carrier_output: Vec<StackID>,
 }
 
+impl CompiledAlgorithm {
+    pub fn add_step(&mut self, stack_in: Vec<StackID>, operator: OperatorID, stack_out: StackID) {
+        let step = ExecutionStep {
+            stack_in,
+            operator_index: operator,
+            stack_out,
+        };
+        self.execution_steps.push(step);
+    }
+}
+
+#[derive(Debug, Default, Clone)]
 pub struct CompiledAlgorithmState {
     pub stack: Vec<f32>,
     pub execution_step_state: Vec<OperatorNoteState>,
 }
 
-impl<E> CompiledAlgorithm<E>
-where
-    E: Envelope,
-{
-    pub fn sample(
+impl CompiledAlgorithm {
+    pub fn sample<E: Envelope>(
         &self,
         note_time: NoteTime,
         note_off: Option<NoteTime>,
@@ -62,10 +80,7 @@ where
         sample_rate: f32,
         operators: &Operators<E>,
         note_state: &mut CompiledAlgorithmState,
-    ) -> f32
-    where
-        E: Envelope,
-    {
+    ) -> f32 {
         self.init_state(note_pitch, note_state);
         for (step, step_state) in self
             .execution_steps
@@ -88,6 +103,10 @@ where
             if let StackID::Index(index) = carrier_id {
                 result += note_state.stack[*index as usize];
             }
+        }
+        // TODO: Unclear if we want to average and just add.
+        if !self.carrier_output.is_empty() {
+            result /= self.carrier_output.len() as f32;
         }
         result
     }

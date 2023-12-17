@@ -3,7 +3,7 @@ use audio_engine_common::{
     waveform::Waveform,
 };
 use audio_engine_instrument_fm::{
-    algorithm::Algorithm,
+    algorithm::preset::Algorithm,
     instrument::FMInstrument,
     operator::{Operator, Operators},
     operator_frequency::RATED_1,
@@ -35,7 +35,7 @@ fn create_fm_waveform_instrument(waveform: Waveform) -> Instrument {
             },
             ..Operators::default()
         },
-        algorithm: Algorithm::A,
+        algorithm: Algorithm::A.compile(),
     };
     Instrument::FM(instrument)
 }

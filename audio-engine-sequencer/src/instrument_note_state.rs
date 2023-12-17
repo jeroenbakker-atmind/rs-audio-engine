@@ -4,7 +4,7 @@ use audio_engine_instrument_sample::sample_note_state::SampleNoteState;
 
 use crate::instrument::Instrument;
 
-#[derive(Default, Copy, Clone)]
+#[derive(Default, Clone)]
 pub enum InstrumentNoteState {
     #[default]
     None,

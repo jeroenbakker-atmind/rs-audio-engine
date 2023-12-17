@@ -1,4 +1,4 @@
-use audio_engine_common::id::{GetID, ID};
+use audio_engine_common::id::ID;
 
 use crate::{
     event::Event,
@@ -18,10 +18,10 @@ impl Default for Pattern {
     }
 }
 
-pub type PatternID = ID<Pattern>;
+pub type PatternID = ID;
 
-impl GetID<Row> for Pattern {
-    fn get(&self, id: RowID) -> Option<&Row> {
+impl Pattern {
+    fn get_row(&self, id: RowID) -> Option<&Row> {
         match id {
             RowID::Index(index) => Some(&self.rows[index as usize]),
             _ => None,

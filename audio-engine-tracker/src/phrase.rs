@@ -7,7 +7,7 @@ pub struct Phrase {
     pub patterns: [PatternID; 16],
 }
 
-pub type PhraseID = ID<Phrase>;
+pub type PhraseID = ID;
 
 impl Phrase {
     pub fn init(&mut self, strings: &[&str]) {

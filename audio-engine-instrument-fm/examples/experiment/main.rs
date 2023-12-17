@@ -4,7 +4,7 @@ use audio_engine_common::{
     waveform::Waveform,
 };
 use audio_engine_instrument_fm::{
-    algorithm::Algorithm,
+    algorithm::preset::Algorithm,
     instrument::{FMInstrument, FMInstrumentNoteState},
     operator::{Operator, Operators},
     operator_frequency::{RATED_1, RATED_2},
@@ -51,7 +51,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
             },
             ..Operators::default()
         },
-        algorithm: Algorithm::BModulatesA,
+        algorithm: Algorithm::BModulatesA.compile(),
     };
     let mut instrument_state = FMInstrumentNoteState::default();
     let note_pitch = 437.0;

@@ -1,8 +1,8 @@
-use audio_engine_common::{digital_sound::sound_state::SoundState, id::GetID};
+use audio_engine_common::{digital_sound::sound_state::SoundState};
 
 use crate::{
     bars_per_beat::BarsPerBeat,
-    pattern::PatternID,
+    pattern::{Pattern, PatternID},
     pattern_state::{PatternState, PatternStates},
     phrase::PhraseID,
     phrase_state::{PhraseState, PhraseStates},
@@ -52,7 +52,7 @@ impl SongState {
         for (phrase, state) in song.phrases.iter().zip(self.phrases.iter_mut()) {
             let mut row_len = 0;
             for pattern_id in phrase.patterns {
-                if let Some(pattern) = song.get(pattern_id) {
+                if let Some(pattern) = song.get_pattern(pattern_id) {
                     row_len += pattern.count_rows();
                 } else {
                     break;

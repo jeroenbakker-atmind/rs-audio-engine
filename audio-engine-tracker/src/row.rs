@@ -12,7 +12,7 @@ pub struct Row {
     pub level: Option<Level>,
 }
 
-pub type RowID = ID<Row>;
+pub type RowID = ID;
 
 impl Row {
     pub fn init(&mut self, string: &str) {
@@ -121,7 +121,7 @@ impl Display for Row {
                 f.write_fmt(format_args!("{}", note.octave))?;
                 f.write_char(' ')?;
                 match instrument_id {
-                    InstrumentID::_PhantomData(_) | InstrumentID::NotSet => {
+                    InstrumentID::NotSet => {
                         f.write_str("--")?;
                     }
                     InstrumentID::Index(index) => {

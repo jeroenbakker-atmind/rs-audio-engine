@@ -5,17 +5,17 @@ use audio_engine_common::{
 };
 
 use crate::{
-    algorithm::Algorithm,
+    algorithm::compiled::{CompiledAlgorithm, CompiledAlgorithmState},
     operator::{Operators, OperatorsNoteState},
 };
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub struct FMInstrument<E>
 where
     E: Envelope + Copy + Clone,
 {
     pub operators: Operators<E>,
-    pub algorithm: Algorithm,
+    pub algorithm: CompiledAlgorithm,
 }
 
 impl<E> Sound for FMInstrument<E>
@@ -42,14 +42,14 @@ where
             note_pitch,
             sample_rate,
             &self.operators,
-            &mut state.operators,
+            &mut state.state,
         )
     }
 }
 
-#[derive(Default, Copy, Clone)]
+#[derive(Default, Clone)]
 pub struct FMInstrumentNoteState {
-    pub operators: OperatorsNoteState,
+    pub state: CompiledAlgorithmState,
 }
 
 impl SoundState for FMInstrumentNoteState {}

@@ -8,7 +8,7 @@ use audio_engine_instrument_sample::sample::Sample;
 
 use crate::instrument_note_state::InstrumentNoteState;
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, Clone)]
 pub enum Instrument {
     #[default]
     None,
@@ -16,7 +16,7 @@ pub enum Instrument {
     Sample(Sample),
 }
 
-pub type InstrumentID = ID<Instrument>;
+pub type InstrumentID = ID;
 
 impl Sound for Instrument {
     type SoundState = InstrumentNoteState;

@@ -1,5 +1,5 @@
 use audio_engine_common::{
-    beats_per_minute::BeatsPerMinute, digital_sound::sound::Sound, id::GetID,
+    beats_per_minute::BeatsPerMinute, digital_sound::sound::Sound,
 };
 use audio_engine_sequencer::instrument::{Instrument, InstrumentID};
 
@@ -16,7 +16,7 @@ pub struct Song {
     pub tracks: [Track; 8],
     pub patterns: [Pattern; 255],
     pub phrases: [Phrase; 255],
-    pub instruments: [Instrument; 255],
+    pub instruments: [Instrument; 16],
 
     /// Initial speed. Speed is the number of rows that will be played per beat.
     pub initial_speed: BarsPerBeat,
@@ -30,31 +30,43 @@ impl Default for Song {
             tracks: [Track::default(); 8],
             patterns: [Pattern::default(); 255],
             phrases: [Phrase::default(); 255],
-            instruments: [Instrument::default(); 255],
+            instruments: [
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+                Instrument::default(),
+            ],
         }
     }
 }
 
-impl GetID<Phrase> for Song {
-    fn get(&self, id: PhraseID) -> Option<&Phrase> {
+impl Song {
+    pub fn get_phrase(&self, id: PhraseID) -> Option<&Phrase> {
         match id {
             PhraseID::Index(index) => Some(&self.phrases[index as usize]),
             _ => None,
         }
     }
-}
-
-impl GetID<Pattern> for Song {
-    fn get(&self, id: PatternID) -> Option<&Pattern> {
+    pub fn get_pattern(&self, id: PatternID) -> Option<&Pattern> {
         match id {
             PatternID::Index(index) => Some(&self.patterns[index as usize]),
             _ => None,
         }
     }
-}
 
-impl GetID<Instrument> for Song {
-    fn get(&self, id: InstrumentID) -> Option<&Instrument> {
+    pub fn get_instrument(&self, id: InstrumentID) -> Option<&Instrument> {
         match id {
             InstrumentID::Index(index) => Some(&self.instruments[index as usize]),
             _ => None,
@@ -72,13 +84,13 @@ impl Sound for Song {
     }
 
     fn sample(
-            &self,
-            note_time: audio_engine_common::note_time::NoteTime,
-            note_off: Option<audio_engine_common::note_time::NoteTime>,
-            note_pitch: f32,
-            sample_rate: f32,
-            state: &mut Self::SoundState,
-        ) -> f32 {
+        &self,
+        note_time: audio_engine_common::note_time::NoteTime,
+        note_off: Option<audio_engine_common::note_time::NoteTime>,
+        note_pitch: f32,
+        sample_rate: f32,
+        state: &mut Self::SoundState,
+    ) -> f32 {
         0.0
     }
 }

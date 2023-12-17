@@ -1,6 +1,6 @@
 use audio_engine_common::envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease;
 use audio_engine_instrument_fm::{
-    algorithm::Algorithm,
+    algorithm::preset::Algorithm,
     instrument::FMInstrument,
     operator::{Operator, Operators},
     operator_frequency::{RATED_1, RATED_2, RATED_4, RATED_8},
@@ -31,7 +31,7 @@ pub fn create_fm_wip_instrument() -> Instrument {
                 ..Operator::default()
             },
         },
-        algorithm: Algorithm::DModulatesABC,
+        algorithm: Algorithm::DModulatesABC.compile(),
     };
     Instrument::FM(instrument)
 }

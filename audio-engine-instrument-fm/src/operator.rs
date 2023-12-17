@@ -1,6 +1,6 @@
 use crate::operator_frequency::{OperatorFrequency, RATED_1};
 use audio_engine_common::{
-    digital_sound::sound::Sound, envelope::Envelope, level::Level, note_time::NoteTime,
+    digital_sound::sound::Sound, envelope::Envelope, id::ID, level::Level, note_time::NoteTime,
     phase_time::PhaseTime, waveform::Waveform,
 };
 
@@ -16,6 +16,7 @@ where
     pub level: Level,
     pub phase: PhaseTime,
 }
+pub type OperatorID = ID;
 
 impl<E> Default for Operator<E>
 where
@@ -82,6 +83,25 @@ where
     pub d: Operator<E>,
 }
 
+impl<E> Operators<E>
+where
+    E: Envelope,
+{
+    pub fn get_operator(&self, operator_index: OperatorID) -> Option<&Operator<E>> {
+        if let OperatorID::Index(index) = operator_index {
+            match index {
+                0 => Some(&self.a),
+                1 => Some(&self.b),
+                2 => Some(&self.c),
+                3 => Some(&self.d),
+                _ => None,
+            }
+        } else {
+            None
+        }
+    }
+}
+
 impl<E> Copy for Operator<E> where E: Envelope + Copy {}
 impl<E> Copy for Operators<E> where E: Envelope + Copy {}
 
@@ -99,7 +119,7 @@ where
     }
 }
 
-#[derive(Default, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct OperatorNoteState {
     pub phase_time: PhaseTime,
 }
