@@ -38,17 +38,6 @@ impl<E> Operator<E>
 where
     E: Envelope,
 {
-    pub fn modulate(
-        &self,
-        note_time: NoteTime,
-        note_off: Option<NoteTime>,
-        note_pitch: f32,
-        sample_rate: f32,
-        state: &mut OperatorNoteState,
-    ) -> f32 {
-        note_pitch + self.sample(note_time, note_off, note_pitch, sample_rate, state)
-    }
-
     pub fn sample(
         &self,
         note_time: NoteTime,
