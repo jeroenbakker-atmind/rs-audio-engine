@@ -54,9 +54,10 @@ fn create_frame(
     let black: [u8; 3] = [0, 0, 0];
     let white: [u8; 3] = [0, 255, 0];
     let half_height = (height / 2) as i32;
+    let scalar = 100;
     let samples = samples
         .iter()
-        .map(|sample| (sample * half_height as f32) as i32 + half_height)
+        .map(|sample| (sample * scalar as f32) as i32 + half_height)
         .collect::<Vec<i32>>();
 
     Array3::from_shape_fn((height, width, 3), |(x, y, z)| {
