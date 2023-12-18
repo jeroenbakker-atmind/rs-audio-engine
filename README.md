@@ -226,7 +226,7 @@ let sample_rate = 44100.0;
 let note_pitch = 437.0;
 
 let mut sound_state = instrument.init_sound_state();
-let sample = instrument.sample(0.0f, None, note_pitch, sample_rate, &mut sound_state);
+let sample = instrument.sample(0.0, None, note_pitch, sample_rate, &mut sound_state);
 ```
 
 ## Effects (short term development)

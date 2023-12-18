@@ -1,8 +1,8 @@
-use audio_engine_common::{digital_sound::sound_state::SoundState};
+use audio_engine_common::digital_sound::sound_state::SoundState;
 
 use crate::{
     bars_per_beat::BarsPerBeat,
-    pattern::{Pattern, PatternID},
+    pattern::PatternID,
     pattern_state::{PatternState, PatternStates},
     phrase::PhraseID,
     phrase_state::{PhraseState, PhraseStates},

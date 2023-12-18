@@ -1,6 +1,4 @@
-use audio_engine_common::{
-    beats_per_minute::BeatsPerMinute, digital_sound::sound::Sound,
-};
+use audio_engine_common::{beats_per_minute::BeatsPerMinute, digital_sound::sound::Sound};
 use audio_engine_sequencer::instrument::{Instrument, InstrumentID};
 
 use crate::{
@@ -91,6 +89,7 @@ impl Sound for Song {
         sample_rate: f32,
         state: &mut Self::SoundState,
     ) -> f32 {
+        todo!("Can tracker call this function?");
         0.0
     }
 }

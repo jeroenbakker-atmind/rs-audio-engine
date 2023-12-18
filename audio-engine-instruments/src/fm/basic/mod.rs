@@ -17,7 +17,7 @@ pub mod square;
 pub mod triangle;
 
 fn create_fm_waveform_instrument(waveform: Waveform) -> Instrument {
-    let instrument = FMInstrument::<DelayAttackHoldDecaySustainRelease> {
+    let mut instrument = FMInstrument::<DelayAttackHoldDecaySustainRelease> {
         operators: Operators::<DelayAttackHoldDecaySustainRelease> {
             a: Operator {
                 waveform,
@@ -35,7 +35,10 @@ fn create_fm_waveform_instrument(waveform: Waveform) -> Instrument {
             },
             ..Operators::default()
         },
-        algorithm: Algorithm::A.compile(),
+        algorithm_preset: Algorithm::A,
+        ..FMInstrument::<DelayAttackHoldDecaySustainRelease>::default()
     };
+    instrument.compile();
+
     Instrument::FM(instrument)
 }

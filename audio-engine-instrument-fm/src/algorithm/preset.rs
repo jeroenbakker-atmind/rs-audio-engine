@@ -19,7 +19,7 @@ pub enum Algorithm {
 }
 
 impl Algorithm {
-    pub fn compile(&self) -> CompiledAlgorithm {
+    pub fn compile(&self, _repeat: u8) -> CompiledAlgorithm {
         let mut result = CompiledAlgorithm::default();
         match self {
             Algorithm::A => {

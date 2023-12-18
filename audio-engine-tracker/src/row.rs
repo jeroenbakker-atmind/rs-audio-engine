@@ -1,6 +1,6 @@
 use std::fmt::{Display, Write};
 
-use audio_engine_common::{id::ID, level::Level};
+use audio_engine_common::level::Level;
 use audio_engine_notes::{ChromaticNote, ChromaticTone};
 use audio_engine_sequencer::instrument::InstrumentID;
 
@@ -11,8 +11,6 @@ pub struct Row {
     pub event: Option<Event>,
     pub level: Option<Level>,
 }
-
-pub type RowID = ID;
 
 impl Row {
     pub fn init(&mut self, string: &str) {

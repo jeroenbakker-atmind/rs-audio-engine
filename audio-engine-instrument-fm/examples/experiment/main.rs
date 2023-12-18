@@ -27,7 +27,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
     let channels = config.channels as usize;
 
     let mut sample_num = 0_u64;
-    let instrument = FMInstrument::<DelayAttackHoldDecaySustainRelease> {
+    let mut instrument = FMInstrument::<DelayAttackHoldDecaySustainRelease> {
         operators: Operators::<DelayAttackHoldDecaySustainRelease> {
             a: Operator {
                 waveform: Waveform::Sine,
@@ -51,8 +51,10 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
             },
             ..Operators::default()
         },
-        algorithm: Algorithm::BModulatesA.compile(),
+        algorithm_preset: Algorithm::BModulatesA,
+        ..FMInstrument::<DelayAttackHoldDecaySustainRelease>::default()
     };
+    instrument.compile();
     let mut instrument_state = FMInstrumentNoteState::default();
     let note_pitch = 437.0;
 

@@ -22,7 +22,6 @@ impl SoundState for WaveformState {}
 
 impl Sound for Waveform {
     type SoundState = WaveformState;
-
     fn init_sound_state(&self) -> Self::SoundState {
         PhaseTime::default()
     }

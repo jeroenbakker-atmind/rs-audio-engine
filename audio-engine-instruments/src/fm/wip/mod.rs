@@ -8,7 +8,7 @@ use audio_engine_instrument_fm::{
 use audio_engine_sequencer::instrument::Instrument;
 
 pub fn create_fm_wip_instrument() -> Instrument {
-    let instrument = FMInstrument::<DelayAttackHoldDecaySustainRelease> {
+    let mut instrument = FMInstrument::<DelayAttackHoldDecaySustainRelease> {
         operators: Operators::<DelayAttackHoldDecaySustainRelease> {
             a: Operator {
                 frequency: RATED_2,
@@ -31,7 +31,9 @@ pub fn create_fm_wip_instrument() -> Instrument {
                 ..Operator::default()
             },
         },
-        algorithm: Algorithm::DModulatesABC.compile(),
+        algorithm_preset: Algorithm::DModulatesABC,
+        ..FMInstrument::<DelayAttackHoldDecaySustainRelease>::default()
     };
+    instrument.compile();
     Instrument::FM(instrument)
 }
