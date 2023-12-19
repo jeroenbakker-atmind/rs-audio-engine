@@ -41,6 +41,8 @@ usage independent.
 | `audio-engine-effect-delay`      | Delay effect processor                        |
 | `audio-engine-sequencer`         | Base data types for sound and state tracking  |
 | `audio-engine-tracker`           | Dirtywave M8 inspired tracker                 |
+| `audio-engine-tracker-songs`     | Song library for tracker                      |
+| `audio-engine-export-video`      | Export audio signal to a video (debugging)    |
 
 
 ## Tracker
@@ -133,6 +135,8 @@ The experiment uses the next logical structure.
 classDiagram
 
     class Instrument {
+        repeat: u8
+        compile()
         sample()
     }
     class Operators
@@ -153,11 +157,9 @@ classDiagram
 
         level()
     }
-    class Algorithm {
+    class AlgorithmPreset {
         A
         BModulatesA
-
-        sample()
     }
     class Waveform {
         Sine
@@ -167,14 +169,28 @@ classDiagram
         sample()
     }
 
+    namespace evaluation {
+        class CompiledAlgorithm{
+            stack_size
+            carrier_stack_ids
+        }
+        class ExecutionStep{
+            input_stack_ids
+            output_stack_id
+        }
+    }
+
     Operators *--> Operator: a
     Operators *--> Operator: b
     Operators *--> Operator: c
     Operators *--> Operator: d
     Operator *--> Envelope: envelope
     Instrument *--> Operators: operators
-    Instrument *--> Algorithm: algorithm
+    Instrument *--> AlgorithmPreset: algorithm_preset
     Operator *--> Waveform: waveform
+    Instrument *--> CompiledAlgorithm: compiled_algorithm
+    CompiledAlgorithm *--> ExecutionStep: steps
+    ExecutionStep o--> Operator
 
 ```
 
