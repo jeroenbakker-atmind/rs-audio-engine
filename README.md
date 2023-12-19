@@ -169,15 +169,13 @@ classDiagram
         sample()
     }
 
-    namespace evaluation {
-        class CompiledAlgorithm{
-            stack_size
-            carrier_stack_ids
-        }
-        class ExecutionStep{
-            input_stack_ids
-            output_stack_id
-        }
+    class CompiledAlgorithm{
+        stack_size
+        carrier_stack_ids
+    }
+    class ExecutionStep{
+        input_stack_ids
+        output_stack_id
     }
 
     Operators *--> Operator: a
