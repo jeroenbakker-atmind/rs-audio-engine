@@ -67,6 +67,7 @@ dependencies = [
  "audio-engine-common",
  "audio-engine-instruments",
  "audio-engine-tracker",
+ "audio-engine-tracker-songs",
  "ndarray",
  "video-rs",
 ]
@@ -132,6 +133,16 @@ dependencies = [
  "audio-engine-sequencer",
  "cpal",
  "hex",
+]
+
+[[package]]
+name = "audio-engine-tracker-songs"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-common",
+ "audio-engine-instruments",
+ "audio-engine-tracker",
+ "cpal",
 ]
 
 [[package]]

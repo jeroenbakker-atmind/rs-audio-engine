@@ -1,15 +1,17 @@
 [package]
-name = "audio-engine-export-video"
+name = "audio-engine-tracker-songs"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+name="audio_engine_tracker_songs"
+path="src/lib.rs"
+
 [dependencies]
 audio-engine-common = {path="../audio-engine-common"}
 audio-engine-instruments = {path="../audio-engine-instruments"}
 audio-engine-tracker = {path="../audio-engine-tracker"}
-audio-engine-tracker-songs = {path="../audio-engine-tracker-songs"}
+cpal="*"
 
-ndarray = {version="*"}
-video-rs = {version="0.5.0", features=["ndarray"]}
