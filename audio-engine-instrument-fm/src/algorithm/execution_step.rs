@@ -19,16 +19,24 @@ impl ExecutionStep {
         &self,
         note_time: NoteTime,
         note_off: Option<NoteTime>,
+        note_pitch_base: f32,
         sample_rate: f32,
         operators: &Operators<E>,
         step_state: &mut OperatorNoteState,
         stack: &mut [f32],
     ) {
-        let note_pitch = self.sum_inputs(stack);
+        let note_pitch_modulator = self.sum_inputs(stack);
         if let (Some(operator), StackID::Index(index)) =
             (operators.get_operator(self.operator_index), self.stack_out)
         {
-            let result = operator.sample(note_time, note_off, note_pitch, sample_rate, step_state);
+            let result = operator.sample(
+                note_time,
+                note_off,
+                note_pitch_base,
+                note_pitch_modulator,
+                sample_rate,
+                step_state,
+            );
             stack[index as usize] = result;
         }
     }

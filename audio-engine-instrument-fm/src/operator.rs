@@ -17,6 +17,10 @@ where
     pub phase: PhaseTime,
 }
 pub type OperatorID = ID;
+pub const OPERATOR_A: OperatorID = OperatorID::Index(0);
+pub const OPERATOR_B: OperatorID = OperatorID::Index(1);
+pub const OPERATOR_C: OperatorID = OperatorID::Index(2);
+pub const OPERATOR_D: OperatorID = OperatorID::Index(3);
 
 impl<E> Default for Operator<E>
 where
@@ -42,13 +46,15 @@ where
         &self,
         note_time: NoteTime,
         note_off: Option<NoteTime>,
-        note_pitch: f32,
+        note_pitch_base: f32,
+        note_pitch_modulator: f32,
         sample_rate: f32,
         state: &mut OperatorNoteState,
     ) -> f32 {
         if !self.enable {
             return 0.0;
         }
+        let note_pitch = self.frequency.apply(note_pitch_base) + note_pitch_modulator;
         // TODO: add phase when initializing the note_state
         let result = self.waveform.sample(
             note_time,

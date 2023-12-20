@@ -2,7 +2,7 @@ use ndarray::Array3;
 use std::path::PathBuf;
 use video_rs::{Encoder, EncoderSettings, Locator, Time};
 
-pub fn export_audio_to_file(filename: &str, samples: &[f32], sample_rate: f32) {
+pub fn export_audio_to_video(filename: &str, samples: &[f32], sample_rate: f32) {
     video_rs::init().unwrap();
 
     let height = 720;
@@ -23,6 +23,7 @@ pub fn export_audio_to_file(filename: &str, samples: &[f32], sample_rate: f32) {
     let num_frames = samples.len() / num_samples_per_frame as usize;
 
     for frame_number in 0..num_frames {
+        print!(" - {}/{}\r", frame_number, num_frames);
         // This will create a smooth rainbow animation video!
         let sample_offset = (frame_number as f32 * num_samples_per_frame) as usize;
         let frame = create_frame(
@@ -64,10 +65,8 @@ fn create_frame(
             if from_offset > samples.len() {
                 from_offset = 0;
             }
-            let mut to_offset = sample_offset + samples_per_column * (column + 2);
-            if to_offset > samples.len() {
-                to_offset = samples.len() - 1;
-            }
+            let to_offset =
+                (sample_offset + samples_per_column * (column + 2)).min(samples.len() - 1);
             (from_offset, to_offset)
         })
         .map(|(from_offset, to_offset)| {

@@ -30,7 +30,7 @@ where
     fn default() -> Self {
         FMInstrument::<E> {
             repeat: 0,
-            algorithm_preset: Algorithm::A,
+            algorithm_preset: Algorithm::default(),
             operators: Operators::<E>::default(),
             algorithm: None,
         }

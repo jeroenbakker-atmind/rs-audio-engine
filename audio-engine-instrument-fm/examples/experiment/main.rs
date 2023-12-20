@@ -4,7 +4,7 @@ use audio_engine_common::{
     waveform::Waveform,
 };
 use audio_engine_instrument_fm::{
-    algorithm::preset::Algorithm,
+    algorithm::preset::FM_ALGORITHM_BASIC_B_MOD_A,
     instrument::{FMInstrument, FMInstrumentNoteState},
     operator::{Operator, Operators},
     operator_frequency::{RATED_1, RATED_2},
@@ -51,7 +51,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
             },
             ..Operators::default()
         },
-        algorithm_preset: Algorithm::BModulatesA,
+        algorithm_preset: FM_ALGORITHM_BASIC_B_MOD_A,
         ..FMInstrument::<DelayAttackHoldDecaySustainRelease>::default()
     };
     instrument.compile();

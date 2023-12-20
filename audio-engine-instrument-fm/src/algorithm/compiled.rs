@@ -40,7 +40,7 @@ impl CompiledAlgorithm {
         operators: &Operators<E>,
         note_state: &mut CompiledAlgorithmState,
     ) -> f32 {
-        self.init_state(note_pitch, note_state);
+        self.init_state(note_state);
         for (step, step_state) in self
             .execution_steps
             .iter()
@@ -49,6 +49,7 @@ impl CompiledAlgorithm {
             step.execute(
                 note_time,
                 note_off,
+                note_pitch,
                 sample_rate,
                 operators,
                 step_state,
@@ -70,7 +71,7 @@ impl CompiledAlgorithm {
         result
     }
 
-    fn init_state(&self, note_pitch: f32, note_state: &mut CompiledAlgorithmState) {
+    fn init_state(&self, note_state: &mut CompiledAlgorithmState) {
         note_state.stack.reserve_exact(self.stack_size);
         note_state.stack.resize(self.stack_size, f32::default());
         note_state
@@ -79,6 +80,5 @@ impl CompiledAlgorithm {
         note_state
             .execution_step_state
             .resize(self.execution_steps.len(), OperatorNoteState::default());
-        note_state.stack[0] = note_pitch;
     }
 }

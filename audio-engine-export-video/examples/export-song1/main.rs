@@ -1,4 +1,4 @@
-use audio_engine_export_video::export::export_audio_to_file;
+use audio_engine_export_video::export::export_audio_to_video;
 use audio_engine_tracker::{song_state::SongState, tracker::Tracker};
 use audio_engine_tracker_songs::SongLibrary;
 
@@ -17,6 +17,6 @@ fn main() {
     println!("Finished rendering");
 
     println!("Begin exporting");
-    export_audio_to_file("export-song1.mp4", &samples, sample_rate);
+    export_audio_to_video("export-song1.mp4", &samples, sample_rate);
     println!("Finished exporting");
 }
