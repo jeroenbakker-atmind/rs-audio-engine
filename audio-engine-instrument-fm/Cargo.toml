@@ -11,6 +11,7 @@ path="src/lib.rs"
 
 [dependencies]
 cpal = "*"
+aquamarine = "*"
 
 audio-engine-common = {path="../audio-engine-common"}
 

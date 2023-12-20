@@ -20,7 +20,7 @@ pub enum Basic {
 }
 
 impl Basic {
-    pub fn compile(&self, repeat: u8) -> CompiledAlgorithm {
+    pub fn compile(&self, _repeat: u8) -> CompiledAlgorithm {
         let mut result = CompiledAlgorithm::default();
         match self {
             Basic::A => {

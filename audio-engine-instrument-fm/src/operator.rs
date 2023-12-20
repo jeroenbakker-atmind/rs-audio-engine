@@ -21,6 +21,14 @@ pub const OPERATOR_A: OperatorID = OperatorID::Index(0);
 pub const OPERATOR_B: OperatorID = OperatorID::Index(1);
 pub const OPERATOR_C: OperatorID = OperatorID::Index(2);
 pub const OPERATOR_D: OperatorID = OperatorID::Index(3);
+pub const OPERATOR_E: OperatorID = OperatorID::Index(4);
+pub const OPERATOR_F: OperatorID = OperatorID::Index(5);
+pub const OPERATOR_1: OperatorID = OperatorID::Index(0);
+pub const OPERATOR_2: OperatorID = OperatorID::Index(1);
+pub const OPERATOR_3: OperatorID = OperatorID::Index(2);
+pub const OPERATOR_4: OperatorID = OperatorID::Index(3);
+pub const OPERATOR_5: OperatorID = OperatorID::Index(4);
+pub const OPERATOR_6: OperatorID = OperatorID::Index(5);
 
 impl<E> Default for Operator<E>
 where
