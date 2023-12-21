@@ -2,8 +2,7 @@ use self::{basic::Basic, dx7::compile_dx7};
 
 use super::compiled::CompiledAlgorithm;
 pub mod basic;
-pub mod builder;
-pub mod dx7;
+mod dx7;
 
 pub const FM_ALGORITHM_BASIC_A: Algorithm = Algorithm::Basic(Basic::A);
 pub const FM_ALGORITHM_BASIC_AB: Algorithm = Algorithm::Basic(Basic::AB);

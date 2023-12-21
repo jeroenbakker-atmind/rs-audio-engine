@@ -1,9 +1,10 @@
 use crate::{
-    algorithm::{compiled::CompiledAlgorithm, preset::builder::build_step},
+    algorithm::{
+        builder::{build_carrier_out, build_repeat, build_step, build_steps},
+        compiled::CompiledAlgorithm,
+    },
     operator::{OPERATOR_1, OPERATOR_2, OPERATOR_3, OPERATOR_4, OPERATOR_5, OPERATOR_6},
 };
-
-use super::builder::{build_carrier_out, build_repeat, build_steps};
 
 pub fn compile_dx7(dx7: u8, repeat: u8) -> CompiledAlgorithm {
     match dx7 {
