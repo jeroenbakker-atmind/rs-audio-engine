@@ -1,7 +1,9 @@
 use crate::{
-    algorithm::compiled::{CompiledAlgorithm, StackID},
+    algorithm::{compiled::CompiledAlgorithm, preset::builder::build_step},
     operator::{OPERATOR_1, OPERATOR_2, OPERATOR_3, OPERATOR_4, OPERATOR_5, OPERATOR_6},
 };
+
+use super::builder::{build_carrier_out, build_repeat, build_steps};
 
 pub fn compile_dx7(dx7: u8, repeat: u8) -> CompiledAlgorithm {
     match dx7 {
@@ -42,7 +44,7 @@ pub fn compile_dx7(dx7: u8, repeat: u8) -> CompiledAlgorithm {
 }
 
 #[cfg_attr(doc, aquamarine::aquamarine)]
-/// Compile DX& algorithm 1.
+/// Compile DX7 algorithm 1.
 ///
 /// ```mermaid
 /// flowchart
@@ -53,51 +55,159 @@ pub fn compile_dx7(dx7: u8, repeat: u8) -> CompiledAlgorithm {
 pub fn compile_dx7_1(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
 
-    let out_6 = StackID::from(repeat);
-    let out_5 = StackID::from(repeat + 1);
-    let out_4 = StackID::from(repeat + 2);
-    let out_3 = StackID::from(repeat + 3);
-    let out_2 = StackID::from(repeat + 4);
-    let out_1 = StackID::from(repeat + 5);
-
-    result.stack_size = (repeat + 6) as usize;
-
-    let mut stack_in = vec![];
-    for stack_index in 0..repeat {
-        result.add_step(stack_in, OPERATOR_6, StackID::from(stack_index));
-        stack_in = vec![StackID::from(stack_index)];
-    }
-    result.add_step(stack_in, OPERATOR_6, out_6);
-    result.add_step(vec![out_6], OPERATOR_5, out_5);
-    result.add_step(vec![out_5], OPERATOR_4, out_4);
-    result.add_step(vec![out_4], OPERATOR_3, out_3);
-    result.add_step(vec![], OPERATOR_2, out_2);
-    result.add_step(vec![out_2], OPERATOR_1, out_1);
-
-    result.carrier_output = vec![out_1, out_3];
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_3 = build_steps(
+        &mut result,
+        vec![out_6],
+        &[OPERATOR_5, OPERATOR_4, OPERATOR_3],
+    );
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_2, OPERATOR_1]);
+    build_carrier_out(&mut result, vec![out_1, out_3]);
 
     result
 }
+
+/// Compile DX7 algorithm 2.
+///
+/// ```mermaid
+/// flowchart
+///     2 --> 2
+///     2 --> 1 --> out
+///     6 --> 5 --> 4 --> 3 --> out
+/// ```
 fn compile_dx7_2(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+
+    let out_2 = build_repeat(&mut result, &[OPERATOR_2], repeat);
+    let out_1 = build_step(&mut result, vec![out_2], OPERATOR_1);
+    let out_3 = build_steps(
+        &mut result,
+        vec![],
+        &[OPERATOR_6, OPERATOR_5, OPERATOR_4, OPERATOR_3],
+    );
+    build_carrier_out(&mut result, vec![out_1, out_3]);
+
+    result
 }
+
+/// Compile DX7 algorithm 3.
+///
+/// ```mermaid
+/// flowchart
+///     6 --> 6
+///     6 --> 5 --> 4 --> out
+///     3 --> 2 --> 1 --> out
+/// ```
 fn compile_dx7_3(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_4 = build_steps(&mut result, vec![out_6], &[OPERATOR_5, OPERATOR_4]);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_3, OPERATOR_2, OPERATOR_1]);
+    build_carrier_out(&mut result, vec![out_1, out_4]);
+
+    result
 }
+
+/// Compile DX7 algorithm 4.
+///
+/// ```mermaid
+/// flowchart
+///     6 --> 5 --> 4 --> 6
+///     4 --> out
+///     3 --> 2 --> 1 --> out
+/// ```
 fn compile_dx7_4(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+
+    let out_4 = build_repeat(&mut result, &[OPERATOR_6, OPERATOR_5, OPERATOR_4], repeat);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_3, OPERATOR_2, OPERATOR_1]);
+    build_carrier_out(&mut result, vec![out_1, out_4]);
+
+    result
 }
+
+/// Compile DX7 algorithm 5.
+///
+/// ```mermaid
+/// flowchart
+///     6 --> 6
+///     6 --> 5 --> out
+///     4 --> 3 --> out
+///     2 --> 1 --> out
+/// ```
 fn compile_dx7_5(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    let out_3 = build_steps(&mut result, vec![], &[OPERATOR_4, OPERATOR_3]);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_2, OPERATOR_1]);
+    build_carrier_out(&mut result, vec![out_1, out_3, out_5]);
+
+    result
 }
+
+/// Compile DX7 algorithm 6.
+///
+/// ```mermaid
+/// flowchart
+///     6 --> 5 --> 6
+///     5 --> out
+///     4 --> 3 --> out
+///     2 --> 1 --> out
+/// ```
 fn compile_dx7_6(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+
+    let out_5 = build_repeat(&mut result, &[OPERATOR_6, OPERATOR_5], repeat);
+    let out_3 = build_steps(&mut result, vec![], &[OPERATOR_4, OPERATOR_3]);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_2, OPERATOR_1]);
+    build_carrier_out(&mut result, vec![out_1, out_3, out_5]);
+
+    result
 }
+
+/// Compile DX7 algorithm 7.
+///
+/// ```mermaid
+/// flowchart
+///     6 --> 6
+///     5 --> 3
+///     4 --> 3 --> out
+///     2 --> 1 --> out
+/// ```
 fn compile_dx7_7(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+
+    let out_5 = build_repeat(&mut result, &[OPERATOR_6, OPERATOR_5], repeat);
+    let out_4 = build_step(&mut result, vec![], OPERATOR_4);
+    let out_3 = build_step(&mut result, vec![out_5, out_4], OPERATOR_3);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_2, OPERATOR_1]);
+    build_carrier_out(&mut result, vec![out_1, out_3]);
+
+    result
 }
+
+/// Compile DX7 algorithm 8.
+///
+/// ```mermaid
+/// flowchart
+///     4 --> 4
+///     6 --> 5 --> 3
+///     4 --> 3 --> out
+///     2 --> 1 --> out
+/// ```
 fn compile_dx7_8(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+
+    let out_4 = build_repeat(&mut result, &[OPERATOR_4], repeat);
+    let out_5 = build_steps(&mut result, vec![], &[OPERATOR_6, OPERATOR_5]);
+    let out_3 = build_step(&mut result, vec![out_5, out_4], OPERATOR_3);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_2, OPERATOR_1]);
+    build_carrier_out(&mut result, vec![out_1, out_3]);
+
+    result
 }
 fn compile_dx7_9(repeat: u8) -> CompiledAlgorithm {
     todo!()
