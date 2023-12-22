@@ -263,5 +263,12 @@ Some type of effects are:
 
 ## Future Ideas
 
-* Add effects like delay, chorus, phaser, distortion
+* Add effects like delay, chorus, phaser, distortion, flanger
 * Add sound to fm instrument converter
+* FMInstrument Compiler that optimizes the compiled algorithm based on enabled operations.
+* Render audio to video using ffmpeg; most crates only support video and not audio
+* Use polyphonic rendering eg (upto 128 voices) each voice can then be tagged with meta data.
+  This meta data can then be used to steer the video rendering (split per instrument, track)
+* FMInstrument: Use ratio buckets in stead of a single sample? Perhaps a sound pressure sample should
+  be an enum, that could be switched between them. This way higher quality can be achieved as frequency
+  extraction steps are less needed. Each bucket would require their own sound state.  
