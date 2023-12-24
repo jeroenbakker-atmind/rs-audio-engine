@@ -1,7 +1,12 @@
 use crate::operator_frequency::{OperatorFrequency, RATED_1};
 use audio_engine_common::{
-    digital_sound::sound::Sound, envelope::Envelope, id::ID, level::Level, note_time::NoteTime,
-    phase_time::PhaseTime, waveform::Waveform,
+    digital_sound::sound::Sound,
+    envelope::Envelope,
+    id::ID,
+    level::Level,
+    note_time::NoteTime,
+    phase_time::PhaseTime,
+    waveform::{state::WaveformState, Waveform},
 };
 
 #[derive(Debug, Clone)]
@@ -69,7 +74,7 @@ where
             note_off,
             note_pitch,
             sample_rate,
-            &mut state.phase_time,
+            &mut state.waveform,
         );
         result * self.envelope.level(note_time, note_off) * self.level
     }
@@ -124,12 +129,13 @@ where
 
 #[derive(Debug, Default, Copy, Clone)]
 pub struct OperatorNoteState {
-    pub phase_time: PhaseTime,
+    pub waveform: WaveformState,
 }
 
 impl OperatorNoteState {
     pub fn reset(&mut self) {
-        self.phase_time = PhaseTime::default();
+        // TODO should use create_state, as the state is getting more settings.
+        self.waveform = WaveformState::default();
     }
 }
 
