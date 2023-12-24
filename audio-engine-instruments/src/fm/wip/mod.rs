@@ -1,4 +1,7 @@
-use audio_engine_common::envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease;
+use audio_engine_common::{
+    envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
+    waveform::Waveform,
+};
 use audio_engine_instrument_fm::{
     algorithm::preset::FM_ALGORITHM_BASIC_D_MOD_ABC,
     instrument::FMInstrument,

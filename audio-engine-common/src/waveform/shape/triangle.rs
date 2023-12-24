@@ -8,7 +8,7 @@ impl HarmonicShape for TriangleShape {
         if harmonic & 1 == 0 {
             0.0
         } else {
-            ((-1.0_f32).powf((harmonic as f32 - 1.0) / 2.0)) / ((harmonic as f32).powi(2))
+            0.8 * ((-1.0_f32).powf((harmonic as f32 - 1.0) / 2.0)) / ((harmonic as f32).powi(2))
         }
     }
 }
@@ -21,7 +21,7 @@ mod test {
 
     #[test]
     fn test_triangle_harmonics() {
-        let shape = TriangleShape { mode: 10 };
+        let shape = TriangleShape::default();
         test_harmonic_shape(&shape);
     }
 }

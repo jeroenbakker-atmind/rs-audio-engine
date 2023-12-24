@@ -10,6 +10,7 @@ use audio_engine_instrument_fm::{
 };
 use audio_engine_sequencer::instrument::Instrument;
 
+pub mod harmonic;
 pub mod saw_ramp_down;
 pub mod saw_ramp_up;
 pub mod sine;

@@ -5,10 +5,18 @@ use std::path::Path;
 use audio_engine_common::phase_time::PhaseTime;
 use audio_engine_common::waveform::shape::morph::MorphShape;
 use audio_engine_common::waveform::shape::shape_sample;
-fn main() {
-    // For reading and opening files
 
-    let path = Path::new(r"morph-shapes.png");
+fn main() {
+    export_morph("morph-shapes-01.png", 1);
+    export_morph("morph-shapes-03.png", 3);
+    export_morph("morph-shapes-05.png", 5);
+    export_morph("morph-shapes-07.png", 7);
+    export_morph("morph-shapes-09.png", 9);
+}
+
+fn export_morph(filename: &str, harmonics: u8) {
+    // For reading and opening files
+    let path = Path::new(filename);
     let file = File::create(path).unwrap();
     let w = BufWriter::new(file);
 
@@ -42,7 +50,7 @@ fn main() {
             for shape_x in 0..shape_dim {
                 let time = shape_x as f32 / shape_dim as f32;
                 let phase_time = PhaseTime { time };
-                let sample = shape_sample(&shape, phase_time, 32).clamp(-1.0, 1.0);
+                let sample = shape_sample(&shape, phase_time, harmonics).clamp(-1.0, 1.0);
                 let from_y = (-sample * 0.5 + 0.5) * shape_visual_size;
                 if from_y >= 0.0 && from_y < shape_dim as f32 {
                     let shape_y = from_y as usize;
