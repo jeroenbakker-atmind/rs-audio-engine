@@ -12,7 +12,8 @@ fn main() {
     let file = File::create(path).unwrap();
     let w = BufWriter::new(file);
 
-    let shape_dim = 64;
+    let shape_dim = 128;
+    let shape_visual_size = shape_dim as f32 / 2.0;
     let num_shapes_per_param = 8;
     let image_dim: usize = shape_dim * num_shapes_per_param;
 
@@ -41,8 +42,8 @@ fn main() {
             for shape_x in 0..shape_dim {
                 let time = shape_x as f32 / shape_dim as f32;
                 let phase_time = PhaseTime { time };
-                let sample = shape_sample(&shape, phase_time, 16).clamp(-1.0, 1.0);
-                let from_y = (sample * 0.5 + 0.5) * 32.0;
+                let sample = shape_sample(&shape, phase_time, 32).clamp(-1.0, 1.0);
+                let from_y = (-sample * 0.5 + 0.5) * shape_visual_size;
                 if from_y >= 0.0 && from_y < shape_dim as f32 {
                     let shape_y = from_y as usize;
 
