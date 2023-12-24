@@ -8,3 +8,6 @@ edition = "2021"
 [lib]
 name="audio_engine_common"
 path="src/lib.rs"
+
+[dependencies]
+png = "0.17.10"

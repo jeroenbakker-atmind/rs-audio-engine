@@ -1,6 +1,9 @@
 use crate::{digital_sound::sound::Sound, phase_time::PhaseTime};
 
-use self::state::WaveformState;
+use self::{
+    shape::{morph::MorphShape, shape_sample},
+    state::WaveformState,
+};
 pub mod shape;
 pub mod state;
 
@@ -17,6 +20,7 @@ pub enum Waveform {
     /// Saw(true): ramp down/decreasing slope
     Saw(bool),
     Pulse(f32),
+    Morph(f32, f32, u8),
 }
 
 impl Sound for Waveform {
@@ -65,6 +69,10 @@ impl Sound for Waveform {
                 } else {
                     sample
                 }
+            }
+            Waveform::Morph(x, y, num_harmonics) => {
+                let shape = MorphShape::new(*x, *y);
+                shape_sample(&shape, state.phase_time, *num_harmonics)
             }
         };
         state.phase_time += PhaseTime::delta_phase_time(note_pitch, sample_rate);
