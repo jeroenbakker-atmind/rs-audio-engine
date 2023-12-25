@@ -1,6 +1,11 @@
 //! Fourier Transformation for audio processing.
 //!
-//! In audio processing fourier transformation is used a lot.
+//! In audio processing fourier transformation is used in many use-cases.
+//!
+//! - Frequency filtering
+//! - Providing warmer sounds by emulating electronics
+//! - Time stretching without loosing pitch
+//!
 //! Commonly a library is used to transform from time to frequency domain and back.
 //! As the goal is to explain many details of constructing a audio engine a basic
 //! fourier transform library will be created.
