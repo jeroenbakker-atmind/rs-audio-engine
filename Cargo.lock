@@ -96,6 +96,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "audio-engine-fourier"
+version = "0.1.0"
+
+[[package]]
 name = "audio-engine-instrument-fm"
 version = "0.1.0"
 dependencies = [

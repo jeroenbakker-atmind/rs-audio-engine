@@ -2,6 +2,7 @@
 [workspace]
 members = [
     "audio-engine-common",
+    "audio-engine-fourier",
     "audio-engine-notes",
 
     "audio-engine-instrument-fm",
