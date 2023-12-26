@@ -1,5 +1,8 @@
 use crate::{fourier_series::FourierSeries, parameters::Parameters};
 
+// Similar to https://gist.github.com/anonymous/129d477ddb1c8025c9ac
+// https://betterexplained.com/articles/an-interactive-guide-to-the-fourier-transform/
+
 pub trait ToFrequencyDomain {
     /// Perform a transformation from time domain to frequency domain.
     fn to_frequency_domain(&self, steps: usize, sub_steps: usize) -> FourierSeries;

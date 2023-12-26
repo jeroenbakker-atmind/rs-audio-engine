@@ -87,12 +87,12 @@ fn time_to_frequency() {
 #[test]
 fn time_to_frequency_to_time() {
     use to_frequency_domain::ToFrequencyDomain;
-    let input = (0..16)
-        .map(|e| e as f32 / 16.0 * TAU)
+    let input = (0..1024)
+        .map(|e| e as f32 / 1024.0 * TAU)
         .map(|radian| radian.sin())
         .collect::<Vec<f32>>();
     println!("input={:#?}", input);
-    let fourier_series = input.as_slice().to_frequency_domain(16, 0);
+    let fourier_series = input.as_slice().to_frequency_domain(1024, 0);
     println!("series={:#?}", fourier_series.amplitudes);
     let output = fourier_series.to_time_domain();
     println!("output={:#?}", output);
