@@ -18,10 +18,10 @@ fn main() {
 
     println!("Begin exporting");
     export_audio_to_video(
-        "export-song1-waveform.mp4",
+        "export-song1-histogram.mp4",
         &samples,
         sample_rate,
-        VideoType::Waveform,
+        VideoType::Histogram,
     );
     println!("Finished exporting");
 }

@@ -38,16 +38,12 @@
 //!         steps: 2,
 //!         sub_steps: 0,
 //!     },
-//!     amplitudes: vec![0.0, 1.0],
+//!     amplitudes: vec![(0.0, 0.0), (0.0, 1.0)],
 //! };
 //!
 //! let time_domain = series.to_time_domain();
 //! println!("{time_domain:#?}");
 //! ```
-
-use std::f32::consts::TAU;
-
-use crate::to_time_domain::ToTimeDomain;
 
 pub mod fourier_series;
 pub mod parameters;
@@ -66,7 +62,7 @@ fn frequency_to_time() {
             steps: 2,
             sub_steps: 0,
         },
-        amplitudes: vec![0.0, 1.0],
+        amplitudes: vec![(0.0, 0.0), (0.0, 1.0)],
     };
 
     let time_domain = series.to_time_domain();
@@ -75,7 +71,9 @@ fn frequency_to_time() {
 
 #[test]
 fn time_to_frequency() {
+    use std::f32::consts::TAU;
     use to_frequency_domain::ToFrequencyDomain;
+
     let time_domain = (0..16)
         .map(|e| e as f32 / 16.0 * TAU)
         .map(|radian| radian.sin())
@@ -86,7 +84,10 @@ fn time_to_frequency() {
 
 #[test]
 fn time_to_frequency_to_time() {
+    use std::f32::consts::TAU;
     use to_frequency_domain::ToFrequencyDomain;
+    use to_time_domain::ToTimeDomain;
+
     let input = (0..1024)
         .map(|e| e as f32 / 1024.0 * TAU)
         .map(|radian| radian.sin())

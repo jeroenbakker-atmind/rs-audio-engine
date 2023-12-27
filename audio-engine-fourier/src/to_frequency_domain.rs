@@ -1,4 +1,7 @@
-use crate::{fourier_series::FourierSeries, parameters::Parameters};
+use crate::{
+    fourier_series::{ComplexNumber, FourierSeries, RadianSpeed},
+    parameters::Parameters,
+};
 
 // Similar to https://gist.github.com/anonymous/129d477ddb1c8025c9ac
 // https://betterexplained.com/articles/an-interactive-guide-to-the-fourier-transform/
@@ -23,7 +26,7 @@ impl ToFrequencyDomain for &[f32] {
         let amplitudes = radian_speeds
             .iter()
             .map(|radian_speed| calc_frequency_amplitude(self, *radian_speed))
-            .collect::<Vec<f32>>();
+            .collect::<Vec<ComplexNumber>>();
 
         FourierSeries {
             parameters,
@@ -32,8 +35,19 @@ impl ToFrequencyDomain for &[f32] {
     }
 }
 
-fn calc_frequency_amplitude(time_domain: &[f32], radian_speed: f32) -> f32 {
-    let amplitude = time_domain
+fn calc_frequency_amplitude(time_domain: &[f32], radian_speed: RadianSpeed) -> ComplexNumber {
+    // TODO: Use single iteration.
+    let amplitude_a = time_domain
+        .iter()
+        .enumerate()
+        .map(|(index, sample)| {
+            let radian = radian_speed * (index as f32 / time_domain.len() as f32);
+            radian.cos() * sample
+        })
+        .sum::<f32>()
+        / time_domain.len().max(1) as f32;
+
+    let amplitude_b = time_domain
         .iter()
         .enumerate()
         .map(|(index, sample)| {
@@ -43,19 +57,5 @@ fn calc_frequency_amplitude(time_domain: &[f32], radian_speed: f32) -> f32 {
         .sum::<f32>()
         / time_domain.len().max(1) as f32;
 
-    amplitude
+    (amplitude_a, amplitude_b)
 }
-
-/*
-fn calc_frequency_amplitude(time_domain: &[f32], radian_speed: f32) -> f32 {
-    let mut sum = 0.0;
-    for (index, sample) in time_domain.iter().enumerate() {
-        let radian = radian_speed * (index as f32 / time_domain.len() as f32);
-        sum += radian.cos() * sample
-    }
-
-    let amplitude = sum / time_domain.len().max(1) as f32;
-    println!("speed={}: sum={} amp={}", radian_speed, sum, amplitude);
-    amplitude
-}
-*/
