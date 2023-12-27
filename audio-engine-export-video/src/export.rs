@@ -27,6 +27,8 @@ pub fn export_audio_to_video(
     let num_samples_per_frame = sample_rate / frame_rate;
     let num_frames = samples.len() / num_samples_per_frame as usize;
 
+    let render_context = video_type.init(samples, num_samples_per_frame as usize);
+
     for frame_number in 0..num_frames {
         print!(" - {}/{}\r", frame_number, num_frames);
         // This will create a smooth rainbow animation video!
@@ -37,6 +39,7 @@ pub fn export_audio_to_video(
             samples,
             sample_offset,
             num_samples_per_frame as usize,
+            &render_context,
         );
 
         encoder

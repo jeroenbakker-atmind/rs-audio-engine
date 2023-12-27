@@ -5,5 +5,6 @@
 //! for an example how we could use ffmpeg for this.
 pub mod export;
 pub mod histogram;
+pub mod render_context;
 pub mod types;
 pub mod waveform;
