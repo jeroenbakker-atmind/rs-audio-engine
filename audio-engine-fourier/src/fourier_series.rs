@@ -2,7 +2,16 @@ use std::f32::consts::TAU;
 
 use crate::parameters::Parameters;
 
+/// ComplexNumber can hold the real and imaginary part of a complex number.
+///
+/// Doing audio processing it isn't really necessary to know how complex
+/// number work. See the `real` part as being associated with cosine and
+/// the imaginary part with sine. The terms complex number, real and
+/// imaginary are kept for alignment with other materials about fourier
+/// transforms.
 pub type ComplexNumber = (f32, f32);
+
+/// RadianSpeed of a frequency
 pub type RadianSpeed = f32;
 
 #[derive(Debug, Clone)]
@@ -15,17 +24,9 @@ pub struct FourierSeries {
 
 impl FourierSeries {
     pub fn collect_radian_speed(parameters: &Parameters) -> Vec<RadianSpeed> {
-        let mut result = Vec::with_capacity(parameters.steps * (parameters.sub_steps + 1));
-
-        (0..parameters.steps).for_each(|integer_step| {
-            (0..=parameters.sub_steps).for_each(|sub_step| {
-                let radian_speed = TAU
-                    * (integer_step as f32 + sub_step as f32 / (parameters.sub_steps + 1) as f32);
-                result.push(radian_speed);
-            })
-        });
-
-        result
+        (0..parameters.steps)
+            .map(|integer_step| TAU * (integer_step as f32))
+            .collect::<Vec<f32>>()
     }
 
     pub fn collect_radian_speed_with_amplitude(&self) -> Vec<(RadianSpeed, ComplexNumber)> {

@@ -3,7 +3,7 @@ use audio_engine_common::{
     waveform::Waveform,
 };
 use audio_engine_instrument_fm::{
-    algorithm::preset::{Algorithm, FM_ALGORITHM_BASIC_A},
+    algorithm::preset::FM_ALGORITHM_BASIC_A,
     instrument::FMInstrument,
     operator::{Operator, Operators},
     operator_frequency::RATED_1,

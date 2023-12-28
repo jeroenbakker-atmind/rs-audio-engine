@@ -8,16 +8,15 @@ use crate::{
 
 pub trait ToFrequencyDomain {
     /// Perform a transformation from time domain to frequency domain.
-    fn to_frequency_domain(&self, steps: usize, sub_steps: usize) -> FourierSeries;
+    fn to_frequency_domain(&self, steps: usize) -> FourierSeries;
     fn to_frequency_domain_with_parameters(&self, parameters: Parameters) -> FourierSeries;
 }
 
 impl ToFrequencyDomain for &[f32] {
-    fn to_frequency_domain(&self, steps: usize, sub_steps: usize) -> FourierSeries {
+    fn to_frequency_domain(&self, steps: usize) -> FourierSeries {
         self.to_frequency_domain_with_parameters(Parameters {
             data_len: self.len(),
             steps,
-            sub_steps,
         })
     }
 
@@ -36,26 +35,14 @@ impl ToFrequencyDomain for &[f32] {
 }
 
 fn calc_frequency_amplitude(time_domain: &[f32], radian_speed: RadianSpeed) -> ComplexNumber {
-    // TODO: Use single iteration.
-    let amplitude_a = time_domain
-        .iter()
-        .enumerate()
-        .map(|(index, sample)| {
-            let radian = radian_speed * (index as f32 / time_domain.len() as f32);
-            radian.cos() * sample
-        })
-        .sum::<f32>()
-        / time_domain.len().max(1) as f32;
+    let mut amplitude = ComplexNumber::default();
+    for (index, sample) in time_domain.iter().enumerate() {
+        let radian = radian_speed * (index as f32 / time_domain.len() as f32);
+        amplitude.0 += radian.cos() * sample;
+        amplitude.1 += radian.sin() * sample;
+    }
+    amplitude.0 /= time_domain.len().max(1) as f32;
+    amplitude.1 /= time_domain.len().max(1) as f32;
 
-    let amplitude_b = time_domain
-        .iter()
-        .enumerate()
-        .map(|(index, sample)| {
-            let radian = radian_speed * (index as f32 / time_domain.len() as f32);
-            radian.sin() * sample
-        })
-        .sum::<f32>()
-        / time_domain.len().max(1) as f32;
-
-    (amplitude_a, amplitude_b)
+    amplitude
 }

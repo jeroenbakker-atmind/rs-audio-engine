@@ -11,7 +11,7 @@ impl RenderContext {
             let frame_samples =
                 &samples[i * samples_per_frame..((i + 1) * samples_per_frame).min(samples.len())];
             self.fourier_series
-                .push(frame_samples.to_frequency_domain(samples_per_frame, 0));
+                .push(frame_samples.to_frequency_domain(samples_per_frame));
         }
     }
 }
