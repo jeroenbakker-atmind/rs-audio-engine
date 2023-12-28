@@ -374,7 +374,6 @@ fn compile_dx7_17(repeat: u8) -> CompiledAlgorithm {
     let out_2 = build_repeat(&mut result, &[OPERATOR_2], repeat);
     let out_5 = build_steps(&mut result, vec![], &[OPERATOR_6, OPERATOR_5]);
     let out_3 = build_steps(&mut result, vec![], &[OPERATOR_4, OPERATOR_3]);
-    let out_2 = build_step(&mut result, vec![], OPERATOR_2);
     let out_1 = build_step(&mut result, vec![out_5, out_3, out_2], OPERATOR_1);
     build_carrier_out(&mut result, vec![out_1, out_3]);
     result
