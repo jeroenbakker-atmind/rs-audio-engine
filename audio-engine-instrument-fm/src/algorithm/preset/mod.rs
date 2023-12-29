@@ -10,7 +10,7 @@ pub const FM_ALGORITHM_BASIC_B_MOD_A: Algorithm = Algorithm::Basic(Basic::BModul
 pub const FM_ALGORITHM_BASIC_D_MOD_ABC: Algorithm = Algorithm::Basic(Basic::DModulatesABC);
 
 #[cfg_attr(doc, aquamarine::aquamarine)]
-/// DX7 algorithm 1.
+/// DX7 algorithm 1
 /// ```mermaid
 /// flowchart
 ///     6 -->|repeat| 6
@@ -336,7 +336,7 @@ pub const FM_ALGORITHM_DX7_26: Algorithm = Algorithm::DX7(26);
 ///     1 --> out
 ///     3 --> 2 --> out
 ///     5 --> 4 --> out
-///     6 --> 4 --> out
+///     6 --> 4
 /// ```
 pub const FM_ALGORITHM_DX7_27: Algorithm = Algorithm::DX7(27);
 
