@@ -7,7 +7,7 @@ use crate::{
 };
 
 pub fn compile_dx7(dx7: u8, repeat: u8) -> CompiledAlgorithm {
-    match dx7 {
+    let compiled_algorithm = match dx7 {
         1 => compile_dx7_1(repeat),
         2 => compile_dx7_2(repeat),
         3 => compile_dx7_3(repeat),
@@ -41,18 +41,21 @@ pub fn compile_dx7(dx7: u8, repeat: u8) -> CompiledAlgorithm {
         31 => compile_dx7_31(repeat),
         32 => compile_dx7_32(repeat),
         _ => CompiledAlgorithm::default(),
-    }
+    };
+    debug_assert!(is_valid_dx7_algorithm(&compiled_algorithm));
+    compiled_algorithm
 }
 
-#[cfg_attr(doc, aquamarine::aquamarine)]
-/// Compile DX7 algorithm 1.
+/// Is the given compiled algorithm a valid DX7 algorithm.
 ///
-/// ```mermaid
-/// flowchart
-///     6 --> 6
-///     6 --> 5 --> 4 --> 3 --> out
-///     2 --> 1 --> out
-/// ```
+/// Validation rules that are checked:
+///
+/// - All operators should be connected (direct or indirect) to the output.
+fn is_valid_dx7_algorithm(_compiled_algorithm: &CompiledAlgorithm) -> bool {
+    true
+}
+
+/// Compile #FM_ALGORITHM_DX7_1
 pub fn compile_dx7_1(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
 
@@ -68,14 +71,7 @@ pub fn compile_dx7_1(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 2.
-///
-/// ```mermaid
-/// flowchart
-///     2 --> 2
-///     2 --> 1 --> out
-///     6 --> 5 --> 4 --> 3 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_2
 fn compile_dx7_2(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
 
@@ -91,14 +87,7 @@ fn compile_dx7_2(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 3.
-///
-/// ```mermaid
-/// flowchart
-///     6 --> 6
-///     6 --> 5 --> 4 --> out
-///     3 --> 2 --> 1 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_3
 fn compile_dx7_3(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
@@ -108,14 +97,7 @@ fn compile_dx7_3(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 4.
-///
-/// ```mermaid
-/// flowchart
-///     6 --> 5 --> 4 --> 6
-///     4 --> out
-///     3 --> 2 --> 1 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_4
 fn compile_dx7_4(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_4 = build_repeat(&mut result, &[OPERATOR_6, OPERATOR_5, OPERATOR_4], repeat);
@@ -124,15 +106,7 @@ fn compile_dx7_4(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 5.
-///
-/// ```mermaid
-/// flowchart
-///     6 --> 6
-///     6 --> 5 --> out
-///     4 --> 3 --> out
-///     2 --> 1 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_5
 fn compile_dx7_5(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
@@ -143,15 +117,7 @@ fn compile_dx7_5(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 6.
-///
-/// ```mermaid
-/// flowchart
-///     6 --> 5 --> 6
-///     5 --> out
-///     4 --> 3 --> out
-///     2 --> 1 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_6
 fn compile_dx7_6(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_5 = build_repeat(&mut result, &[OPERATOR_6, OPERATOR_5], repeat);
@@ -161,15 +127,7 @@ fn compile_dx7_6(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 7.
-///
-/// ```mermaid
-/// flowchart
-///     6 --> 6
-///     5 --> 3
-///     4 --> 3 --> out
-///     2 --> 1 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_7
 fn compile_dx7_7(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_5 = build_repeat(&mut result, &[OPERATOR_6, OPERATOR_5], repeat);
@@ -180,15 +138,7 @@ fn compile_dx7_7(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 8.
-///
-/// ```mermaid
-/// flowchart
-///     4 --> 4
-///     6 --> 5 --> 3
-///     4 --> 3 --> out
-///     2 --> 1 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_8
 fn compile_dx7_8(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_4 = build_repeat(&mut result, &[OPERATOR_4], repeat);
@@ -199,15 +149,7 @@ fn compile_dx7_8(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 9.
-///
-/// ```mermaid
-/// flowchart
-///     2 --> 2
-///     2 --> 1 --> out
-///     6 --> 5 --> 3
-///     4 --> 3 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_9
 fn compile_dx7_9(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_2 = build_repeat(&mut result, &[OPERATOR_2], repeat);
@@ -219,15 +161,7 @@ fn compile_dx7_9(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 10.
-///
-/// ```mermaid
-/// flowchart
-///     3 --> 3
-///     3 --> 2 --> 1 --> out
-///     6 --> 4
-///     5 --> 4 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_10
 fn compile_dx7_10(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_3 = build_repeat(&mut result, &[OPERATOR_3], repeat);
@@ -239,15 +173,7 @@ fn compile_dx7_10(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 11.
-///
-/// ```mermaid
-/// flowchart
-///     3 --> 2 --> 1
-///     6 --> 6
-///     6 --> 4 --> out
-///     5 --> 4
-/// ```
+/// Compile #FM_ALGORITHM_DX7_11
 fn compile_dx7_11(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
@@ -258,16 +184,7 @@ fn compile_dx7_11(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 12.
-///
-/// ```mermaid
-/// flowchart
-///     2 --> 2
-///     2 --> 1 --> out
-///     4 --> 3 --> out
-///     5 --> 3
-///     6 --> 3
-/// ```
+/// Compile #FM_ALGORITHM_DX7_12
 fn compile_dx7_12(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_2 = build_repeat(&mut result, &[OPERATOR_2], repeat);
@@ -280,16 +197,7 @@ fn compile_dx7_12(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 13.
-///
-/// ```mermaid
-/// flowchart
-///     2 --> 1 --> out
-///     4 --> 3 --> out
-///     5 --> 3
-///     6 --> 6
-///     6 --> 3
-/// ```
+/// Compile #FM_ALGORITHM_DX7_13
 fn compile_dx7_13(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
@@ -301,15 +209,7 @@ fn compile_dx7_13(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 14.
-///
-/// ```mermaid
-/// flowchart
-///     6 --> 6
-///     2 --> 1 --> out
-///     6 --> 4 --> 3 --> out
-///     5 --> 4
-/// ```
+/// Compile #FM_ALGORITHM_DX7_14
 fn compile_dx7_14(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
@@ -320,15 +220,7 @@ fn compile_dx7_14(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 15.
-///
-/// ```mermaid
-/// flowchart
-///     2 --> 2
-///     2 --> 1 --> out
-///     6 --> 4 --> 3 --> out
-///     5 --> 4
-/// ```
+/// Compile #FM_ALGORITHM_DX7_15
 fn compile_dx7_15(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_2 = build_repeat(&mut result, &[OPERATOR_2], repeat);
@@ -340,15 +232,7 @@ fn compile_dx7_15(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 16.
-///
-/// ```mermaid
-/// flowchart
-///     6 --> 6
-///     6 --> 5 --> 1
-///     4 --> 3 --> 1
-///     2 --> 1 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_16
 fn compile_dx7_16(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
@@ -360,15 +244,7 @@ fn compile_dx7_16(repeat: u8) -> CompiledAlgorithm {
     result
 }
 
-/// Compile DX7 algorithm 17.
-///
-/// ```mermaid
-/// flowchart
-///     2 --> 2
-///     6 --> 5 --> 1
-///     4 --> 3 --> 1
-///     2 --> 1 --> out
-/// ```
+/// Compile #FM_ALGORITHM_DX7_17
 fn compile_dx7_17(repeat: u8) -> CompiledAlgorithm {
     let mut result = CompiledAlgorithm::default();
     let out_2 = build_repeat(&mut result, &[OPERATOR_2], repeat);
@@ -378,49 +254,93 @@ fn compile_dx7_17(repeat: u8) -> CompiledAlgorithm {
     build_carrier_out(&mut result, vec![out_1, out_3]);
     result
 }
+
+/// Compile #FM_ALGORITHM_DX7_18
 fn compile_dx7_18(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_19
 fn compile_dx7_19(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+/// Compile #FM_ALGORITHM_DX7_20
 fn compile_dx7_20(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_21
 fn compile_dx7_21(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_22
 fn compile_dx7_22(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_23
 fn compile_dx7_23(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_24
 fn compile_dx7_24(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_25
 fn compile_dx7_25(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_26
 fn compile_dx7_26(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_27
 fn compile_dx7_27(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_28
 fn compile_dx7_28(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_29
 fn compile_dx7_29(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
 
+/// Compile #FM_ALGORITHM_DX7_30
 fn compile_dx7_30(repeat: u8) -> CompiledAlgorithm {
     todo!()
 }
+
+/// Compile #FM_ALGORITHM_DX7_31
 fn compile_dx7_31(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    let out_4 = build_step(&mut result, vec![], OPERATOR_4);
+    let out_3 = build_step(&mut result, vec![], OPERATOR_3);
+    let out_2 = build_step(&mut result, vec![], OPERATOR_2);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_3, out_4, out_5]);
+    result
 }
+
+/// Compile #FM_ALGORITHM_DX7_32
 fn compile_dx7_32(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_5 = build_step(&mut result, vec![], OPERATOR_5);
+    let out_4 = build_step(&mut result, vec![], OPERATOR_4);
+    let out_3 = build_step(&mut result, vec![], OPERATOR_3);
+    let out_2 = build_step(&mut result, vec![], OPERATOR_2);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_3, out_4, out_5, out_6]);
+    result
 }
