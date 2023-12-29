@@ -74,7 +74,7 @@ mod test {
         let mut delay_state = delay.effect_create_state();
 
         for out_value in [1.0, 1.5, 1.75, 1.875] {
-            for s in 0..4 {
+            for _ in 0..4 {
                 let mut samples = in_samples;
                 delay.effect_apply(&mut samples, sample_rate, &mut delay_state);
                 assert_eq!(samples, [out_value]);

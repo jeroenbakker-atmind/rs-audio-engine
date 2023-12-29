@@ -3,7 +3,9 @@ use crate::{
         builder::{build_carrier_out, build_repeat, build_step, build_steps},
         compiled::CompiledAlgorithm,
     },
-    operator::{OPERATOR_1, OPERATOR_2, OPERATOR_3, OPERATOR_4, OPERATOR_5, OPERATOR_6},
+    operator::{
+        OperatorID, OPERATOR_1, OPERATOR_2, OPERATOR_3, OPERATOR_4, OPERATOR_5, OPERATOR_6,
+    },
 };
 
 pub fn compile_dx7(dx7: u8, repeat: u8) -> CompiledAlgorithm {
@@ -50,8 +52,35 @@ pub fn compile_dx7(dx7: u8, repeat: u8) -> CompiledAlgorithm {
 ///
 /// Validation rules that are checked:
 ///
+/// - All operators should be part of the compiled algorithm
 /// - All operators should be connected (direct or indirect) to the output.
-fn is_valid_dx7_algorithm(_compiled_algorithm: &CompiledAlgorithm) -> bool {
+fn is_valid_dx7_algorithm(compiled_algorithm: &CompiledAlgorithm) -> bool {
+    fn has_operator(compiled_algorithm: &CompiledAlgorithm, operator_index: OperatorID) -> bool {
+        compiled_algorithm
+            .execution_steps
+            .iter()
+            .any(|step| step.operator_index == operator_index)
+    }
+
+    if !has_operator(compiled_algorithm, OPERATOR_1) {
+        return false;
+    }
+    if !has_operator(compiled_algorithm, OPERATOR_2) {
+        return false;
+    }
+    if !has_operator(compiled_algorithm, OPERATOR_3) {
+        return false;
+    }
+    if !has_operator(compiled_algorithm, OPERATOR_4) {
+        return false;
+    }
+    if !has_operator(compiled_algorithm, OPERATOR_5) {
+        return false;
+    }
+    if !has_operator(compiled_algorithm, OPERATOR_6) {
+        return false;
+    }
+
     true
 }
 
@@ -257,66 +286,160 @@ fn compile_dx7_17(repeat: u8) -> CompiledAlgorithm {
 
 /// Compile #FM_ALGORITHM_DX7_18
 fn compile_dx7_18(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_3 = build_repeat(&mut result, &[OPERATOR_3], repeat);
+    let out_4 = build_steps(&mut result, vec![], &[OPERATOR_6, OPERATOR_5, OPERATOR_4]);
+    let out_2 = build_step(&mut result, vec![], OPERATOR_2);
+    let out_1 = build_step(&mut result, vec![out_2, out_3, out_4], OPERATOR_1);
+    build_carrier_out(&mut result, vec![out_1]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_19
 fn compile_dx7_19(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_4 = build_step(&mut result, vec![out_6], OPERATOR_4);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_3, OPERATOR_2, OPERATOR_1]);
+    build_carrier_out(&mut result, vec![out_1, out_4, out_5]);
+    result
 }
+
 /// Compile #FM_ALGORITHM_DX7_20
 fn compile_dx7_20(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_3 = build_repeat(&mut result, &[OPERATOR_3], repeat);
+    let out_1 = build_step(&mut result, vec![out_3], OPERATOR_1);
+    let out_2 = build_step(&mut result, vec![out_3], OPERATOR_2);
+    let out_5 = build_step(&mut result, vec![], OPERATOR_5);
+    let out_6 = build_step(&mut result, vec![], OPERATOR_6);
+    let out_4 = build_step(&mut result, vec![out_6, out_5], OPERATOR_4);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_4]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_21
 fn compile_dx7_21(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_3 = build_repeat(&mut result, &[OPERATOR_3], repeat);
+    let out_1 = build_step(&mut result, vec![out_3], OPERATOR_1);
+    let out_2 = build_step(&mut result, vec![out_3], OPERATOR_2);
+    let out_6 = build_step(&mut result, vec![], OPERATOR_6);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    let out_4 = build_step(&mut result, vec![out_6], OPERATOR_4);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_4, out_5]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_22
 fn compile_dx7_22(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_2, OPERATOR_1]);
+    let out_3 = build_step(&mut result, vec![out_6], OPERATOR_3);
+    let out_4 = build_step(&mut result, vec![out_6], OPERATOR_4);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    build_carrier_out(&mut result, vec![out_1, out_3, out_4, out_5]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_23
 fn compile_dx7_23(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    let out_2 = build_steps(&mut result, vec![], &[OPERATOR_3, OPERATOR_2]);
+    let out_4 = build_step(&mut result, vec![out_6], OPERATOR_4);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_4, out_5]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_24
 fn compile_dx7_24(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    let out_2 = build_step(&mut result, vec![], OPERATOR_2);
+    let out_3 = build_step(&mut result, vec![out_6], OPERATOR_3);
+    let out_4 = build_step(&mut result, vec![out_6], OPERATOR_4);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_3, out_4, out_5]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_25
 fn compile_dx7_25(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    let out_2 = build_step(&mut result, vec![], OPERATOR_2);
+    let out_3 = build_step(&mut result, vec![], OPERATOR_3);
+    let out_4 = build_step(&mut result, vec![out_6], OPERATOR_4);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_3, out_4, out_5]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_26
 fn compile_dx7_26(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    let out_2 = build_steps(&mut result, vec![], &[OPERATOR_3, OPERATOR_2]);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    let out_4 = build_step(&mut result, vec![out_5, out_6], OPERATOR_4);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_4]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_27
 fn compile_dx7_27(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_3 = build_repeat(&mut result, &[OPERATOR_3], repeat);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    let out_2 = build_step(&mut result, vec![out_3], OPERATOR_2);
+    let out_6 = build_step(&mut result, vec![], OPERATOR_6);
+    let out_5 = build_step(&mut result, vec![], OPERATOR_5);
+    let out_4 = build_step(&mut result, vec![out_5, out_6], OPERATOR_4);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_4]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_28
 fn compile_dx7_28(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_5 = build_repeat(&mut result, &[OPERATOR_5], repeat);
+    let out_1 = build_steps(&mut result, vec![], &[OPERATOR_2, OPERATOR_1]);
+    let out_3 = build_steps(&mut result, vec![out_5], &[OPERATOR_4, OPERATOR_3]);
+    let out_6 = build_step(&mut result, vec![], OPERATOR_6);
+    build_carrier_out(&mut result, vec![out_1, out_3, out_6]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_29
 fn compile_dx7_29(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_6 = build_repeat(&mut result, &[OPERATOR_6], repeat);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    let out_2 = build_step(&mut result, vec![], OPERATOR_2);
+    let out_3 = build_steps(&mut result, vec![], &[OPERATOR_4, OPERATOR_3]);
+    let out_5 = build_step(&mut result, vec![out_6], OPERATOR_5);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_3, out_5]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_30
 fn compile_dx7_30(repeat: u8) -> CompiledAlgorithm {
-    todo!()
+    let mut result = CompiledAlgorithm::default();
+    let out_5 = build_repeat(&mut result, &[OPERATOR_5], repeat);
+    let out_1 = build_step(&mut result, vec![], OPERATOR_1);
+    let out_2 = build_step(&mut result, vec![], OPERATOR_2);
+    let out_3 = build_steps(&mut result, vec![out_5], &[OPERATOR_4, OPERATOR_3]);
+    let out_6 = build_step(&mut result, vec![], OPERATOR_6);
+    build_carrier_out(&mut result, vec![out_1, out_2, out_3, out_6]);
+    result
 }
 
 /// Compile #FM_ALGORITHM_DX7_31
@@ -343,4 +466,17 @@ fn compile_dx7_32(repeat: u8) -> CompiledAlgorithm {
     let out_1 = build_step(&mut result, vec![], OPERATOR_1);
     build_carrier_out(&mut result, vec![out_1, out_2, out_3, out_4, out_5, out_6]);
     result
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn compile_dx7_algorithms() {
+        use super::compile_dx7;
+        for algorithm in 1..=32 {
+            for repeat in 0..=7 {
+                compile_dx7(algorithm, repeat);
+            }
+        }
+    }
 }

@@ -1,4 +1,4 @@
-#[derive(Default, Copy, Clone, Debug)]
+#[derive(Default, Copy, Clone, Debug, PartialEq)]
 pub enum ID {
     #[default]
     NotSet,
