@@ -9,9 +9,11 @@ use fm::basic::{
     square::create_fm_basic_square_instrument, triangle::create_fm_basic_triangle_instrument,
 };
 use fm::wip::create_fm_wip_instrument;
+use sample::pianos::piano_ax::create_sample_pianos_piano_ax;
 
 mod fm;
 mod sample;
+mod samples;
 
 pub enum InstrumentLibrary {
     FmBasicWaveformSine,
@@ -43,6 +45,8 @@ pub enum InstrumentLibrary {
     FmBasicHarmonicSaw15,
 
     FmWIP,
+
+    SamplePianosPianoAX,
 }
 
 impl InstrumentLibrary {
@@ -75,6 +79,8 @@ impl InstrumentLibrary {
             Self::FmBasicHarmonicSaw11 => create_fm_basic_harmonic_saw_instrument(11),
             Self::FmBasicHarmonicSaw13 => create_fm_basic_harmonic_saw_instrument(13),
             Self::FmBasicHarmonicSaw15 => create_fm_basic_harmonic_saw_instrument(15),
+
+            Self::SamplePianosPianoAX => create_sample_pianos_piano_ax(),
 
             Self::FmWIP => create_fm_wip_instrument(),
         }

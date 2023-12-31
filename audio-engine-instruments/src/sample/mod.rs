@@ -1,1 +1,1 @@
-mod piano;
+pub mod pianos;

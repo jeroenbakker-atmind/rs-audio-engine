@@ -1252,7 +1252,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "wav2f32"
+name = "wav2rs"
 version = "0.1.0"
 dependencies = [
  "wav",

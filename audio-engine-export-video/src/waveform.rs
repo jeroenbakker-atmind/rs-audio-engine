@@ -18,7 +18,8 @@ pub fn create_waveform_frame(
         .collect::<Vec<i32>>();
     let min_max_per_column = (0..width)
         .map(|column| {
-            let mut from_offset = sample_offset + samples_per_column * (column - 1);
+            let c = if column == 0 { 0 } else { column - 1 };
+            let mut from_offset = sample_offset + samples_per_column * c;
             if from_offset > samples.len() {
                 from_offset = 0;
             }
