@@ -18,7 +18,7 @@ members = [
     "audio-engine-tracker-songs",
     "audio-engine-player",
 
-    "audio-engine-export-video",
+    "audio-engine-export-video", "tools/wav2f32",
 ]
 
 resolver = "2"

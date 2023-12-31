@@ -11,6 +11,7 @@ use fm::basic::{
 use fm::wip::create_fm_wip_instrument;
 
 mod fm;
+mod sample;
 
 pub enum InstrumentLibrary {
     FmBasicWaveformSine,
