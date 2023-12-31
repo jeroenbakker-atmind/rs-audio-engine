@@ -12,29 +12,28 @@ fn main() {
     let mut wav_file = File::open(Path::new(wav_filepath)).unwrap();
     let (header, data) = wav::read(&mut wav_file).unwrap();
     let floats = convert(header, data);
-    println!("static audio: Vec<f32> = vec![");
+    let floats_len = floats.len();
+    println!("pub static audio: [f32;{floats_len}] = [");
     for float in floats {
-        println!("    {float}, ");
+        println!("    {float:.0}, ");
     }
     println!("];")
 }
 
 fn convert(header: Header, data: BitDepth) -> Vec<f32> {
     let mut samples = Vec::new();
-    let mut started= false;
+    let mut started = false;
     match data {
         BitDepth::Sixteen(data) => {
             for channel_samples in data.chunks(header.channel_count as usize) {
-                let sample = 
-                    channel_samples
-                        .iter()
-                        .map(|a| *a as f32 / 32768.0)
-                        .sum::<f32>();
-                    if sample > 0.0 || started {
-                        started=true;
-                        samples.push(sample);
-                    }
-                
+                let sample = channel_samples
+                    .iter()
+                    .map(|a| *a as f32 / 32768.0)
+                    .sum::<f32>();
+                if sample > 0.0 || started {
+                    started = true;
+                    samples.push(sample);
+                }
             }
         }
 
