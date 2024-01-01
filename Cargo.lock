@@ -114,6 +114,7 @@ name = "audio-engine-instrument-sample"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
+ "audio-engine-notes",
  "cpal",
 ]
 

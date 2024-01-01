@@ -8,7 +8,7 @@ fn main() -> Result<(), ()> {
     let device = host.default_output_device().unwrap();
     let config = device.default_output_config().unwrap();
 
-    let song = SongLibrary::C4.create();
+    let song = SongLibrary::InstrumentTest.create();
 
     play_song(&device, &config.into(), song)
 }

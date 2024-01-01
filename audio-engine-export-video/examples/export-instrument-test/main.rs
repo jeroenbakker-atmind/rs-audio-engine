@@ -3,7 +3,7 @@ use audio_engine_tracker::{song_state::SongState, tracker::Tracker};
 use audio_engine_tracker_songs::SongLibrary;
 
 fn main() {
-    let song = SongLibrary::C4.create();
+    let song = SongLibrary::InstrumentTest.create();
     let sample_rate = 44100.0;
 
     let mut tracker = Tracker {
@@ -18,7 +18,7 @@ fn main() {
 
     println!("Begin exporting");
     export_audio_to_video(
-        "export-c4-waveform.mp4",
+        "export-instrument-test-waveform.mp4",
         &samples,
         sample_rate,
         VideoType::Waveform,

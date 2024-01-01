@@ -1,4 +1,5 @@
 use audio_engine_common::{digital_sound::sound::Sound, note_time::NoteTime};
+use audio_engine_notes::{ChromaticNote, ChromaticTone};
 
 use crate::sample_note_state::SampleNoteState;
 
@@ -46,8 +47,13 @@ impl Sound for Sample {
         };
         let do_loop_evaluation = self.is_looped && !is_note_released;
 
-        // TODO: delta should depend on note_pitch and self.sample_rate_c4 and sample_rate
-        let mut new_sample_offset = state.sample_offset + 1.0;
+        let note_pitch_c4: f32 = ChromaticNote {
+            tone: ChromaticTone::C,
+            octave: 4,
+        }
+        .pitch();
+        let sample_offset_add = (note_pitch / note_pitch_c4) * self.sample_rate_c4 / sample_rate;
+        let mut new_sample_offset = state.sample_offset + sample_offset_add;
 
         if new_sample_offset >= self.loop_end as f32 && do_loop_evaluation {
             new_sample_offset -= (self.loop_end - self.loop_start) as f32;

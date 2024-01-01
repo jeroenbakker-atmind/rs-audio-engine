@@ -1,12 +1,12 @@
 use audio_engine_tracker::song::Song;
-use songs::{c4::create_c4, song1::create_song1, song2::create_song2};
+use songs::{instrument_test::create_instrument_test, song1::create_song1, song2::create_song2};
 
 mod songs;
 
 pub enum SongLibrary {
     Song1,
     Song2,
-    C4,
+    InstrumentTest,
 }
 
 impl SongLibrary {
@@ -14,7 +14,7 @@ impl SongLibrary {
         match self {
             Self::Song1 => create_song1(),
             Self::Song2 => create_song2(),
-            Self::C4 => create_c4(),
+            Self::InstrumentTest => create_instrument_test(),
         }
     }
 }
