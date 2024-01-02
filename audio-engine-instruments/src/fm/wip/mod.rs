@@ -30,6 +30,7 @@ pub fn create_fm_wip_instrument() -> Instrument {
                 level: 16.0,
                 ..Operator::default()
             },
+            ..Operators::<DelayAttackHoldDecaySustainRelease>::default()
         },
         algorithm_preset: FM_ALGORITHM_BASIC_D_MOD_ABC,
         ..FMInstrument::<DelayAttackHoldDecaySustainRelease>::default()

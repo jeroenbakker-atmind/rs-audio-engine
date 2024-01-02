@@ -21,6 +21,7 @@ members = [
     "audio-engine-export-video",
 
     "tools/wav2rs",
+    "tools/sample2fm",
 ]
 
 resolver = "2"

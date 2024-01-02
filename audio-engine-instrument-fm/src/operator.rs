@@ -89,6 +89,8 @@ where
     pub b: Operator<E>,
     pub c: Operator<E>,
     pub d: Operator<E>,
+    pub e: Operator<E>,
+    pub f: Operator<E>,
 }
 
 impl<E> Operators<E>
@@ -102,6 +104,8 @@ where
                 1 => Some(&self.b),
                 2 => Some(&self.c),
                 3 => Some(&self.d),
+                4 => Some(&self.e),
+                5 => Some(&self.f),
                 _ => None,
             }
         } else {
@@ -123,6 +127,8 @@ where
             b: Operator::<E>::default(),
             c: Operator::<E>::default(),
             d: Operator::<E>::default(),
+            e: Operator::<E>::default(),
+            f: Operator::<E>::default(),
         }
     }
 }

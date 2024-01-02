@@ -1083,6 +1083,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "sample2fm"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-common",
+ "audio-engine-instrument-fm",
+ "audio-engine-instruments",
+ "audio-engine-notes",
+ "audio-engine-sequencer",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
