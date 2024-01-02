@@ -1,23 +1,28 @@
-use std::{env, fs::File, path::Path};
+use std::{fs::File, path::Path};
 
+use clap::Parser;
 use convert_f32s::Convert2F32;
 use wav::Header;
 
+use crate::argument::Arguments;
+
+mod argument;
 mod convert_f32s;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        panic!("invalid arguments");
+    let args = Arguments::parse();
+
+    let mut wav_file = File::open(Path::new(&args.input_filename)).unwrap();
+    let (header, data) = wav::read(&mut wav_file).unwrap();
+    let mut floats = data.to_f32s();
+    floats = join_channels(header, &floats);
+    if args.trim_start {
+        floats = trim_start(&floats);
+    }
+    if args.normalize {
+        floats = normalize(&floats);
     }
 
-    let wav_filepath = &args[1];
-    let mut wav_file = File::open(Path::new(wav_filepath)).unwrap();
-    let (header, data) = wav::read(&mut wav_file).unwrap();
-    let floats = data.to_f32s();
-    let floats = join_channels(header, &floats);
-    let floats = trim_start(&floats);
-    let floats = normalize(&floats);
     let floats_len = floats.len();
     println!("pub static SAMPLES: [f32;{floats_len}] = [");
     for float in floats {
