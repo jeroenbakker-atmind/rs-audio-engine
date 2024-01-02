@@ -26,7 +26,7 @@ fn main() {
     let floats_len = floats.len();
     println!("pub static SAMPLES: [f32;{floats_len}] = [");
     for float in floats {
-        println!("    {float:.0}, ");
+        println!("    {float:?}, ");
     }
     println!("];")
 }
