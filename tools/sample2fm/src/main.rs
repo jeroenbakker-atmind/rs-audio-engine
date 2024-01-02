@@ -4,7 +4,10 @@ use audio_engine_common::{
     waveform::Waveform,
 };
 use audio_engine_instrument_fm::{
-    algorithm::preset::Algorithm,
+    algorithm::{
+        compiled::CompiledAlgorithm,
+        preset::{Algorithm, FM_ALGORITHM_BASIC_A},
+    },
     instrument::FMInstrument,
     operator::{Operator, Operators},
     operator_frequency::OperatorFrequency,
@@ -54,10 +57,6 @@ fn find_wave_start(samples: &[f32]) -> usize {
         .unwrap()
 }
 
-fn calculate_distance(a: &[f32], b: &[f32]) -> f64 {
-    a.iter().zip(b).map(|(a, b)| (a - b).abs() as f64).sum()
-}
-
 fn find_best_instrument(
     extracted_samples: &[f32],
     note_pitch: f32,
@@ -70,61 +69,75 @@ fn find_best_instrument(
     let mut best_distance = f64::MAX;
     let mut best_option = None;
 
+    let compiled_algorithms = (1..=32)
+        .zip(0..=7)
+        .map(|(alg, repeat)| Algorithm::DX7(alg).compile(repeat))
+        .collect::<Vec<CompiledAlgorithm>>();
+
     for operator_1 in &operators {
         for operator_2 in &operators {
             for operator_3 in &operators {
                 for operator_4 in &operators {
                     for operator_5 in &operators {
                         for operator_6 in &operators {
-                            for algorithm in 0..32 {
-                                let algorithm_preset = Algorithm::DX7(algorithm + 1);
-                                for repeat in 0..7 {
-                                    let mut instrument =
-                                        FMInstrument::<DelayAttackHoldDecaySustainRelease> {
-                                            algorithm_preset,
-                                            repeat,
-                                            operators:
-                                                Operators::<DelayAttackHoldDecaySustainRelease> {
-                                                    a: *operator_1,
-                                                    b: *operator_2,
-                                                    c: *operator_3,
-                                                    d: *operator_4,
-                                                    e: *operator_5,
-                                                    f: *operator_6,
-                                                },
-                                                    ..FMInstrument::<
-                                                        DelayAttackHoldDecaySustainRelease,
-                                                    >::default(
-                                                    )
-                                        };
-                                    instrument.compile();
+                            let instruments = compiled_algorithms
+                                .iter()
+                                .map(|compiled_algorithm| FMInstrument::<
+                                    DelayAttackHoldDecaySustainRelease,
+                                > {
+                                    algorithm: Some(compiled_algorithm.clone()),
+                                    algorithm_preset: FM_ALGORITHM_BASIC_A,
+                                    repeat: 0,
+                                    operators: Operators::<DelayAttackHoldDecaySustainRelease> {
+                                        a: *operator_1,
+                                        b: *operator_2,
+                                        c: *operator_3,
+                                        d: *operator_4,
+                                        e: *operator_5,
+                                        f: *operator_6,
+                                    },
+                                })
+                                .collect::<Vec<FMInstrument<DelayAttackHoldDecaySustainRelease>>>();
 
+                            let distances = instruments
+                                .iter()
+                                .map(|instrument| {
                                     let mut sound_state = instrument.init_sound_state();
-                                    let fm_samples = (0..extracted_samples.len())
-                                        .map(|index| index as f32 / sample_rate)
-                                        .map(|note_time| {
-                                            instrument.sample(
-                                                note_time,
-                                                None,
-                                                note_pitch,
-                                                sample_rate,
-                                                &mut sound_state,
-                                            )
-                                        })
-                                        .collect::<Vec<f32>>();
-                                    let distance =
-                                        calculate_distance(extracted_samples, &fm_samples);
+                                    let mut distance = 0.0;
+                                    for (index, sample) in extracted_samples.iter().enumerate() {
+                                        let note_time = index as f32 / sample_rate;
+                                        let fm_sample = instrument.sample(
+                                            note_time,
+                                            None,
+                                            note_pitch,
+                                            sample_rate,
+                                            &mut sound_state,
+                                        );
+                                        let sample_distance = (sample - fm_sample).abs();
+                                        distance += sample_distance as f64;
+                                        if distance > best_distance {
+                                            distance = f64::MAX;
+                                            break;
+                                        }
+                                    }
 
+                                    distance
+                                })
+                                .collect::<Vec<f64>>();
+
+                            instruments
+                                .iter()
+                                .zip(distances)
+                                .for_each(|(instrument, distance)| {
                                     if distance < best_distance {
                                         best_distance = distance;
-                                        best_option = Some(instrument);
+                                        best_option = Some(instrument.clone());
                                         num_options += 1;
                                         println!(
                                             "option: {num_options} distance: {best_distance:#?}"
                                         );
                                     }
-                                }
-                            }
+                                })
                         }
                     }
                 }
@@ -137,10 +150,14 @@ fn find_best_instrument(
 fn generate_operators() -> Vec<Operator<DelayAttackHoldDecaySustainRelease>> {
     let mut result = Vec::new();
 
-    for ratio_i in 0..32 {
-        let ratio = (ratio_i + 1) as f32 / 4.0;
-        for level_i in 0..32 {
-            let level = (level_i + 1) as f32 / 4.0;
+    for ratio in [
+        0.1, 0.2, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0,
+        14.0, 15.0, 16.0, 0.3, 0.6, 0.7, 0.8, 0.9,
+    ] {
+        for level in [
+            0.0, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 12.0, 16.0, 24.0, 32.0, 64.0, 0.4,
+            0.6, 0.7, 0.8, 0.9,
+        ] {
             result.push(Operator::<DelayAttackHoldDecaySustainRelease> {
                 enable: true,
                 frequency: OperatorFrequency::Rated(ratio),
@@ -150,10 +167,5 @@ fn generate_operators() -> Vec<Operator<DelayAttackHoldDecaySustainRelease>> {
             });
         }
     }
-    result.push(Operator::<DelayAttackHoldDecaySustainRelease> {
-        enable: false,
-        ..Operator::<DelayAttackHoldDecaySustainRelease>::default()
-    });
-
     result
 }
