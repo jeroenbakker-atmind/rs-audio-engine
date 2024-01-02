@@ -38,10 +38,15 @@ fn join_channels(header: Header, data: &[f32]) -> Vec<f32> {
 }
 
 fn trim_start(data: &[f32]) -> Vec<f32> {
-    data.iter()
-        .skip_while(|sample| **sample == 0.0)
-        .cloned()
-        .collect::<Vec<f32>>()
+    let mut result = Vec::new();
+    result.push(0.0);
+    result.extend(
+        data.iter()
+            .skip_while(|sample| **sample == 0.0)
+            .cloned()
+            .collect::<Vec<f32>>(),
+    );
+    result
 }
 
 fn normalize(data: &[f32]) -> Vec<f32> {
