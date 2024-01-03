@@ -64,6 +64,8 @@ impl From<ChromaticTone> for u8 {
 }
 
 impl ChromaticTone {
+    // double NOTE_UP_SCALAR = pow(2.0,1.0/12.0);
+    // f(t) = f(t-1) * note_up_scalar;
     pub const fn pitch_octave4(&self) -> f32 {
         match self {
             ChromaticTone::C => 261.63,

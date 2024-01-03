@@ -158,6 +158,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "audio-engine-instrument-piano"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-common",
+ "audio-engine-notes",
+ "cpal",
+]
+
+[[package]]
 name = "audio-engine-instrument-sample"
 version = "0.1.0"
 dependencies = [

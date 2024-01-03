@@ -1,0 +1,17 @@
+[package]
+name = "audio-engine-instrument-piano"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name="audio_engine_instrument_piano"
+path="src/lib.rs"
+
+[dependencies]
+cpal = "*"
+
+audio-engine-common = {path="../audio-engine-common"}
+audio-engine-notes = {path="../audio-engine-notes"}
+
