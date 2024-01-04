@@ -1,3 +1,4 @@
+#[derive(Debug, Default, Copy, Clone)]
 pub struct Hammer {
     pub dt: f32,
     pub dti: f32,
@@ -37,7 +38,7 @@ impl Hammer {
     }
 
     pub fn load(&mut self, t: f32, vin: f32) -> f32 {
-        for _ in (0..self.s) {
+        for _ in 0..self.s {
             let up = if self.x > 0.0 {
                 self.x.powf(self.p)
             } else {

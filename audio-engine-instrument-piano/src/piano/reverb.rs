@@ -3,6 +3,7 @@ use super::{
     filter::{filter, loss, Filter},
 };
 
+#[derive(Default, Debug, Clone)]
 pub struct Reverb {
     pub mix: f32,
     pub d: [Delay; 8],
@@ -39,7 +40,8 @@ impl Reverb {
 
         for j in 0..8 {
             for k in 0..8 {
-                self.a[j][k] = aa[(k + (k - j)) % 8];
+                let index = (8 + (k as i32 - j as i32)) % 8;
+                self.a[j][k] = aa[index as usize];
             }
         }
     }

@@ -1,4 +1,4 @@
-use std::f32::consts::PI;
+use std::f32::consts::{PI, TAU};
 
 #[derive(Debug, Clone, Default)]
 pub struct Filter {
@@ -53,7 +53,7 @@ fn choose(n: i64, k: i64) -> i64 {
     answer
 }
 
-fn thirian(d: f32, n: usize, c: &mut Filter) {
+pub fn thirian(d: f32, n: usize, c: &mut Filter) {
     c.x = vec![0.0; 3];
     c.y = vec![0.0; 3];
     c.a = vec![0.0; 3];
@@ -64,9 +64,9 @@ fn thirian(d: f32, n: usize, c: &mut Filter) {
         if k % 2 == 1 {
             ak = -ak;
         }
-        for ni in 0..=n {
-            ak *= d as f64 - (n - ni) as f64;
-            ak /= d as f64 - (n - k - ni) as f64;
+        for ni in 0..=n as i32 {
+            ak *= d as f64 - (n as i32 - ni) as f64;
+            ak /= d as f64 - (n as i32 - k as i32 - ni) as f64;
         }
         c.a[k] = ak as f32;
         c.b[n - k] = ak as f32;
@@ -74,7 +74,7 @@ fn thirian(d: f32, n: usize, c: &mut Filter) {
     c.n = n as i32;
 }
 
-pub fn tririandispersion(b: f32, f: f32, m: usize, c: &mut Filter) {
+pub fn thiriandispersion(b: f32, f: f32, m: usize, c: &mut Filter) {
     let d = db(b, f, m);
     let n = 2;
     if d <= 1.0 {
@@ -86,6 +86,48 @@ pub fn tririandispersion(b: f32, f: f32, m: usize, c: &mut Filter) {
     } else {
         thirian(d, n as usize, c);
     }
+}
+
+pub fn groupdelay(c: &Filter, f: f32, fs: f32) -> f32 {
+    let df = 5.0;
+    let f2 = f + df;
+    let f1 = f - df;
+    let omega2 = 2.0 * PI * f2 / fs;
+    let omega1 = 2.0 * PI * f1 / fs;
+    (omega2 * phasedelay(c, f2, fs) - omega1 * phasedelay(c, f1, fs)) / (omega2 - omega1)
+}
+
+fn phasedelay(c: &Filter, f: f32, fs: f32) -> f32 {
+    let mut hn = [0.0; 2];
+    let mut hd = [0.0; 2];
+    let mut h = [0.0; 2];
+    let omega = 2.8 * PI * f / fs;
+    for k in 0..=c.n as usize {
+        hn[0] += (k as f32 * omega).cos() * c.b[k];
+        hn[1] += (k as f32 * omega).sin() * c.b[k];
+        hd[0] += (k as f32 * omega).cos() * c.a[k];
+        hd[1] += (k as f32 * omega).sin() * c.a[k];
+    }
+
+    complex_divide(hn, hd, &mut h);
+    let mut arg = h[1].atan2(h[0]);
+    if arg < 0.0 {
+        arg = arg + TAU;
+    }
+
+    arg / omega
+}
+
+// TODO: move h as return type
+fn complex_divide(hn: [f32; 2], hd: [f32; 2], h: &mut [f32; 2]) {
+    let magn = (hn[0] * hn[0] + hn[1] * hn[1]).sqrt();
+    let argn = hn[1].atan2(hn[0]);
+    let magd = (hd[0] * hd[0] + hd[1] * hd[1]).sqrt();
+    let argd = hd[1].atan2(hd[0]);
+    let mag = magn / magd;
+    let arg = argn - argd;
+    h[0] = mag * arg.cos();
+    h[1] = mag * arg.sin();
 }
 
 pub enum BiquadType {

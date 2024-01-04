@@ -13,10 +13,13 @@ use self::{
     string::PianoString,
 };
 
+#[derive(Debug, Default, Clone)]
 pub struct Piano {
+    // Hammer Velocity (between 0..10) in m/s
     pub v0: f32,
     pub samples: usize,
     pub sample: usize,
+    // Sample rate
     pub fs: f32,
     pub t: f32,
     pub dt: f32,
@@ -65,7 +68,7 @@ impl Piano {
         // TODO: unused?
         let flong = (e / rho).sqrt() / (2.0 * l);
         // TODO: use min
-        let rcore = if (r < 0.0006) { r } else { 0.0006 };
+        let rcore = if r < 0.0006 { r } else { 0.0006 };
         let b = (PI * PI * PI) * e * (rcore * rcore * rcore * rcore) / (4.0 * l * l * t);
         let hp = 1.0 / 7.0;
 
@@ -115,5 +118,47 @@ impl Piano {
         biquad(500.0, fs, 10.0, BiquadType::Notch, &mut self.shaping1);
         biquad(200.0, fs, 1.0, BiquadType::High, &mut self.shaping2);
         biquad(800.0, fs, 1.0, BiquadType::Low, &mut self.shaping3);
+    }
+
+    pub fn go(&mut self, samples_out: &mut [f32]) {
+        let string_len = self.strings.len() as f32;
+        for sample_out in samples_out {
+            let mut vstring = 0.0;
+            for string in &self.strings {
+                vstring += string.input_velocity();
+            }
+            let hload = self.hammer.load(self.t, vstring / string_len);
+            let mut load = 0.0;
+            for string in &mut self.strings {
+                load += (2.0 * self.z * string.go_hammer(hload / (2.0 * self.z)))
+                    / (self.z * string_len + self.zb);
+            }
+
+            let mut output = 0.0;
+            for string in &mut self.strings {
+                output += string.go_soundboard(load);
+            }
+
+            output = self.soundboard.reverb(output);
+            self.t += self.dt;
+            *sample_out = output * 100.0;
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Piano;
+
+    #[test]
+    fn generate_c4() {
+        let mut piano = Piano::default();
+        let s = 5;
+        let samples = s * 44100;
+        piano.init(437.0, 44100.0, 5.0, samples);
+        let mut result = Vec::<f32>::new();
+        result.resize(samples, 0.0);
+        piano.go(&mut result);
+        println!("{result:#?}");
     }
 }

@@ -1,4 +1,5 @@
 // This could be replaced by our ring buffer.
+#[derive(Debug, Default, Clone)]
 pub struct Delay {
     di: i32,
     d1: i32,
