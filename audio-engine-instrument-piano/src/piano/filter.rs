@@ -1,11 +1,91 @@
 use std::f32::consts::PI;
 
+#[derive(Debug, Clone, Default)]
 pub struct Filter {
     pub x: Vec<f32>,
     pub y: Vec<f32>,
     pub a: Vec<f32>,
     pub b: Vec<f32>,
     pub n: i32,
+}
+
+pub fn filter(in_value: f32, c: &mut Filter) -> f32 {
+    for index in c.n as usize..0 {
+        c.x[index] = c.x[index - 1];
+        c.y[index] = c.y[index - 1];
+    }
+    c.x[0] = in_value;
+    let mut result = c.b[0] * in_value;
+    for index in 1..=c.n as usize {
+        result += c.b[index] * c.x[index];
+        result -= c.a[index] * c.y[index];
+    }
+    c.y[0] = result;
+    result
+}
+
+pub fn db(b: f32, f: f32, m: usize) -> f32 {
+    let (c1, c2, k1, k2, k3) = if m == 4 {
+        (0.069618, 2.0427, -0.00050469, -0.0064264, -2.8743)
+    } else {
+        (0.071089, 2.1074, -0.0026580, -0.014811, -2.9018)
+    };
+    let logb = b.ln();
+    let kd = (k1 * logb * logb + k2 * logb + k3).exp();
+    let cd = (c1 * logb + c2).exp();
+    let halfstep = 2.0_f32.powf(1.0 / 12.0);
+    let ikey = (f * halfstep / 27.5).ln() / halfstep.ln();
+    let d = (cd - ikey * kd).exp();
+    d
+}
+
+fn choose(n: i64, k: i64) -> i64 {
+    // TODO: can be calculated inline.
+    let mut divisor = 1;
+    let mut multiplier = n;
+    let mut answer = 1;
+    let k = k.min(n - k);
+    while divisor < k {
+        answer = (answer * multiplier) / divisor;
+        multiplier -= 1;
+        divisor += 1;
+    }
+    answer
+}
+
+fn thirian(d: f32, n: usize, c: &mut Filter) {
+    c.x = vec![0.0; 3];
+    c.y = vec![0.0; 3];
+    c.a = vec![0.0; 3];
+    c.b = vec![0.0; 3];
+
+    for k in 0..=n {
+        let mut ak = choose(n as i64, k as i64) as f64;
+        if k % 2 == 1 {
+            ak = -ak;
+        }
+        for ni in 0..=n {
+            ak *= d as f64 - (n - ni) as f64;
+            ak /= d as f64 - (n - k - ni) as f64;
+        }
+        c.a[k] = ak as f32;
+        c.b[n - k] = ak as f32;
+    }
+    c.n = n as i32;
+}
+
+pub fn tririandispersion(b: f32, f: f32, m: usize, c: &mut Filter) {
+    let d = db(b, f, m);
+    let n = 2;
+    if d <= 1.0 {
+        c.x = vec![0.0; 3];
+        c.y = vec![0.0; 3];
+        c.a = vec![1.0, 0.0, 0.0];
+        c.b = vec![1.0, 0.0, 0.0];
+        c.n = n;
+    } else {
+        thirian(d, n as usize, c);
+    }
 }
 
 pub enum BiquadType {
@@ -27,6 +107,7 @@ pub fn biquad(f0: f32, fs: f32, q: f32, biquad_type: BiquadType, c: &mut Filter)
     let aoq = a / q;
     let d = 4.0 * a2 + 2.0 * aoq + 1.0;
 
+    // TODO: init inline
     c.a[0] = 1.0;
     c.a[1] = -(8.0 * a2 - 2.0) / d;
     c.a[2] = (4.0 * a2 - 2.0 * aoq + 1.0) / d;

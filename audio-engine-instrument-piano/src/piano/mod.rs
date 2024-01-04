@@ -62,6 +62,7 @@ impl Piano {
         self.zh = 0.0;
 
         let e = 200e9;
+        // TODO: unused?
         let flong = (e / rho).sqrt() / (2.0 * l);
         // TODO: use min
         let rcore = if (r < 0.0006) { r } else { 0.0006 };

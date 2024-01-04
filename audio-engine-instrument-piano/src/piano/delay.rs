@@ -33,3 +33,12 @@ pub fn init_delay(c: &mut Delay, di: i32) {
     c.di = di;
     c.d1 = (c.size - di) % c.size;
 }
+
+pub fn delay(in_value: f32, c: &mut Delay) -> f32 {
+    let result = c.x[c.d1 as usize];
+    c.y[c.cursor as usize] = result;
+    c.x[c.cursor as usize] = in_value;
+    c.d1 = (c.d1 + 1) & c.mask;
+    c.cursor = (c.cursor + 1) & c.mask;
+    result
+}

@@ -1,6 +1,6 @@
 use super::{
-    delay::{init_delay, Delay},
-    filter::{loss, Filter},
+    delay::{delay, init_delay, Delay},
+    filter::{filter, loss, Filter},
 };
 
 pub struct Reverb {
@@ -49,13 +49,13 @@ impl Reverb {
         for j in 0..8 {
             i[j] = self.b[j] * in_value;
             for k in 0..8 {
-                i[j] += self.a[j][k] * o[k];
+                i[j] += self.a[j][k] * self.o[k];
             }
         }
 
         let mut result = 0.0;
         for j in 0..8 {
-            self.o[j] = filter(delay(i[j], &self.d[j], &self.decay[j]));
+            self.o[j] = filter(delay(i[j], &mut self.d[j]), &mut self.decay[j]);
             result += self.c[j] * self.o[j] * 0.5;
         }
 
