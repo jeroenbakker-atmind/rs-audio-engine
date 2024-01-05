@@ -52,8 +52,8 @@ impl Hammer {
                 self.a = -self.f * self.mi;
                 v1 = self.v + self.a * self.dt;
                 x1 = self.x + (v1 - (vin + self.f * self.z2i)) * self.dt;
-                let upnew = if self.x > 0.0 {
-                    self.x.powf(self.p)
+                let upnew = if x1 > 0.0 {
+                    x1.powf(self.p)
                 } else {
                     0.0
                 };

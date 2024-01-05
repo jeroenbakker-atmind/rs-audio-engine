@@ -10,7 +10,7 @@ pub struct Filter {
 }
 
 pub fn filter(in_value: f32, c: &mut Filter) -> f32 {
-    for index in c.n as usize..0 {
+    for index in (1..=c.n as usize).rev() {
         c.x[index] = c.x[index - 1];
         c.y[index] = c.y[index - 1];
     }
@@ -45,7 +45,7 @@ fn choose(n: i64, k: i64) -> i64 {
     let mut multiplier = n;
     let mut answer = 1;
     let k = k.min(n - k);
-    while divisor < k {
+    while divisor <= k {
         answer = (answer * multiplier) / divisor;
         multiplier -= 1;
         divisor += 1;
@@ -54,10 +54,10 @@ fn choose(n: i64, k: i64) -> i64 {
 }
 
 pub fn thirian(d: f32, n: usize, c: &mut Filter) {
-    c.x = vec![0.0; 3];
-    c.y = vec![0.0; 3];
-    c.a = vec![0.0; 3];
-    c.b = vec![0.0; 3];
+    c.x = vec![0.0; n + 1];
+    c.y = vec![0.0; n + 1];
+    c.a = vec![0.0; n + 1];
+    c.b = vec![0.0; n + 1];
 
     for k in 0..=n {
         let mut ak = choose(n as i64, k as i64) as f64;

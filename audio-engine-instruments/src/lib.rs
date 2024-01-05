@@ -9,9 +9,11 @@ use fm::basic::{
     square::create_fm_basic_square_instrument, triangle::create_fm_basic_triangle_instrument,
 };
 use fm::wip::create_fm_wip_instrument;
+use piano::create_piano_piano_instrument;
 use sample::pianos::piano_ax::create_sample_pianos_piano_ax;
 
 mod fm;
+mod piano;
 mod sample;
 mod samples;
 
@@ -47,6 +49,8 @@ pub enum InstrumentLibrary {
     FmWIP,
 
     SamplePianosPianoAX,
+
+    PianoPiano,
 }
 
 impl InstrumentLibrary {
@@ -83,6 +87,8 @@ impl InstrumentLibrary {
             Self::SamplePianosPianoAX => create_sample_pianos_piano_ax(),
 
             Self::FmWIP => create_fm_wip_instrument(),
+
+            Self::PianoPiano => create_piano_piano_instrument(),
         }
     }
 }

@@ -1,9 +1,10 @@
 use audio_engine_common::digital_sound::sound_state::SoundState;
 
-#[derive(Debug, Default, Copy, Clone)]
-pub struct NoteState {
-    pub is_finished: bool,
-    pub sample_offset: f32,
+use crate::piano::Piano;
+
+#[derive(Debug, Default, Clone)]
+pub struct PianoNoteState {
+    pub piano: Option<Piano>,
 }
 
-impl SoundState for NoteState {}
+impl SoundState for PianoNoteState {}

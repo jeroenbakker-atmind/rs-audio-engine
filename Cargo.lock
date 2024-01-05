@@ -181,6 +181,7 @@ version = "0.1.0"
 dependencies = [
  "audio-engine-common",
  "audio-engine-instrument-fm",
+ "audio-engine-instrument-piano",
  "audio-engine-instrument-sample",
  "audio-engine-sequencer",
  "cpal",
@@ -203,6 +204,7 @@ version = "0.1.0"
 dependencies = [
  "audio-engine-common",
  "audio-engine-instrument-fm",
+ "audio-engine-instrument-piano",
  "audio-engine-instrument-sample",
 ]
 

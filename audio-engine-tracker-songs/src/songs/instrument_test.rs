@@ -120,7 +120,7 @@ pub fn create_instrument_test() -> Song {
     song.tracks[0x00].init(&["00", "01"]);
     song.tracks[0x00].level = 1.0;
 
-    song.instruments[0] = InstrumentLibrary::SamplePianosPianoAX.create();
+    song.instruments[0] = InstrumentLibrary::PianoPiano.create();
 
     song
 }

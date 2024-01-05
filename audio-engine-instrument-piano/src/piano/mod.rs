@@ -56,9 +56,9 @@ impl Piano {
         let m = 0.06 - 0.058 * ((self.f / f0).ln() / (4192.0 / f0).ln()).powf(0.1);
         let k = 40.0 / (0.7e-3_f32).powf(p);
         // TODO: is unused?
-        let l = 1.4 - 1.0 / 32.0 * (self.f / f0).ln() / (4192.0 / f0).ln();
-        let l = 0.04 + 1.4 / (1.0 + (-3.4 + 1.4 * (self.f / f0).ln())).exp();
-        let r = 0.002 * (1.0 + 0.6 * (self.f / f0).ln().powf(-1.4));
+        let l = 1.4 - 1.32 * (self.f / f0).ln() / (4192.0 / f0).ln();
+        let l = 0.04 + 1.4 / (1.0 + (-3.4 + 1.4 * (self.f / f0).ln()).exp());
+        let r = 0.002 * (1.0 + 0.6 * (self.f / f0).ln()).powf(-1.4);
         let rhol = PI * r * r * rho;
         // TODO: Use sqr?
         let t = (2.0 * l * self.f) * (2.0 * l * self.f) * rhol;
@@ -73,6 +73,17 @@ impl Piano {
         let rcore = if r < 0.0006 { r } else { 0.0006 };
         let b = (PI * PI * PI) * e * (rcore * rcore * rcore * rcore) / (4.0 * l * l * t);
         let hp = 1.0 / 7.0;
+        println!(
+            "f = {}, r = {} mm, L = {}, T = {}, hammer = {}, Z = {}, K = {}, B = {}",
+            self.f,
+            1000.0 * r,
+            l,
+            t,
+            hp,
+            self.z,
+            k,
+            b
+        );
 
         let c1 = 0.25;
         let c3 = 5.85;
@@ -103,7 +114,7 @@ impl Piano {
                 c3,
                 b,
                 self.z,
-                self.zb + (string_index as f32 - 1.0) * self.z,
+                self.zb + (num_strings as f32 - 1.0) * self.z,
                 self.zh,
             );
         }

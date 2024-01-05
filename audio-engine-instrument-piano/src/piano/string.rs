@@ -1,5 +1,3 @@
-use std::{borrow::BorrowMut, cell::RefCell, rc::Rc};
-
 use crate::piano::filter::{groupdelay, loss, thirian, thiriandispersion};
 
 use super::{
@@ -39,6 +37,7 @@ impl PianoString {
             thiriandispersion(b, f, self.m, &mut self.dispersion[0]);
         } else {
             self.m = 4;
+            self.dispersion.resize(4, Filter::default());
             for m in 0..self.m {
                 thiriandispersion(b, f, self.m, &mut self.dispersion[m]);
             }
@@ -47,18 +46,19 @@ impl PianoString {
         loss(f, fs, c1, c3, &mut self.lowpass);
         let lowpassdelay = groupdelay(&self.lowpass, f, fs);
 
-        let del2 = ((0.5 * (deltot - 2.0 - del1 as f32) - dispersiondelay) as i32).max(1);
+        let del2 = ((0.5 * (deltot - 2.0 * del1 as f32) - dispersiondelay) as i32).max(1);
         let del3 = ((0.5 * (deltot - 2.0 * del1 as f32) - lowpassdelay - 5.0) as i32).max(1);
 
         let d = deltot - ((del1 + del1 + del2 + del3) as f32 + dispersiondelay + lowpassdelay);
         thirian(d, d.min(2.0) as usize, &mut self.fracdelay);
         // TODO: Unused
-        let tuningdelay = groupdelay(&self.fracdelay, f, fs);
+        // let tuningdelay = groupdelay(&self.fracdelay, f, fs);
+        // println!("total delay = {}/{}, leftdel = {}/{}, rightdel = {}/{}, dispersion delay = {}, lowpass delay = {}, fractional delay = {}/{}",(del1+del1+del2+del3 )as f32+dispersiondelay+lowpassdelay+tuningdelay,deltot, del1, del1, del2, del3, dispersiondelay, lowpassdelay, tuningdelay,d);
 
         self.d[0] = Dwg::new(z, del1, del1, 0);
-        self.d[0] = Dwg::new(z, del2, del3, 0);
-        self.d[0] = Dwg::new(zb, 0, 0, 0);
-        self.d[0] = Dwg::new(zh, 0, 0, 0);
+        self.d[1] = Dwg::new(z, del2, del3, 1);
+        self.d[2] = Dwg::new(zb, 0, 0, 0);
+        self.d[3] = Dwg::new(zh, 0, 0, 0);
         self.d[0].connect_right(DwgNodeRef::Dwg1Left);
         self.d[1].connect_left(DwgNodeRef::Dwg0Right);
         self.d[1].connect_right(DwgNodeRef::Dwg2Left);
@@ -69,8 +69,11 @@ impl PianoString {
         self.d[3].connect_left(DwgNodeRef::Dwg1Left);
         let parent = self.clone();
         self.d[0].init(&parent);
+        let parent = self.clone();
         self.d[1].init(&parent);
+        let parent = self.clone();
         self.d[2].init(&parent);
+        let parent = self.clone();
         self.d[3].init(&parent);
     }
 
@@ -231,7 +234,7 @@ impl Dwg {
         let dal = if self.del2 < 2 {
             self.l.a[0]
         } else {
-            delay(self.l.a[0], &mut self.d[1])
+            delay(self.l.a[1], &mut self.d[1])
         };
         self.l.a[0] = dar;
         self.r.a[1] = dal;
