@@ -156,6 +156,7 @@ pub struct Dwg {
     pub alpharthis: f32,
     pub alphal: [f32; 2],
     pub alphar: [f32; 2],
+    // TODO: make Option<Delay>
     pub d: [Delay; 2],
     // Is boolean
     pub commute: i32,
@@ -221,13 +222,13 @@ impl Dwg {
     }
 
     pub fn dodelay(&mut self) {
-        let dar = if self.del1 == 1 {
+        let dar = if self.del1 < 2 {
             self.r.a[0]
         } else {
             delay(self.r.a[0], &mut self.d[0])
         };
 
-        let dal = if self.del1 == 1 {
+        let dal = if self.del2 < 2 {
             self.l.a[0]
         } else {
             delay(self.l.a[0], &mut self.d[1])
