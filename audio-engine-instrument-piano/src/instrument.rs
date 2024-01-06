@@ -23,7 +23,7 @@ impl Sound for PianoInstrument {
     ) -> f32 {
         if state.piano.is_none() {
             let mut piano = Piano::default();
-            piano.init(note_pitch, sample_rate, 5.0, 1);
+            piano.init(note_pitch, sample_rate, 10.0);
             state.piano = Some(piano);
         }
         let mut result = [0.0; 1];

@@ -1,12 +1,9 @@
-use super::{
-    delay::{delay, init_delay, Delay},
-    filter::{filter, loss, Filter},
-};
+use super::{delay::Delay, filter::Filter};
 
 #[derive(Default, Debug, Clone)]
 pub struct Reverb {
     pub mix: f32,
-    pub d: [Delay; 8],
+    pub delays: [Delay; 8],
     pub a: [[f32; 8]; 8],
     pub o: [f32; 8],
     pub b: [f32; 8],
@@ -15,27 +12,24 @@ pub struct Reverb {
 }
 
 impl Reverb {
-    pub fn init(&mut self, c1: f32, c3: f32, a: f32, mix: f32, fs: f32) {
+    pub fn new(c1: f32, c3: f32, a: f32, mix: f32, sample_rate: f32) -> Reverb {
+        let mut result = Reverb::default();
+        result.init(c1, c3, a, mix, sample_rate);
+        result
+    }
+
+    fn init(&mut self, c1: f32, c3: f32, a: f32, mix: f32, sample_rate: f32) {
         self.mix = mix;
         let lengths = [37, 87, 181, 271, 359, 592, 687, 721];
         let aa = [a, a + 1.0, a, a, a, a, a, a];
 
         for k in 0..8 {
-            init_delay(&mut self.d[k], lengths[k]);
+            self.delays[k] = Delay::new(lengths[k]);
             self.o[k] = 0.0;
             self.b[k] = 1.0;
-            // TODO: k is always smaller than 8?
-            self.c[k] = if k < 8 {
-                if k % 2 == 0 {
-                    1.0 / 8.0
-                } else {
-                    -1.0 / 8.0
-                }
-            } else {
-                0.0
-            };
+            self.c[k] = if k % 2 == 0 { 1.0 / 8.0 } else { -1.0 / 8.0 };
 
-            loss(fs / lengths[k] as f32, fs, c1, c3, &mut self.decay[k]);
+            self.decay[k] = Filter::loss(sample_rate / lengths[k] as f32, c1, c3);
         }
 
         for j in 0..8 {
@@ -57,7 +51,7 @@ impl Reverb {
 
         let mut result = 0.0;
         for j in 0..8 {
-            self.o[j] = filter(delay(i[j], &mut self.d[j]), &mut self.decay[j]);
+            self.o[j] = self.decay[j].filter(self.delays[j].delay(i[j]));
             result += self.c[j] * self.o[j] * 0.5;
         }
 

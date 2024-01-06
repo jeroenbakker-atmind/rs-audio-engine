@@ -213,7 +213,7 @@ pub fn create_song2() -> Song {
     song.tracks[0x01].init(&["20", "21"]);
     song.tracks[0x01].level = 0.6;
 
-    song.instruments[0] = InstrumentLibrary::FmWIP.create();
+    song.instruments[0] = InstrumentLibrary::PianoPiano.create();
 
     song
 }
