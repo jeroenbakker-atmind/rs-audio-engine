@@ -446,9 +446,9 @@ pub fn create_song2() -> Song {
     song.phrases[0xFE].init(&["FE", "FE", "FE", "FE"]);
 
     song.tracks[0x00].init(&["00"]);
-    song.tracks[0x00].level = 0.8;
+    song.tracks[0x00].level = 0.6;
     song.tracks[0x04].init(&["80"]);
-    song.tracks[0x04].level = 0.8;
+    song.tracks[0x04].level = 0.6;
 
     song.instruments[0] = InstrumentLibrary::PianoPiano.create();
     song.instruments[1] = InstrumentLibrary::PianoPiano.create();

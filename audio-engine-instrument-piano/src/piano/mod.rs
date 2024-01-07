@@ -140,6 +140,11 @@ impl Piano {
             }
 
             output = self.soundboard.reverb(output);
+
+            output = self.shaping1.filter(output);
+            output = self.shaping2.filter(output);
+            output = self.shaping3.filter(output);
+
             *sample_out = output * 100.0;
         }
     }
