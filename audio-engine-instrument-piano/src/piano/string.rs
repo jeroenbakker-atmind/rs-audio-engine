@@ -53,14 +53,14 @@ impl PianoString {
         self.d[1] = Dwg::new(z, del2, del3, true);
         self.d[2] = Dwg::new(zb, 0, 0, false);
         self.d[3] = Dwg::new(zh, 0, 0, false);
-        self.d[0].connect_right(DwgNodeRef::Dwg1Left);
-        self.d[1].connect_left(DwgNodeRef::Dwg0Right);
-        self.d[1].connect_right(DwgNodeRef::Dwg2Left);
-        self.d[2].connect_left(DwgNodeRef::Dwg1Right);
-        self.d[0].connect_right(DwgNodeRef::Dwg3Left);
-        self.d[1].connect_left(DwgNodeRef::Dwg3Left);
-        self.d[3].connect_left(DwgNodeRef::Dwg0Right);
-        self.d[3].connect_left(DwgNodeRef::Dwg1Left);
+        self.d[0].connect_right(DWG_1_LEFT);
+        self.d[1].connect_left(DWG_0_RIGHT);
+        self.d[1].connect_right(DWG_2_LEFT);
+        self.d[2].connect_left(DWG_1_RIGHT);
+        self.d[0].connect_right(DWG_3_LEFT);
+        self.d[1].connect_left(DWG_3_LEFT);
+        self.d[3].connect_left(DWG_0_RIGHT);
+        self.d[3].connect_left(DWG_1_LEFT);
         let parent = self.clone();
         self.d[0].init(&parent);
         let parent = self.clone();
@@ -72,15 +72,11 @@ impl PianoString {
     }
 
     fn get_node(&self, dwg_node_ref: DwgNodeRef) -> &'_ DwgNode {
-        match dwg_node_ref {
-            DwgNodeRef::Dwg0Left => &self.d[0].left,
-            DwgNodeRef::Dwg0Right => &self.d[0].right,
-            DwgNodeRef::Dwg1Left => &self.d[1].left,
-            DwgNodeRef::Dwg1Right => &self.d[1].right,
-            DwgNodeRef::Dwg2Left => &self.d[2].left,
-            DwgNodeRef::Dwg2Right => &self.d[2].right,
-            DwgNodeRef::Dwg3Left => &self.d[3].left,
-            DwgNodeRef::Dwg3Right => &self.d[3].right,
+        let dwg = &self.d[dwg_node_ref.0 as usize];
+        if dwg_node_ref.1 == 0 {
+            &dwg.left
+        }else {
+            &dwg.right
         }
     }
 
@@ -266,14 +262,13 @@ impl DwgNode {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum DwgNodeRef {
-    Dwg0Left,
-    Dwg0Right,
-    Dwg1Left,
-    Dwg1Right,
-    Dwg2Left,
-    Dwg2Right,
-    Dwg3Left,
-    Dwg3Right,
-}
+/// First u8 refers to the Dwg, the second 0=left, 1 = right
+pub type DwgNodeRef = (u8, u8);
+// const DWG_0_LEFT:DwgNodeRef = (0, 0);
+const DWG_0_RIGHT:DwgNodeRef = (0, 1);
+const DWG_1_LEFT:DwgNodeRef = (1, 0);
+const DWG_1_RIGHT:DwgNodeRef = (1, 1);
+const DWG_2_LEFT:DwgNodeRef = (2, 0);
+// const DWG_2_RIGHT:DwgNodeRef = (2, 1);
+const DWG_3_LEFT:DwgNodeRef = (3, 0);
+// const DWG_3_RIGHT:DwgNodeRef = (3, 1);
