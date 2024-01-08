@@ -61,8 +61,8 @@ impl PianoString {
         self.d[1].connect_left(DWG_3_LEFT);
         self.d[3].connect_left(DWG_0_RIGHT);
         self.d[3].connect_left(DWG_1_LEFT);
-        
-        let mut dwg_nodes = DwgNodes::new(&self);
+
+        let mut dwg_nodes = DwgNodes::new(self);
         for node_index in 0..3 {
             self.d[node_index].init(&dwg_nodes);
             dwg_nodes.update(node_index,&self.d[node_index]);
@@ -84,7 +84,7 @@ impl PianoString {
 
     pub fn do_soundboard(&mut self, load: f32) -> f32 {
         self.d[2].left.load = load;
-        let mut dwg_nodes = DwgNodes::new(&self);
+        let mut dwg_nodes = DwgNodes::new(self);
         for k in 0..3 {
             self.d[k].do_load(&dwg_nodes);
             dwg_nodes.update(k, &self.d[k]);
@@ -265,7 +265,7 @@ const DWG_3_LEFT:DwgNodeRef = (3, 0);
 // const DWG_3_RIGHT:DwgNodeRef = (3, 1);
 
 /// Utility class to work around the borrow checker without to many allocations/deallocations.
-/// 
+///
 /// When updating a node the other nodes will be read from this structure. The borrow checker would
 /// otherwise complain that the same data is passed as mutable and immutable to the same function
 /// `Dwg::init` and `Dwg::update`

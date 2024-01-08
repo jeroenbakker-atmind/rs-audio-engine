@@ -27,11 +27,13 @@ impl Filter {
     }
 
     pub fn thirian(d: f32, n: usize) -> Filter {
-        let mut result = Filter::default();
-        result.x = vec![0.0; n + 1];
-        result.y = vec![0.0; n + 1];
-        result.a = vec![0.0; n + 1];
-        result.b = vec![0.0; n + 1];
+        let mut result = Filter {
+            x: vec![0.0; n + 1],
+            y: vec![0.0; n + 1],
+            a: vec![0.0; n + 1],
+            b: vec![0.0; n + 1],
+            n: n as i32,
+        };
 
         for k in 0..=n {
             let mut ak = choose(n as i64, k as i64) as f64;
@@ -45,40 +47,30 @@ impl Filter {
             result.a[k] = ak as f32;
             result.b[n - k] = ak as f32;
         }
-        result.n = n as i32;
         result
     }
 
     pub fn loss(f0: f32, c1: f32, c3: f32) -> Filter {
-        let mut result = Filter::default();
-        result.x = vec![0.0; 2];
-        result.y = vec![0.0; 2];
-
-        // TODO: can be initialized inline.
-        result.a = vec![0.0; 2];
-        result.b = vec![0.0; 2];
-
         let g = 1.0 - c1 / f0;
         let b = 4.0 * c3 + f0;
         let a1 = (-b + (b * b - 16.0 * c3 * c3).sqrt()) / (4.0 * c3);
 
-        result.b[0] = g * (1.0 + a1);
-        result.b[1] = 0.0;
-        result.a[0] = 1.0;
-        result.a[1] = a1;
-
-        result.n = 1;
-        result
+        Filter {
+            x: vec![0.0; 2],
+            y: vec![0.0; 2],
+            a: vec![1.0, a1],
+            b: vec![g * (1.0 + a1), 0.0],
+            n: 1,
+        }
     }
 }
 
 impl Filter {
     pub fn filter(&mut self, in_value: f32) -> f32 {
-        for index in (1..=self.n as usize).rev() {
-            self.x[index] = self.x[index - 1];
-            self.y[index] = self.y[index - 1];
-        }
-        self.x[0] = in_value;
+        self.x.pop().unwrap();
+        self.x.insert(0, in_value);
+        self.y.pop().unwrap();
+        self.y.insert(0, 0.0);
         let mut result = self.b[0] * in_value;
         for index in 1..=self.n as usize {
             result += self.b[index] * self.x[index];
@@ -92,8 +84,8 @@ impl Filter {
         let df = 5.0;
         let f2 = f + df;
         let f1 = f - df;
-        let omega2 = 2.0 * PI * f2 / sample_rate;
-        let omega1 = 2.0 * PI * f1 / sample_rate;
+        let omega2 = TAU * f2 / sample_rate;
+        let omega1 = TAU * f1 / sample_rate;
         (omega2 * self.phase_delay(f2, sample_rate) - omega1 * self.phase_delay(f1, sample_rate))
             / (omega2 - omega1)
     }
@@ -130,8 +122,7 @@ fn calc_decibel(b: f32, note_pitch: f32, m: usize) -> f32 {
     let cd = (c1 * logb + c2).exp();
     let halfstep = 2.0_f32.powf(1.0 / 12.0);
     let ikey = (note_pitch * halfstep / 27.5).ln() / halfstep.ln();
-    let d = (cd - ikey * kd).exp();
-    d
+    (cd - ikey * kd).exp()
 }
 
 fn choose(n: i64, k: i64) -> i64 {
