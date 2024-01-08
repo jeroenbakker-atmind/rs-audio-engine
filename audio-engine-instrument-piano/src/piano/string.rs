@@ -1,9 +1,7 @@
-use super::{delay::Delay, filter::Filter, Piano};
+use super::{delay::Delay, filter::Filter};
 
 #[derive(Debug, Default, Clone)]
 pub struct PianoString {
-    /// Number of dispersion filters
-    pub m: usize,
     pub dispersion: Vec<Filter>,
     pub low_pass: Filter,
     pub fracdelay: Filter,
@@ -28,18 +26,18 @@ impl PianoString {
 
         self.dispersion.clear();
         if note_pitch > 400.0 {
-            self.m = 1;
-            self.dispersion.resize(1, Filter::default());
-            self.dispersion[0] = Filter::thirian_dispersion(b, note_pitch, self.m);
+            self.dispersion.reserve(1);
+            self.dispersion
+                .push(Filter::thirian_dispersion(b, note_pitch, 1));
         } else {
-            self.m = 4;
-            self.dispersion.resize(4, Filter::default());
-            for m in 0..self.m {
-                self.dispersion[m] = Filter::thirian_dispersion(b, note_pitch, self.m);
+            self.dispersion.reserve(4);
+            for _ in 0..4 {
+                self.dispersion
+                    .push(Filter::thirian_dispersion(b, note_pitch, 4));
             }
         }
         let dispersion_delay =
-            self.m as f32 * self.dispersion[0].group_delay(note_pitch, sample_rate);
+            self.dispersion.len() as f32 * self.dispersion[0].group_delay(note_pitch, sample_rate);
         self.low_pass = Filter::loss(note_pitch, c1, c3);
         let low_pass_delay = self.low_pass.group_delay(note_pitch, sample_rate);
 
@@ -65,8 +63,7 @@ impl PianoString {
         let mut dwg_nodes = DwgNodes::new(self);
         for node_index in 0..3 {
             self.d[node_index].init(&dwg_nodes);
-            dwg_nodes.update(node_index,&self.d[node_index]);
-
+            dwg_nodes.update(node_index, &self.d[node_index]);
         }
     }
 
@@ -101,8 +98,8 @@ impl PianoString {
         let dwg = &mut self.d[k];
         let mut a = dwg.load_left - dwg.left.a[0];
         if dwg.commute {
-            for m in 0..self.m {
-                a = self.dispersion[m].filter(a);
+            for dispersion in self.dispersion.iter_mut() {
+                a = dispersion.filter(a);
             }
         }
         dwg.left.a[1] = a;
@@ -256,12 +253,12 @@ impl DwgNode {
 /// First u8 refers to the Dwg, the second 0=left, 1 = right
 pub type DwgNodeRef = (u8, u8);
 // const DWG_0_LEFT:DwgNodeRef = (0, 0);
-const DWG_0_RIGHT:DwgNodeRef = (0, 1);
-const DWG_1_LEFT:DwgNodeRef = (1, 0);
-const DWG_1_RIGHT:DwgNodeRef = (1, 1);
-const DWG_2_LEFT:DwgNodeRef = (2, 0);
+const DWG_0_RIGHT: DwgNodeRef = (0, 1);
+const DWG_1_LEFT: DwgNodeRef = (1, 0);
+const DWG_1_RIGHT: DwgNodeRef = (1, 1);
+const DWG_2_LEFT: DwgNodeRef = (2, 0);
 // const DWG_2_RIGHT:DwgNodeRef = (2, 1);
-const DWG_3_LEFT:DwgNodeRef = (3, 0);
+const DWG_3_LEFT: DwgNodeRef = (3, 0);
 // const DWG_3_RIGHT:DwgNodeRef = (3, 1);
 
 /// Utility class to work around the borrow checker without to many allocations/deallocations.
@@ -270,22 +267,21 @@ const DWG_3_LEFT:DwgNodeRef = (3, 0);
 /// otherwise complain that the same data is passed as mutable and immutable to the same function
 /// `Dwg::init` and `Dwg::update`
 pub struct DwgNodes {
-    pub nodes: [[DwgNode;2];4],
+    pub nodes: [[DwgNode; 2]; 4],
 }
 
 impl DwgNodes {
     fn new(string: &PianoString) -> DwgNodes {
         DwgNodes {
-            nodes:[
-
+            nodes: [
                 [string.d[0].left, string.d[0].right],
                 [string.d[1].left, string.d[1].right],
                 [string.d[2].left, string.d[2].right],
                 [string.d[3].left, string.d[3].right],
-                ]
+            ],
         }
     }
-    fn get_node(&self, dwg_node_ref: DwgNodeRef) ->&DwgNode {
+    fn get_node(&self, dwg_node_ref: DwgNodeRef) -> &DwgNode {
         &self.nodes[dwg_node_ref.0 as usize][dwg_node_ref.1 as usize]
     }
 
@@ -293,4 +289,3 @@ impl DwgNodes {
         self.nodes[index] = [dwg.left, dwg.right];
     }
 }
-
