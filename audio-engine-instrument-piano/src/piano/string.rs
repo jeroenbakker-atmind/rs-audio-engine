@@ -1,4 +1,4 @@
-use super::{delay::Delay, filter::Filter};
+use super::{delay::Delay, filter::Filter, Piano};
 
 #[derive(Debug, Default, Clone)]
 pub struct PianoString {
@@ -61,22 +61,12 @@ impl PianoString {
         self.d[1].connect_left(DWG_3_LEFT);
         self.d[3].connect_left(DWG_0_RIGHT);
         self.d[3].connect_left(DWG_1_LEFT);
-        let parent = self.clone();
-        self.d[0].init(&parent);
-        let parent = self.clone();
-        self.d[1].init(&parent);
-        let parent = self.clone();
-        self.d[2].init(&parent);
-        let parent = self.clone();
-        self.d[3].init(&parent);
-    }
+        
+        let mut dwg_nodes = DwgNodes::new(&self);
+        for node_index in 0..3 {
+            self.d[node_index].init(&dwg_nodes);
+            dwg_nodes.update(node_index,&self.d[node_index]);
 
-    fn get_node(&self, dwg_node_ref: DwgNodeRef) -> &'_ DwgNode {
-        let dwg = &self.d[dwg_node_ref.0 as usize];
-        if dwg_node_ref.1 == 0 {
-            &dwg.left
-        }else {
-            &dwg.right
         }
     }
 
@@ -94,9 +84,10 @@ impl PianoString {
 
     pub fn do_soundboard(&mut self, load: f32) -> f32 {
         self.d[2].left.load = load;
+        let mut dwg_nodes = DwgNodes::new(&self);
         for k in 0..3 {
-            let parent = self.clone();
-            self.d[k].do_load(&parent);
+            self.d[k].do_load(&dwg_nodes);
+            dwg_nodes.update(k, &self.d[k]);
         }
 
         for k in 0..3 {
@@ -184,7 +175,7 @@ impl Dwg {
         self.right_connections.push(DwgConnection::new(node_ref));
     }
 
-    pub fn init(&mut self, parent: &PianoString) {
+    pub fn init(&mut self, parent: &DwgNodes) {
         let mut sum_z = self.left.z;
         for connection in &self.left_connections {
             sum_z += parent.get_node(connection.node_ref).z;
@@ -221,7 +212,7 @@ impl Dwg {
         self.right.a[1] = dal;
     }
 
-    pub fn do_load(&mut self, parent: &PianoString) {
+    pub fn do_load(&mut self, parent: &DwgNodes) {
         if self.left_connections.is_empty() {
             self.load_left = 0.0;
         } else {
@@ -246,7 +237,7 @@ impl Dwg {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct DwgNode {
     pub z: f32,
     pub load: f32,
@@ -272,3 +263,34 @@ const DWG_2_LEFT:DwgNodeRef = (2, 0);
 // const DWG_2_RIGHT:DwgNodeRef = (2, 1);
 const DWG_3_LEFT:DwgNodeRef = (3, 0);
 // const DWG_3_RIGHT:DwgNodeRef = (3, 1);
+
+/// Utility class to work around the borrow checker without to many allocations/deallocations.
+/// 
+/// When updating a node the other nodes will be read from this structure. The borrow checker would
+/// otherwise complain that the same data is passed as mutable and immutable to the same function
+/// `Dwg::init` and `Dwg::update`
+pub struct DwgNodes {
+    pub nodes: [[DwgNode;2];4],
+}
+
+impl DwgNodes {
+    fn new(string: &PianoString) -> DwgNodes {
+        DwgNodes {
+            nodes:[
+
+                [string.d[0].left, string.d[0].right],
+                [string.d[1].left, string.d[1].right],
+                [string.d[2].left, string.d[2].right],
+                [string.d[3].left, string.d[3].right],
+                ]
+        }
+    }
+    fn get_node(&self, dwg_node_ref: DwgNodeRef) ->&DwgNode {
+        &self.nodes[dwg_node_ref.0 as usize][dwg_node_ref.1 as usize]
+    }
+
+    fn update(&mut self, index: usize, dwg: &Dwg) {
+        self.nodes[index] = [dwg.left, dwg.right];
+    }
+}
+
