@@ -265,7 +265,10 @@ const DWG_3_LEFT: DwgNodeRef = (3, 0);
 ///
 /// When updating a node the other nodes will be read from this structure. The borrow checker would
 /// otherwise complain that the same data is passed as mutable and immutable to the same function
-/// `Dwg::init` and `Dwg::update`
+/// `Dwg::init` and `Dwg::update`.
+/// 
+/// This struct will keep a copy of the read-only data and provides an #DwgNodes::update function
+/// that can do specific updates.
 pub struct DwgNodes {
     pub nodes: [[DwgNode; 2]; 4],
 }
