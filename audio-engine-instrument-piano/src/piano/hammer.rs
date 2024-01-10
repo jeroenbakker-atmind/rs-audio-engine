@@ -18,7 +18,16 @@ pub struct Hammer {
 }
 
 impl Hammer {
-    pub fn init(&mut self, sample_rate: f32, m: f32, k: f32, p: f32, z: f32, alpha: f32, hammer_velocity: f32) {
+    pub fn init(
+        &mut self,
+        sample_rate: f32,
+        m: f32,
+        k: f32,
+        p: f32,
+        z: f32,
+        alpha: f32,
+        hammer_velocity: f32,
+    ) {
         self.s = 3;
         self.sample_rate = sample_rate;
         self.p = p;

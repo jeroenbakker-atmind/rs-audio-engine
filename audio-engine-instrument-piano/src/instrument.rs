@@ -1,4 +1,4 @@
-use audio_engine_common::{digital_sound::sound::Sound, note_time::NoteTime};
+use audio_engine_common::digital_sound::{parameters::NoteParameters, sound::Sound};
 
 use crate::{note_state::PianoNoteState, piano::Piano};
 
@@ -7,23 +7,18 @@ pub struct PianoInstrument {}
 
 impl Sound for PianoInstrument {
     type SoundState = PianoNoteState;
+    type Parameters = NoteParameters;
+
     fn init_sound_state(&self) -> Self::SoundState {
         PianoNoteState {
             ..PianoNoteState::default()
         }
     }
 
-    fn sample(
-        &self,
-        _note_time: NoteTime,
-        _note_off: Option<NoteTime>,
-        note_pitch: f32,
-        sample_rate: f32,
-        state: &mut PianoNoteState,
-    ) -> f32 {
+    fn sample(&self, parameters: &Self::Parameters, state: &mut PianoNoteState) -> f32 {
         if state.piano.is_none() {
             let mut piano = Piano::default();
-            piano.init(note_pitch, sample_rate, 10.0);
+            piano.init(parameters.note_pitch, parameters.sample_rate, 10.0);
             state.piano = Some(piano);
         }
         let mut result = [0.0; 1];

@@ -1,4 +1,7 @@
-use audio_engine_common::{digital_sound::sound::Sound, song_time::SongTime};
+use audio_engine_common::{
+    digital_sound::{parameters::NoteParameters, sound::Sound},
+    song_time::SongTime,
+};
 use audio_engine_effect::effect::Effect;
 use audio_engine_sequencer::instrument::InstrumentID;
 
@@ -78,10 +81,12 @@ pub fn sample_track(
         let note_time = song_time - track_state.note_on.unwrap();
         let note_off = track_state.note_off.map(|note_off| song_time - note_off);
         let instrument_sample = instrument.sample(
-            note_time,
-            note_off,
-            track_state.note_pitch,
-            sample_rate,
+            &NoteParameters {
+                note_time,
+                note_off,
+                note_pitch: track_state.note_pitch,
+                sample_rate,
+            },
             &mut track_state.instrument_note_state,
         );
 

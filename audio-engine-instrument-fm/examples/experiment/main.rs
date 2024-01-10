@@ -1,5 +1,5 @@
 use audio_engine_common::{
-    digital_sound::sound::Sound,
+    digital_sound::{parameters::NoteParameters, sound::Sound},
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
     waveform::Waveform,
 };
@@ -62,10 +62,12 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
         sample_num += 1;
         let sample_time = sample_num as f32 / sample_rate;
         instrument.sample(
-            sample_time,
-            None,
-            note_pitch,
-            sample_rate,
+            &NoteParameters {
+                note_time: sample_time,
+                note_off: None,
+                note_pitch,
+                sample_rate,
+            },
             &mut instrument_state,
         )
     };

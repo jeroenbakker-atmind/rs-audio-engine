@@ -1,4 +1,4 @@
-use audio_engine_common::{envelope::Envelope, id::ID, note_time::NoteTime};
+use audio_engine_common::{digital_sound::parameters::NoteParameters, envelope::Envelope, id::ID};
 
 use crate::operator::{OperatorID, OperatorNoteState, Operators};
 
@@ -17,24 +17,22 @@ pub struct ExecutionStep {
 impl ExecutionStep {
     pub fn execute<E: Envelope>(
         &self,
-        note_time: NoteTime,
-        note_off: Option<NoteTime>,
-        note_pitch_base: f32,
-        sample_rate: f32,
+        parameters: &NoteParameters,
         operators: &Operators<E>,
         step_state: &mut OperatorNoteState,
         stack: &mut [f32],
     ) {
+        let note_pitch_base = parameters.note_pitch;
         let note_pitch_modulator = self.sum_inputs(stack);
         if let (Some(operator), StackID::Index(index)) =
             (operators.get_operator(self.operator_index), self.stack_out)
         {
             let result = operator.sample(
-                note_time,
-                note_off,
+                parameters.note_time,
+                parameters.note_off,
                 note_pitch_base,
                 note_pitch_modulator,
-                sample_rate,
+                parameters.sample_rate,
                 step_state,
             );
             stack[index as usize] = result;

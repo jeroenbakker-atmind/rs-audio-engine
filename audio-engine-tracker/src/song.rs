@@ -1,4 +1,7 @@
-use audio_engine_common::{beats_per_minute::BeatsPerMinute, digital_sound::sound::Sound};
+use audio_engine_common::{
+    beats_per_minute::BeatsPerMinute,
+    digital_sound::{parameters::NoteParameters, sound::Sound},
+};
 use audio_engine_sequencer::instrument::{Instrument, InstrumentID};
 
 use crate::{
@@ -74,6 +77,7 @@ impl Song {
 
 impl Sound for Song {
     type SoundState = SongState;
+    type Parameters = NoteParameters;
 
     fn init_sound_state(&self) -> Self::SoundState {
         let mut state = SongState::default();
@@ -81,14 +85,7 @@ impl Sound for Song {
         state
     }
 
-    fn sample(
-        &self,
-        note_time: audio_engine_common::note_time::NoteTime,
-        note_off: Option<audio_engine_common::note_time::NoteTime>,
-        note_pitch: f32,
-        sample_rate: f32,
-        state: &mut Self::SoundState,
-    ) -> f32 {
+    fn sample(&self, parameters: &Self::Parameters, state: &mut Self::SoundState) -> f32 {
         todo!("Can tracker call this function?");
         0.0
     }

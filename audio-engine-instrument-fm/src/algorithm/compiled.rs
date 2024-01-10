@@ -1,4 +1,4 @@
-use audio_engine_common::{envelope::Envelope, id::ID, note_time::NoteTime};
+use audio_engine_common::{digital_sound::parameters::NoteParameters, envelope::Envelope, id::ID};
 
 use crate::operator::{OperatorID, OperatorNoteState, Operators};
 
@@ -79,22 +79,12 @@ pub struct CompiledAlgorithmState {
 impl CompiledAlgorithm {
     pub fn sample<E: Envelope>(
         &self,
-        note_time: NoteTime,
-        note_off: Option<NoteTime>,
-        note_pitch: f32,
-        sample_rate: f32,
+        parameters: &NoteParameters,
         operators: &Operators<E>,
         note_state: &mut CompiledAlgorithmState,
     ) -> f32 {
         self.init_state(note_state);
-        self.execute_steps(
-            note_time,
-            note_off,
-            note_pitch,
-            sample_rate,
-            operators,
-            note_state,
-        );
+        self.execute_steps(parameters, operators, note_state);
         self.sum_carrier_result(note_state)
     }
 
@@ -111,10 +101,7 @@ impl CompiledAlgorithm {
 
     fn execute_steps<E: Envelope>(
         &self,
-        note_time: NoteTime,
-        note_off: Option<NoteTime>,
-        note_pitch: f32,
-        sample_rate: f32,
+        parameters: &NoteParameters,
         operators: &Operators<E>,
         note_state: &mut CompiledAlgorithmState,
     ) {
@@ -123,15 +110,7 @@ impl CompiledAlgorithm {
             .iter()
             .zip(note_state.execution_step_state.iter_mut())
         {
-            step.execute(
-                note_time,
-                note_off,
-                note_pitch,
-                sample_rate,
-                operators,
-                step_state,
-                &mut note_state.stack,
-            );
+            step.execute(parameters, operators, step_state, &mut note_state.stack);
         }
     }
 

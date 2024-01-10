@@ -1,6 +1,6 @@
 use crate::operator_frequency::{OperatorFrequency, RATED_1};
 use audio_engine_common::{
-    digital_sound::sound::Sound,
+    digital_sound::{parameters::NoteParameters, sound::Sound},
     envelope::Envelope,
     id::ID,
     level::Level,
@@ -51,6 +51,7 @@ where
     }
 }
 
+// TODO: Use Sound
 impl<E> Operator<E>
 where
     E: Envelope,
@@ -70,10 +71,12 @@ where
         let note_pitch = self.frequency.apply(note_pitch_base) + note_pitch_modulator;
         // TODO: add phase when initializing the note_state
         let result = self.waveform.sample(
-            note_time,
-            note_off,
-            note_pitch,
-            sample_rate,
+            &NoteParameters {
+                note_time,
+                note_off,
+                note_pitch,
+                sample_rate,
+            },
             &mut state.waveform,
         );
         result * self.envelope.level(note_time, note_off) * self.level

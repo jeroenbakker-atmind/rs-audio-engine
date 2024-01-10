@@ -14,5 +14,3 @@ pub fn create_fm_basic_harmonic_triangle_instrument(harmonic: u8) -> Instrument 
 pub fn create_fm_basic_harmonic_saw_instrument(harmonic: u8) -> Instrument {
     create_fm_waveform_instrument(Waveform::Morph(1.0, 1.0, harmonic))
 }
-
-

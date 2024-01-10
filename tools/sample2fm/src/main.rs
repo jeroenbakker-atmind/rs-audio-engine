@@ -1,5 +1,5 @@
 use audio_engine_common::{
-    digital_sound::sound::Sound,
+    digital_sound::{parameters::NoteParameters, sound::Sound},
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
     waveform::Waveform,
 };
@@ -107,10 +107,12 @@ fn find_best_instrument(
                                     for (index, sample) in extracted_samples.iter().enumerate() {
                                         let note_time = index as f32 / sample_rate;
                                         let fm_sample = instrument.sample(
-                                            note_time,
-                                            None,
-                                            note_pitch,
-                                            sample_rate,
+                                            &NoteParameters {
+                                                note_time,
+                                                note_off: None,
+                                                note_pitch,
+                                                sample_rate,
+                                            },
                                             &mut sound_state,
                                         );
                                         let sample_distance = (sample - fm_sample).abs();

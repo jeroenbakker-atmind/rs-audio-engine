@@ -1,7 +1,6 @@
 use audio_engine_common::{
-    digital_sound::{sound::Sound, sound_state::SoundState},
+    digital_sound::{parameters::NoteParameters, sound::Sound, sound_state::SoundState},
     envelope::Envelope,
-    note_time::NoteTime,
 };
 
 use crate::{
@@ -51,29 +50,16 @@ where
     E: Envelope + Copy,
 {
     type SoundState = FMInstrumentNoteState;
+    type Parameters = NoteParameters;
 
     fn init_sound_state(&self) -> Self::SoundState {
         assert!(self.algorithm.is_some(), "Algorithm should have been compiled when creating the instrument by calling #FMInstrument::compile.");
         Self::SoundState::default()
     }
 
-    fn sample(
-        &self,
-        note_time: NoteTime,
-        note_off: Option<NoteTime>,
-        note_pitch: f32,
-        sample_rate: f32,
-        state: &mut Self::SoundState,
-    ) -> f32 {
+    fn sample(&self, parameters: &Self::Parameters, state: &mut Self::SoundState) -> f32 {
         if let Some(program) = &self.algorithm {
-            program.sample(
-                note_time,
-                note_off,
-                note_pitch,
-                sample_rate,
-                &self.operators,
-                &mut state.state,
-            )
+            program.sample(parameters, &self.operators, &mut state.state)
         } else {
             0.0
         }

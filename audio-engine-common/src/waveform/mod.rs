@@ -1,4 +1,7 @@
-use crate::{digital_sound::sound::Sound, phase_time::PhaseTime};
+use crate::{
+    digital_sound::{parameters::NoteParameters, sound::Sound},
+    phase_time::PhaseTime,
+};
 
 use self::{
     shape::{morph::MorphShape, shape_sample},
@@ -25,18 +28,13 @@ pub enum Waveform {
 
 impl Sound for Waveform {
     type SoundState = WaveformState;
+    type Parameters = NoteParameters;
+
     fn init_sound_state(&self) -> Self::SoundState {
         WaveformState::default()
     }
 
-    fn sample(
-        &self,
-        _note_time: crate::note_time::NoteTime,
-        _note_off: Option<crate::note_time::NoteTime>,
-        note_pitch: f32,
-        sample_rate: f32,
-        state: &mut Self::SoundState,
-    ) -> f32 {
+    fn sample(&self, parameters: &Self::Parameters, state: &mut Self::SoundState) -> f32 {
         let result = match self {
             Waveform::Sine => (state.phase_time.time * std::f32::consts::TAU).sin(),
             Waveform::Triangle => {
@@ -75,7 +73,8 @@ impl Sound for Waveform {
                 shape_sample(&shape, state.phase_time, *num_harmonics)
             }
         };
-        state.phase_time += PhaseTime::delta_phase_time(note_pitch, sample_rate);
+        state.phase_time +=
+            PhaseTime::delta_phase_time(parameters.note_pitch, parameters.sample_rate);
         result
     }
 }
