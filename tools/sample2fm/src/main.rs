@@ -111,6 +111,7 @@ fn find_best_instrument(
                                                 note_time,
                                                 note_off: None,
                                                 note_pitch,
+                                                gain: 1.0,
                                                 sample_rate,
                                             },
                                             &mut sound_state,

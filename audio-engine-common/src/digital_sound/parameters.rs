@@ -1,4 +1,4 @@
-use crate::note_time::NoteTime;
+use crate::{level::Level, note_time::NoteTime};
 
 pub trait SoundParameters {}
 
@@ -11,7 +11,7 @@ pub struct NoteParameters {
     /// Pitch of the note being played.
     pub note_pitch: f32,
     /// Current gain (volume/amplification level)
-    pub gain: f32,
+    pub gain: Level,
     /// Sample rate being used to sample the Sound.
     pub sample_rate: f32,
 }
