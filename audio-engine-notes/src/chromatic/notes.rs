@@ -27,3 +27,11 @@ impl ChromaticNote {
         self.tone.pitch_octave4() * self.multiplier()
     }
 }
+
+/// Test to check that A4 is at 440 hz.
+#[test]
+fn chromatic_note_pitch_a4() {
+    let a4 = ChromaticNote::new(ChromaticTone::A, 4);
+    let pitch = a4.pitch();
+    assert_eq!(pitch, 440.0);
+}
