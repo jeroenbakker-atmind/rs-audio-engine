@@ -31,8 +31,15 @@ impl Row {
             } else if note_str == "OFF" {
                 self.event = Some(Event::NoteOff);
             } else {
-                let instrument_index = hex::decode(instrument_str).unwrap()[0];
-                let instrument_id = InstrumentID::from(instrument_index);
+                let instrument_id = {
+                    if instrument_str != "--" {
+                        let instrument_index = hex::decode(instrument_str).unwrap()[0];
+                        let instrument_id = InstrumentID::from(instrument_index);
+                        instrument_id
+                    } else {
+                        InstrumentID::NotSet
+                    }
+                };
 
                 let tone = if note_str.starts_with("C ") {
                     ChromaticTone::C

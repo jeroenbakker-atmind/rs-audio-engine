@@ -1,0 +1,737 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio_engine_common'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-common"
+                ],
+                "filter": {
+                    "name": "audio_engine_common",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'morph-shapes'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=morph-shapes",
+                    "--package=audio-engine-common"
+                ],
+                "filter": {
+                    "name": "morph-shapes",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'morph-shapes'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=morph-shapes",
+                    "--package=audio-engine-common"
+                ],
+                "filter": {
+                    "name": "morph-shapes",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio-engine-fourier'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-fourier"
+                ],
+                "filter": {
+                    "name": "audio-engine-fourier",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio_engine_notes'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-notes"
+                ],
+                "filter": {
+                    "name": "audio_engine_notes",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio_engine_instrument_fm'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-instrument-fm"
+                ],
+                "filter": {
+                    "name": "audio_engine_instrument_fm",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'experiment'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=experiment",
+                    "--package=audio-engine-instrument-fm"
+                ],
+                "filter": {
+                    "name": "experiment",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'experiment'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=experiment",
+                    "--package=audio-engine-instrument-fm"
+                ],
+                "filter": {
+                    "name": "experiment",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio_engine_instrument_sample'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-instrument-sample"
+                ],
+                "filter": {
+                    "name": "audio_engine_instrument_sample",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio_engine_instrument_piano'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-instrument-piano"
+                ],
+                "filter": {
+                    "name": "audio_engine_instrument_piano",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio_engine_instruments'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-instruments"
+                ],
+                "filter": {
+                    "name": "audio_engine_instruments",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio-engine-sequencer'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-sequencer"
+                ],
+                "filter": {
+                    "name": "audio-engine-sequencer",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio-engine-effect'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-effect"
+                ],
+                "filter": {
+                    "name": "audio-engine-effect",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio-engine-effect-delay'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-effect-delay"
+                ],
+                "filter": {
+                    "name": "audio-engine-effect-delay",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio-engine-effect-distortion'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-effect-distortion"
+                ],
+                "filter": {
+                    "name": "audio-engine-effect-distortion",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio-engine-tracker'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-tracker"
+                ],
+                "filter": {
+                    "name": "audio-engine-tracker",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'track-with-delay'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=track-with-delay",
+                    "--package=audio-engine-tracker"
+                ],
+                "filter": {
+                    "name": "track-with-delay",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'track-with-delay'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=track-with-delay",
+                    "--package=audio-engine-tracker"
+                ],
+                "filter": {
+                    "name": "track-with-delay",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'track-with-distortion'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=track-with-distortion",
+                    "--package=audio-engine-tracker"
+                ],
+                "filter": {
+                    "name": "track-with-distortion",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'track-with-distortion'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=track-with-distortion",
+                    "--package=audio-engine-tracker"
+                ],
+                "filter": {
+                    "name": "track-with-distortion",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio-engine-player'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-player"
+                ],
+                "filter": {
+                    "name": "audio-engine-player",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio_engine_tracker_songs'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-tracker-songs"
+                ],
+                "filter": {
+                    "name": "audio_engine_tracker_songs",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'song2'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=song2",
+                    "--package=audio-engine-tracker-songs"
+                ],
+                "filter": {
+                    "name": "song2",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'song2'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=song2",
+                    "--package=audio-engine-tracker-songs"
+                ],
+                "filter": {
+                    "name": "song2",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'song1'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=song1",
+                    "--package=audio-engine-tracker-songs"
+                ],
+                "filter": {
+                    "name": "song1",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'song1'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=song1",
+                    "--package=audio-engine-tracker-songs"
+                ],
+                "filter": {
+                    "name": "song1",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'instrument-test'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=instrument-test",
+                    "--package=audio-engine-tracker-songs"
+                ],
+                "filter": {
+                    "name": "instrument-test",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'instrument-test'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=instrument-test",
+                    "--package=audio-engine-tracker-songs"
+                ],
+                "filter": {
+                    "name": "instrument-test",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'audio-engine-export-video'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=audio-engine-export-video"
+                ],
+                "filter": {
+                    "name": "audio-engine-export-video",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'export-histogram'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=export-histogram",
+                    "--package=audio-engine-export-video"
+                ],
+                "filter": {
+                    "name": "export-histogram",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'export-histogram'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=export-histogram",
+                    "--package=audio-engine-export-video"
+                ],
+                "filter": {
+                    "name": "export-histogram",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'export-song1'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=export-song1",
+                    "--package=audio-engine-export-video"
+                ],
+                "filter": {
+                    "name": "export-song1",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'export-song1'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=export-song1",
+                    "--package=audio-engine-export-video"
+                ],
+                "filter": {
+                    "name": "export-song1",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'export-instrument-test'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=export-instrument-test",
+                    "--package=audio-engine-export-video"
+                ],
+                "filter": {
+                    "name": "export-instrument-test",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'export-instrument-test'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=export-instrument-test",
+                    "--package=audio-engine-export-video"
+                ],
+                "filter": {
+                    "name": "export-instrument-test",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'wav2rs'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=wav2rs",
+                    "--package=wav2rs"
+                ],
+                "filter": {
+                    "name": "wav2rs",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'wav2rs'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=wav2rs",
+                    "--package=wav2rs"
+                ],
+                "filter": {
+                    "name": "wav2rs",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'sample2fm'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=sample2fm",
+                    "--package=sample2fm"
+                ],
+                "filter": {
+                    "name": "sample2fm",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'sample2fm'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=sample2fm",
+                    "--package=sample2fm"
+                ],
+                "filter": {
+                    "name": "sample2fm",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

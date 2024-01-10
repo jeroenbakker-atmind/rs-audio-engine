@@ -77,19 +77,23 @@ pub fn sample_track(
     song_time: SongTime,
     sample_rate: f32,
 ) -> f32 {
-    let track_sample = if let Some(instrument) = song.get_instrument(track_state.instrument_id) {
-        let note_time = song_time - track_state.note_on.unwrap();
-        let note_off = track_state.note_off.map(|note_off| song_time - note_off);
-        instrument.sample(
-            &NoteParameters {
-                note_time,
-                note_off,
-                note_pitch: track_state.note_pitch,
-                gain: track_state.level,
-                sample_rate,
-            },
-            &mut track_state.instrument_note_state,
-        ) * track.level
+    let track_sample = if let Some(note_on) = track_state.note_on {
+        if let Some(instrument) = song.get_instrument(track_state.instrument_id) {
+            let note_time = song_time - note_on;
+            let note_off = track_state.note_off.map(|note_off| song_time - note_off);
+            instrument.sample(
+                &NoteParameters {
+                    note_time,
+                    note_off,
+                    note_pitch: track_state.note_pitch,
+                    gain: track_state.level,
+                    sample_rate,
+                },
+                &mut track_state.instrument_note_state,
+            ) * track.level
+        } else {
+            0.0
+        }
     } else {
         0.0
     };
@@ -173,9 +177,12 @@ fn apply_row(
         match row.event {
             Some(Event::NoteOn(note, instrument_id)) => {
                 track_state.note_on = Some(song_time);
-                track_state.instrument_id = instrument_id;
+                if instrument_id != InstrumentID::NotSet {
+                    track_state.instrument_id = instrument_id;
+                }
+
                 track_state.note_pitch = note.pitch();
-                let instrument = song.get_instrument(instrument_id);
+                let instrument = song.get_instrument(track_state.instrument_id);
                 track_state.instrument_note_state.reset(instrument);
             }
             Some(Event::NoteRelease) => {
@@ -184,7 +191,6 @@ fn apply_row(
             Some(Event::NoteOff) => {
                 track_state.note_on = None;
                 track_state.note_off = None;
-                track_state.instrument_id = InstrumentID::NotSet;
                 track_state.instrument_note_state.reset(None);
             }
             Some(Event::Empty) | Some(Event::PatternEnd) | None => {}
