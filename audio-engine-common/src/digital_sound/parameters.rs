@@ -10,6 +10,8 @@ pub struct NoteParameters {
     pub note_off: Option<NoteTime>,
     /// Pitch of the note being played.
     pub note_pitch: f32,
+    /// Current gain (volume/amplification level)
+    pub gain: f32,
     /// Sample rate being used to sample the Sound.
     pub sample_rate: f32,
 }

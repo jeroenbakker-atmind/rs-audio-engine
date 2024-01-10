@@ -80,17 +80,16 @@ pub fn sample_track(
     let track_sample = if let Some(instrument) = song.get_instrument(track_state.instrument_id) {
         let note_time = song_time - track_state.note_on.unwrap();
         let note_off = track_state.note_off.map(|note_off| song_time - note_off);
-        let instrument_sample = instrument.sample(
+        instrument.sample(
             &NoteParameters {
                 note_time,
                 note_off,
                 note_pitch: track_state.note_pitch,
+                gain: track_state.level,
                 sample_rate,
             },
             &mut track_state.instrument_note_state,
-        );
-
-        instrument_sample * track.level * track_state.level
+        ) * track.level
     } else {
         0.0
     };

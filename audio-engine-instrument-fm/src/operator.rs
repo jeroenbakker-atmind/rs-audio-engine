@@ -70,16 +70,16 @@ where
         }
         let note_pitch = self.frequency.apply(note_pitch_base) + note_pitch_modulator;
         // TODO: add phase when initializing the note_state
-        let result = self.waveform.sample(
+        self.waveform.sample(
             &NoteParameters {
                 note_time,
                 note_off,
                 note_pitch,
+                gain: self.envelope.level(note_time, note_off) * self.level,
                 sample_rate,
             },
             &mut state.waveform,
-        );
-        result * self.envelope.level(note_time, note_off) * self.level
+        )
     }
 }
 

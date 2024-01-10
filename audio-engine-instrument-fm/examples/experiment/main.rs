@@ -66,6 +66,7 @@ fn play_tone(device: &cpal::Device, config: &cpal::StreamConfig) -> Result<(), (
                 note_time: sample_time,
                 note_off: None,
                 note_pitch,
+                gain: 1.0,
                 sample_rate,
             },
             &mut instrument_state,

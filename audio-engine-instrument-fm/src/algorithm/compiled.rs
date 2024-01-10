@@ -85,7 +85,7 @@ impl CompiledAlgorithm {
     ) -> f32 {
         self.init_state(note_state);
         self.execute_steps(parameters, operators, note_state);
-        self.sum_carrier_result(note_state)
+        self.sum_carrier_result(note_state) * parameters.gain
     }
 
     fn init_state(&self, note_state: &mut CompiledAlgorithmState) {

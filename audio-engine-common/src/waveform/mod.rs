@@ -72,7 +72,7 @@ impl Sound for Waveform {
                 let shape = MorphShape::new(*x, *y);
                 shape_sample(&shape, state.phase_time, *num_harmonics)
             }
-        };
+        } * parameters.gain;
         state.phase_time +=
             PhaseTime::delta_phase_time(parameters.note_pitch, parameters.sample_rate);
         result
