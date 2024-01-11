@@ -53,6 +53,9 @@ impl Default for Song {
     }
 }
 
+/// Helper constant to use with #Song::init_patterns when track lengths are not in sync.
+pub const _SKIP_ROW__: &str = "";
+
 impl Song {
     pub fn get_phrase(&self, id: PhraseID) -> Option<&Phrase> {
         match id {
@@ -71,6 +74,69 @@ impl Song {
         match id {
             InstrumentID::Index(index) => Some(&self.instruments[index as usize]),
             _ => None,
+        }
+    }
+
+    /// Initialize multiple patterns in a single call.
+    ///
+    /// This is useful when you want to keep the rows in several patterns synchronized.
+    /// For example when using coords in multiple tracks.
+    ///
+    /// ```
+    /// use audio_engine_tracker::song::Song;
+    /// let mut song = Song::default();
+    /// song.init_patterns(&[0x00, 0x01, 0x02], &[
+    ///     &["C 4 01 FF", "E 4 01 FF", "G 4 01 FF"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    /// ]);
+    /// assert_eq!(4, song.patterns[0x00].count_rows());
+    /// assert_eq!(4, song.patterns[0x01].count_rows());
+    /// assert_eq!(4, song.patterns[0x02].count_rows());
+    /// ```
+    ///
+    /// Empty rows can be used when tracks don't start at the same beat.
+    ///
+    /// ```
+    /// use audio_engine_tracker::song::{Song, _SKIP_ROW__};
+    /// let mut song = Song::default();
+    /// song.init_patterns(&[0x00, 0x10, 0x20], &[
+    ///     &["C 4 01 FF", "E 4 01 FF", "G 4 01 FF"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    ///     &[_SKIP_ROW__, "E 4 01 FF", _SKIP_ROW__],
+    ///     &[_SKIP_ROW__, "--- -- --", _SKIP_ROW__],
+    ///     &[_SKIP_ROW__, "--- -- --", _SKIP_ROW__],
+    ///     &[_SKIP_ROW__, "--- -- --", _SKIP_ROW__],
+    /// ]);
+    /// song.init_patterns(&[0x01, 0x11, 0x21], &[
+    ///     &["C 4 01 FF", _SKIP_ROW__, "G 4 01 FF"],
+    ///     &["--- -- --", _SKIP_ROW__, "--- -- --"],
+    ///     &["--- -- --", _SKIP_ROW__, "--- -- --"],
+    ///     &["--- -- --", _SKIP_ROW__, "--- -- --"],
+    ///     &["C 4 01 FF", "E 4 01 FF", "G 4 01 FF"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    ///     &["--- -- --", "--- -- --", "--- -- --"],
+    /// ]);
+    /// assert_eq!(4, song.patterns[0x00].count_rows());
+    /// assert_eq!(8, song.patterns[0x01].count_rows());
+    /// assert_eq!(8, song.patterns[0x10].count_rows());
+    /// assert_eq!(4, song.patterns[0x11].count_rows());
+    /// assert_eq!(4, song.patterns[0x20].count_rows());
+    /// assert_eq!(8, song.patterns[0x21].count_rows());
+    /// ```
+    pub fn init_patterns(&mut self, pattern_indices: &[usize], rows: &[&'static [&'static str]]) {
+        for (column, pattern_index) in pattern_indices.iter().enumerate() {
+            let pattern = &mut self.patterns[*pattern_index];
+            let pattern_rows = rows
+                .iter()
+                .map(|rows| rows[column])
+                .filter(|row| !row.is_empty())
+                .collect::<Vec<&str>>();
+            pattern.init(&pattern_rows);
         }
     }
 }
