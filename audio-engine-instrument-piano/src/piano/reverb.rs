@@ -23,13 +23,13 @@ impl Reverb {
         let lengths = [37, 87, 181, 271, 359, 592, 687, 721];
         let aa = [a, a + 1.0, a, a, a, a, a, a];
 
-        for k in 0..8 {
-            self.delays[k] = Delay::new(lengths[k]);
+        for (k, length) in lengths.iter().enumerate() {
+            self.delays[k] = Delay::new(*length);
             self.o[k] = 0.0;
             self.b[k] = 1.0;
             self.c[k] = if k % 2 == 0 { 1.0 / 8.0 } else { -1.0 / 8.0 };
 
-            self.decay[k] = Filter::loss(sample_rate / lengths[k] as f32, c1, c3);
+            self.decay[k] = Filter::loss(sample_rate / *length as f32, c1, c3);
         }
 
         for j in 0..8 {

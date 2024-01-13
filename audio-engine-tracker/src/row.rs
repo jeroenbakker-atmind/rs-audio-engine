@@ -34,8 +34,7 @@ impl Row {
                 let instrument_id = {
                     if instrument_str != "--" {
                         let instrument_index = hex::decode(instrument_str).unwrap()[0];
-                        let instrument_id = InstrumentID::from(instrument_index);
-                        instrument_id
+                        InstrumentID::from(instrument_index)
                     } else {
                         InstrumentID::NotSet
                     }
@@ -130,7 +129,7 @@ impl Display for Row {
                         f.write_str("--")?;
                     }
                     InstrumentID::Index(index) => {
-                        f.write_fmt(format_args!("{:02}", &hex::encode_upper(&[index])))?;
+                        f.write_fmt(format_args!("{:02}", &hex::encode_upper([index])))?;
                     }
                 }
             }
