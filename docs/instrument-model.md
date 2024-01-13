@@ -1,1 +1,2 @@
  - piano virtual physical model http://large.stanford.edu/courses/2007/ph210/otey2/c/
+ - bowed string physical model https://github.com/Nemus-Project/EfficientBowedString/blob/main/RealTimeImpl/EfficientBowedString/Source/ModalStiffStringProcessor.cpp

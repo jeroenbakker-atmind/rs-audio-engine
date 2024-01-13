@@ -7,7 +7,7 @@ use audio_engine_tracker::{
 
 pub fn create_song2() -> Song {
     let mut song = Song {
-        speed: 120.0,
+        speed: 130.0,
         initial_speed: 4.0,
         ..Song::default()
     };
