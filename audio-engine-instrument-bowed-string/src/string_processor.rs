@@ -145,6 +145,63 @@ impl StringProcessor {
             return;
         }
 
+        let zeta_1 = (0..self.modes_number as usize)
+            .map(|mode_number| {
+                self.modes_in[self.modes_in_current][mode_number]
+                    * self.states[self.state_current][mode_number + self.modes_number as usize]
+            })
+            .sum::<f32>();
+        let eta = zeta_1 - self.vb;
+        let d = (2.0 * self.a).sqrt() * (-self.a * eta * eta + 0.5).exp();
+        let lambda = d * (1.0 - 2.0 * self.a * eta * eta);
+
+        let mut vt1 = 0.0;
+        let mut vt2 = 0.0;
+
+        (0..self.modes_number as usize).for_each(|mode_number| {
+            let zeta_2 = self.modes_in[self.modes_in_current][mode_number] * zeta_1;
+            let b1 = self.b11[mode_number] * self.states[self.state_current][mode_number]
+                + self.b12[mode_number]
+                    * self.states[self.state_current][mode_number + self.modes_number as usize];
+            let b2 = self.b21[mode_number] * self.states[self.state_current][mode_number]
+                + self.b22[mode_number]
+                    * self.states[self.state_current][mode_number + self.modes_number as usize]
+                + zeta_2 * 0.5 * self.timestep * self.fb * (lambda - 2.0 * d)
+                + self.timestep
+                    * self.fb
+                    * d
+                    * self.modes_in[self.modes_in_current][mode_number]
+                    * self.vb;
+            let z1 = 0.5
+                * self.timestep
+                * self.fb
+                * lambda
+                * self.modes_in[self.modes_in_current][mode_number];
+            self.inv_av2[mode_number] = 1.0 / self.schur_comp[mode_number] * z1;
+            self.inv_av1[mode_number] =
+                -self.t11[mode_number] * self.t12[mode_number] * self.inv_av2[mode_number];
+
+            let y2 = self.t11[mode_number] * b1;
+            let z2 = b2 - self.t21[mode_number] * y2;
+            self.inv_ab2[mode_number] = 1.0 / self.schur_comp[mode_number] * z2;
+            self.inv_ab1[mode_number] =
+                y2 - self.t11[mode_number] * self.t12[mode_number] * self.inv_ab2[mode_number];
+
+            vt1 += self.modes_in[self.modes_in_current][mode_number] * self.inv_av2[mode_number];
+            vt2 += self.modes_in[self.modes_in_current][mode_number] * self.inv_ab2[mode_number];
+        });
+
+        let coeff = 1.0 / (1.0 + vt1);
+
+        (0..self.modes_number as usize).for_each(|mode_number| {
+            self.states[self.state_new][mode_number] =
+                self.inv_ab1[mode_number] - coeff * self.inv_av1[mode_number] * vt2;
+            self.states[self.state_new][mode_number + self.modes_number as usize] =
+                self.inv_ab2[mode_number] - coeff * self.inv_av2[mode_number] * vt2;
+        });
+
+        swap(&mut self.state_current, &mut self.state_new);
+
         todo!()
     }
     pub fn read_output(&mut self) -> f32 {
