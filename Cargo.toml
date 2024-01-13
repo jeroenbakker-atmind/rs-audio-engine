@@ -8,6 +8,7 @@ members = [
     "audio-engine-instrument-fm",
     "audio-engine-instrument-sample",
     "audio-engine-instrument-piano",
+    "audio-engine-instrument-bowed-string",
     "audio-engine-instruments",
 
     "audio-engine-effect",
