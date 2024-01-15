@@ -1,4 +1,5 @@
 use audio_engine_sequencer::instrument::Instrument;
+use bowed_string::cello::create_bowed_string_cello_instrument;
 use fm::basic::harmonic::{
     create_fm_basic_harmonic_saw_instrument, create_fm_basic_harmonic_square_instrument,
     create_fm_basic_harmonic_triangle_instrument,
@@ -12,6 +13,7 @@ use fm::wip::create_fm_wip_instrument;
 use piano::create_piano_piano_instrument;
 use sample::pianos::piano_ax::create_sample_pianos_piano_ax;
 
+mod bowed_string;
 mod fm;
 mod piano;
 mod sample;
@@ -51,6 +53,8 @@ pub enum InstrumentLibrary {
     SamplePianosPianoAX,
 
     PianoPiano,
+
+    BowedStringCello,
 }
 
 impl InstrumentLibrary {
@@ -89,6 +93,8 @@ impl InstrumentLibrary {
             Self::FmWIP => create_fm_wip_instrument(),
 
             Self::PianoPiano => create_piano_piano_instrument(),
+
+            Self::BowedStringCello => create_bowed_string_cello_instrument(),
         }
     }
 }

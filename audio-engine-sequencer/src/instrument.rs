@@ -3,6 +3,7 @@ use audio_engine_common::{
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
     id::ID,
 };
+use audio_engine_instrument_bowed_string::instrument::BowedStringInstrument;
 use audio_engine_instrument_fm::instrument::FMInstrument;
 use audio_engine_instrument_piano::instrument::PianoInstrument;
 use audio_engine_instrument_sample::sample::Sample;
@@ -16,6 +17,7 @@ pub enum Instrument {
     FM(FMInstrument<DelayAttackHoldDecaySustainRelease>),
     Sample(Sample),
     Piano(PianoInstrument),
+    BowedString(BowedStringInstrument),
 }
 
 pub type InstrumentID = ID;
@@ -30,6 +32,9 @@ impl Sound for Instrument {
             Self::FM(fm) => InstrumentNoteState::FM(fm.init_sound_state()),
             Self::Sample(sample) => InstrumentNoteState::Sample(sample.init_sound_state()),
             Self::Piano(piano) => InstrumentNoteState::Piano(piano.init_sound_state()),
+            Self::BowedString(bowed_string) => {
+                InstrumentNoteState::BowedString(bowed_string.init_sound_state())
+            }
         }
     }
 
@@ -52,6 +57,13 @@ impl Sound for Instrument {
             Instrument::Sample(sample) => {
                 if let InstrumentNoteState::Sample(state) = state {
                     sample.sample(parameters, state)
+                } else {
+                    0.0
+                }
+            }
+            Instrument::BowedString(bowed_string) => {
+                if let InstrumentNoteState::BowedString(state) = state {
+                    bowed_string.sample(parameters, state)
                 } else {
                     0.0
                 }

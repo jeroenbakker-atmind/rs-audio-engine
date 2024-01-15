@@ -188,6 +188,7 @@ name = "audio-engine-instruments"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
+ "audio-engine-instrument-bowed-string",
  "audio-engine-instrument-fm",
  "audio-engine-instrument-piano",
  "audio-engine-instrument-sample",
@@ -211,6 +212,7 @@ name = "audio-engine-sequencer"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
+ "audio-engine-instrument-bowed-string",
  "audio-engine-instrument-fm",
  "audio-engine-instrument-piano",
  "audio-engine-instrument-sample",

@@ -201,14 +201,12 @@ impl StringProcessor {
         });
 
         swap(&mut self.state_current, &mut self.state_new);
-
-        todo!()
     }
     pub fn read_output(&mut self) -> f32 {
         let result = if self.is_being_played {
             (0..self.modes_number as usize)
                 .map(|mode_number| {
-                    self.modes_out[self.modes_out_current][mode_number]
+                    self.modes_in[self.modes_in_current][mode_number]
                         * self.states[self.state_current][mode_number]
                 })
                 .sum::<f32>()
