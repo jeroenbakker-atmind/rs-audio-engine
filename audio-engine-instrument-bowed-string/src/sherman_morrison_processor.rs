@@ -1,14 +1,11 @@
 use std::f32::consts::{PI, TAU};
 
 use crate::{
-    bow::Bow,
-    damping::DampingCoeffcient,
-    eigen_frequencies::{self, EigenFrequency},
-    hand::Hand,
-    processor::StringProcessor,
-    string::String,
-    string_and_hand::StringAndHand,
+    bow::Bow, damping::DampingCoeffcient, eigen_frequencies::EigenFrequency,
+    processor::StringProcessor, string_and_hand::StringAndHand,
 };
+// friction can become a trait.
+
 #[derive(Default, Debug)]
 pub struct ShermanMorrison {
     string_and_hand: StringAndHand,
@@ -33,12 +30,12 @@ pub struct ShermanMorrison {
     a21: Vec<f32>,
     a22: f32,
 
-    schur_comp: Vec<f32>,
+    shur_comp: Vec<f32>,
 
     b11: f32,
     b12: f32,
     b21: Vec<f32>,
-    b22: Vec<f32>,
+    b22: f32,
 }
 
 impl StringProcessor for ShermanMorrison {
@@ -59,6 +56,13 @@ impl StringProcessor for ShermanMorrison {
     fn set_read_position(&mut self, read_position: f32) {}
     fn compute_state(&mut self) {}
     fn read_output(&mut self) -> f32 {
+        let mode_len = self.mode_len();
+        let zeta1 = (0..mode_len)
+            .map(|mode| self.modes_in[mode] * self.states[mode + mode_len])
+            .sum::<f32>();
+        let eta = zeta1 * self.bow.velocity;
+        todo!("bilbao friction");
+
         0.0
     }
 }
@@ -71,6 +75,7 @@ impl ShermanMorrison {
         self.initialize_matrices();
         self.initialize_states();
     }
+
     fn initialize_eigen_frequencies(&mut self) {
         let mut mode = 1;
         let mut eigen_frequencies = Vec::with_capacity(200);
@@ -120,7 +125,7 @@ impl ShermanMorrison {
         // TODO a22 should be 1.0 ?
 
         // Optimize 1 - a21 *-0.5k
-        self.schur_comp = (0..mode_len)
+        self.shur_comp = (0..mode_len)
             .map(|mode| self.a22 - self.a21[mode] * self.a11 * self.a12)
             .collect::<Vec<f32>>();
 
@@ -132,12 +137,9 @@ impl ShermanMorrison {
             .iter()
             .map(|eigen_frequency| 0.5 * self.k() * (-eigen_frequency * eigen_frequency))
             .collect::<Vec<f32>>();
-        self.b22 = self
-            .damping_profile
-            .iter()
-            .map(|damping_coeefcient| 1.0 - 0.5 * self.k() * damping_coeefcient)
-            .collect::<Vec<f32>>();
+        self.b22 = 1.0;
     }
+
     fn initialize_states(&mut self) {
         self.states = vec![0.0; self.mode_len() * 2];
     }
@@ -156,8 +158,12 @@ impl ShermanMorrison {
         self.eigen_frequencies.len()
     }
 
+    fn sample_duration(&self) -> f32 {
+        1.0 / self.sample_rate
+    }
+
     // TODO rename to sample_duration
     fn k(&self) -> f32 {
-        1.0 / self.sample_rate
+        self.sample_duration()
     }
 }
