@@ -1,3 +1,7 @@
+use std::f32::consts::PI;
+
+use crate::hand::Hand;
+
 #[derive(Debug, Default, Copy, Clone)]
 pub struct String {
     /// Radius of the string in meters.
@@ -10,4 +14,22 @@ pub struct String {
     pub young_mod: f32,
     /// Length of the string in meters.
     pub length: f32,
+}
+
+impl String {
+    pub fn area(&self) -> f32 {
+        PI * self.radius * self.radius
+    }
+
+    pub fn lin_density(&self) -> f32 {
+        self.density * self.area()
+    }
+
+    pub fn inertia(&self) -> f32 {
+        PI * self.radius * self.radius * self.radius * self.radius / 4.0
+    }
+
+    pub fn c(&self) -> f32 {
+        self.tension / self.lin_density()
+    }
 }

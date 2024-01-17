@@ -1,9 +1,9 @@
 use std::{f32::consts::PI, mem::swap};
 
-use crate::string::String;
+use crate::{processor::StringProcessor, string::String};
 
 #[derive(Default, Debug)]
-pub struct StringProcessor {
+pub struct NemusProcessor {
     pub string: String,
     pub is_being_played: bool,
     pub gain: f32,
@@ -79,9 +79,9 @@ pub struct StringProcessor {
     previous_sample: f32,
 }
 
-impl StringProcessor {
-    pub fn new(sample_rate: f32, string: &String) -> StringProcessor {
-        let mut processor = StringProcessor::default();
+impl StringProcessor for NemusProcessor {
+     fn new(sample_rate: f32, string: &String) -> NemusProcessor {
+        let mut processor = NemusProcessor::default();
         processor.oversampling_factor = 1;
         processor.timestep = 1.0 / (sample_rate * processor.oversampling_factor as f32);
 
@@ -119,28 +119,28 @@ impl StringProcessor {
         processor
     }
 
-    pub fn reset_string_states(&mut self) {
+     fn reset_string_states(&mut self) {
         self.is_being_played = false;
         self.states[0].fill(0.0);
         self.states[1].fill(0.0);
         self.previous_sample = 0.0;
     }
 
-    pub fn set_input_position(&mut self, input_position: f32) {
+    fn set_input_position(&mut self, input_position: f32) {
         assert!(input_position >= 0.0);
         assert!(input_position <= 1.0);
         self.excit_position = self.length * input_position;
         self.recompute_in_modes();
     }
 
-    pub fn set_read_position(&mut self, read_position: f32) {
+    fn set_read_position(&mut self, read_position: f32) {
         assert!(read_position >= 0.0);
         assert!(read_position <= 1.0);
         self.read_position = self.length * read_position;
         self.recompute_out_modes();
     }
 
-    pub fn compute_state(&mut self) {
+    fn compute_state(&mut self) {
         if !self.is_being_played {
             return;
         }
@@ -202,7 +202,7 @@ impl StringProcessor {
 
         swap(&mut self.state_current, &mut self.state_new);
     }
-    pub fn read_output(&mut self) -> f32 {
+    fn read_output(&mut self) -> f32 {
         let result = if self.is_being_played {
             (0..self.modes_number as usize)
                 .map(|mode_number| {
@@ -220,7 +220,7 @@ impl StringProcessor {
     }
 }
 
-impl StringProcessor {
+impl NemusProcessor {
     fn compute_eigen_frequency(&self, mode_number: i32) -> f32 {
         let n = mode_number as f32 * PI / self.length;
         ((self.tension / self.lin_density) * n * n
