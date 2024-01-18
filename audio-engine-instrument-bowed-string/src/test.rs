@@ -13,7 +13,7 @@ fn string_processor() {
         length: 0.69,
     };
     let mut string_processor = ShermanMorrison::new(44100.0, &string);
-    string_processor.bow.velocity = 0.2;
+    string_processor.bow.velocity = 0.1;
     string_processor.bow.pressure = 10.0;
     for _ in 0..4096 {
         string_processor.compute_state();

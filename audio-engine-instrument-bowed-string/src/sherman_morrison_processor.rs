@@ -1,8 +1,11 @@
 use std::f32::consts::{PI, TAU};
 
 use crate::{
-    bow::Bow, damping::DampingCoeffcient, eigen_frequencies::EigenFrequency,
-    processor::StringProcessor, string_and_hand::StringAndHand,
+    bow::{Bow, BOW_FREE_PARAMETER},
+    damping::DampingCoeffcient,
+    eigen_frequencies::EigenFrequency,
+    processor::StringProcessor,
+    string_and_hand::StringAndHand,
 };
 // friction can become a trait.
 
@@ -36,6 +39,12 @@ pub struct ShermanMorrison {
     b12: f32,
     b21: Vec<f32>,
     b22: f32,
+
+    // scratch space
+    inv_av1: Vec<f32>,
+    inv_av2: Vec<f32>,
+    inv_ab1: Vec<f32>,
+    inv_ab2: Vec<f32>,
 }
 
 impl StringProcessor for ShermanMorrison {
@@ -60,8 +69,43 @@ impl StringProcessor for ShermanMorrison {
         let zeta1 = (0..mode_len)
             .map(|mode| self.modes_in[mode] * self.states[mode + mode_len])
             .sum::<f32>();
-        let eta = zeta1 * self.bow.velocity;
-        todo!("bilbao friction");
+
+        // Bilbao friction
+        let eta = zeta1 - self.bow.velocity;
+        let d = (2.0 * BOW_FREE_PARAMETER).sqrt() * (-BOW_FREE_PARAMETER * eta * eta + 0.5).exp();
+        let lambda = d * (1.0 - 2.0 * BOW_FREE_PARAMETER * eta.powi(2));
+
+        let mut v1 = 0.0;
+        let mut v2 = 0.0;
+
+        for mode in 0..mode_len {
+            let zeta2 = self.modes_in[mode] * zeta1;
+            let b1 = self.b11 * self.states[mode] + self.b12 * self.states[mode + mode_len];
+            let b2 = self.b21[mode] * self.states[mode]
+                + self.b22 * self.states[mode + mode_len]
+                + zeta2 * 0.5 * self.k() * self.bow.pressure * (lambda - 2.0 * d)
+                + self.k() * self.bow.pressure * d * self.modes_in[mode] * self.bow.velocity;
+
+            // Sherman Morrison Solver
+            let v = 0.5 * self.k() * self.bow.pressure * lambda * self.modes_in[mode];
+            self.inv_av2[mode] = (1.0 / self.shur_comp[mode]) * v;
+            self.inv_av1[mode] = self.a11 * self.a12 * self.inv_av2[mode];
+            let y2 = self.a11 * b1;
+            let z2 = b2 - self.a21[mode] * y2;
+            self.inv_ab2[mode] = (1.0 / self.shur_comp[mode]) * z2;
+            self.inv_ab2[mode] = y2 - self.a11 * self.a12 * self.inv_ab2[mode];
+
+            v1 += self.modes_in[mode] * self.inv_av2[mode];
+            v2 += self.modes_in[mode] * self.inv_ab2[mode];
+        }
+
+        let coeffcient = 1.0 / (1.0 + v1);
+
+        for mode in 0..mode_len {
+            self.states[mode] = self.inv_ab1[mode] - coeffcient * self.inv_av1[mode] * v2;
+            self.states[mode + mode_len] =
+                self.inv_ab2[mode] - coeffcient * self.inv_av2[mode] * v2;
+        }
 
         0.0
     }
@@ -141,7 +185,12 @@ impl ShermanMorrison {
     }
 
     fn initialize_states(&mut self) {
-        self.states = vec![0.0; self.mode_len() * 2];
+        let mode_len = self.mode_len();
+        self.states = vec![0.0; mode_len * 2];
+        self.inv_ab1 = vec![0.0; mode_len];
+        self.inv_ab2 = vec![0.0; mode_len];
+        self.inv_av1 = vec![0.0; mode_len];
+        self.inv_av2 = vec![0.0; mode_len];
     }
 
     fn initialize_damping(&mut self) {
