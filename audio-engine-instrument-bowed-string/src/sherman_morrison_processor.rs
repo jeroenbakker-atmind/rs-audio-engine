@@ -9,7 +9,7 @@ use crate::{
 };
 // friction can become a trait.
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct ShermanMorrison {
     string_and_hand: StringAndHand,
     pub bow: Bow,

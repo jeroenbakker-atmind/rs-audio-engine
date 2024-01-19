@@ -1,5 +1,5 @@
 /// The hand that doesn't hold the bow can block the string to change the pitch.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Hand {
     /// 1.0 = hand doesn't block the string,
     /// 0.5 = hand blocks string halfway (one octave up)

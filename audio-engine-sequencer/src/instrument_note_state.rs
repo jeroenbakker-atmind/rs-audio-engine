@@ -27,7 +27,11 @@ impl InstrumentNoteState {
                 *self = Self::Sample(instrument.init_sound_state())
             }
             Some(Instrument::Piano(piano)) => *self = Self::Piano(piano.init_sound_state()),
-            Some(Instrument::BowedString(instrument)) => {}
+            Some(Instrument::BowedString(instrument)) => {
+                //if self == InstrumentNoteState::None {
+                    *self = Self::BowedString(instrument.init_sound_state());
+                //}
+            }
         }
     }
 }

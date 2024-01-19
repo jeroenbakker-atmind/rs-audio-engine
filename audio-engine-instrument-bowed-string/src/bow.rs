@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct Bow {
     /// Bow Pressure (fb)
     pub pressure: f32,

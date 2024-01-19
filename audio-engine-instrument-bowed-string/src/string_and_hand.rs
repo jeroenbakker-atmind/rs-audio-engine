@@ -1,6 +1,6 @@
 use crate::{hand::Hand, string::String};
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Copy, Clone)]
 pub struct StringAndHand {
     pub string: String,
     pub hand: Hand,
