@@ -1,10 +1,16 @@
 use audio_engine_common::digital_sound::{parameters::NoteParameters, sound::Sound};
 
-use crate::{instrument_state::BowedStringInstrumentState, string::String, processor::StringProcessor};
+use crate::{instrument_state::BowedStringInstrumentState, string::String, processor::StringProcessor, bow::Bow};
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct BowedStringInstrument {
-    pub string: String,
+    pub strings: Vec<String>,
+}
+
+impl BowedStringInstrument {
+    pub fn add_string(&mut self, string: String) {
+        self.strings.push(string);
+    }
 }
 
 impl Sound for BowedStringInstrument {
@@ -16,21 +22,28 @@ impl Sound for BowedStringInstrument {
     }
 
     fn sample(&self, parameters: &Self::Parameters, state: &mut BowedStringInstrumentState) -> f32 {
-        if state.string_processor.is_none() {
-            state.string_processor = Some(StringProcessor::new(parameters.sample_rate, &self.string));
+        if state.string_processors.is_empty() {
+            for string in &self.strings {
+                state.string_processors.push(StringProcessor::new(parameters.sample_rate, string));
+
+            }
         }
 
-        if let Some(processor) = state.string_processor.as_mut() {
-            processor.bow.velocity = 0.1;
-            processor.bow.pressure = 10.0 * parameters.gain;
-            if parameters.note_off.is_some() {
-                processor.bow.velocity = 0.0;
-                processor.bow.pressure = 0.0;
-            }
-            processor.compute_state();
-            processor.read_output()
-        } else {
-            0.0
+        // Remove pressure from all strings
+        state.string_processors.iter_mut().for_each(|processor|processor.bow = Bow{velocity: 0.0, pressure: 0.0});
+        
+        // TODO: Select a string, closest to the last played note.
+        // TODO: apply pressure and hand position to the string.
+        let processor = &mut state.string_processors[2];
+        processor.bow.velocity = 0.1;
+        processor.bow.pressure = 10.0 * parameters.gain;
+        if parameters.note_off.is_some() {
+            processor.bow.velocity = 0.0;
+            processor.bow.pressure = 0.0;
         }
+        
+        // Sample the state of all strings 
+        state.string_processors.iter_mut().for_each(|processor|processor.compute_state());
+        state.string_processors.iter_mut().map(|processor|processor.read_output()).sum::<f32>()
     }
 }

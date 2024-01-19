@@ -441,7 +441,7 @@ pub fn create_song2() -> Song {
     song.tracks[0x04].level = 0.6;
 
     song.instruments[0] = InstrumentLibrary::PianoPiano.create();
-    song.instruments[1] = InstrumentLibrary::PianoPiano.create();
+    song.instruments[1] = InstrumentLibrary::BowedStringCello.create();
 
     {
         let mut song_state = SongState::default();

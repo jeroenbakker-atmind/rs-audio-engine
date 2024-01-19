@@ -230,10 +230,10 @@ impl NemusProcessor {
 
     fn recompute_modes_numbers(&mut self) {
         let mut result = 1;
-        const limit_frequency: f32 = 20e3 * 2.0 * PI;
+        const LIMIT_FREQUENCY: f32 = 20e3 * 2.0 * PI;
         loop {
             let frequency = self.compute_eigen_frequency(result);
-            if frequency > limit_frequency {
+            if frequency > LIMIT_FREQUENCY {
                 result -= 1;
                 break;
             }

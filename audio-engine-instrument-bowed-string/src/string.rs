@@ -1,7 +1,5 @@
 use std::f32::consts::PI;
 
-use crate::hand::Hand;
-
 #[derive(Debug, Default, Copy, Clone)]
 pub struct String {
     /// Radius of the string in meters.
