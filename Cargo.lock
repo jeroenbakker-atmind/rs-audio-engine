@@ -192,6 +192,7 @@ dependencies = [
  "audio-engine-instrument-fm",
  "audio-engine-instrument-piano",
  "audio-engine-instrument-sample",
+ "audio-engine-notes",
  "audio-engine-sequencer",
  "cpal",
 ]

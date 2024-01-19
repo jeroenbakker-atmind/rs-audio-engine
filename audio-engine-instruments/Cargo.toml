@@ -12,6 +12,7 @@ path="src/lib.rs"
 [dependencies]
 cpal = "*"
 audio-engine-common = {path="../audio-engine-common"}
+audio-engine-notes = {path="../audio-engine-notes"}
 audio-engine-sequencer = {path="../audio-engine-sequencer"}
 audio-engine-instrument-bowed-string = {path="../audio-engine-instrument-bowed-string"}
 audio-engine-instrument-fm = {path="../audio-engine-instrument-fm"}

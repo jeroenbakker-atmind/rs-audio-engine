@@ -35,6 +35,7 @@ impl ChromaticNote {
     /// use audio_engine_notes::{ChromaticNote, ChromaticTone};
     /// assert_eq!(440.0, ChromaticNote::new(ChromaticTone::A, 4).pitch());
     /// ```
+    // TODO: Use Pitch as return type.
     pub fn pitch(&self) -> f32 {
         self.tone.pitch_octave4() * self.multiplier_octave4()
     }

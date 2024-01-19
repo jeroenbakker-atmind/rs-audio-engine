@@ -1,5 +1,6 @@
 use audio_engine_sequencer::instrument::Instrument;
 use bowed_string::cello::create_bowed_string_cello_instrument;
+use bowed_string::violin::create_bowed_string_violin_instrument;
 use fm::basic::harmonic::{
     create_fm_basic_harmonic_saw_instrument, create_fm_basic_harmonic_square_instrument,
     create_fm_basic_harmonic_triangle_instrument,
@@ -55,6 +56,7 @@ pub enum InstrumentLibrary {
     PianoPiano,
 
     BowedStringCello,
+    BowedStringViolin,
 }
 
 impl InstrumentLibrary {
@@ -95,6 +97,7 @@ impl InstrumentLibrary {
             Self::PianoPiano => create_piano_piano_instrument(),
 
             Self::BowedStringCello => create_bowed_string_cello_instrument(),
+            Self::BowedStringViolin => create_bowed_string_violin_instrument(),
         }
     }
 }

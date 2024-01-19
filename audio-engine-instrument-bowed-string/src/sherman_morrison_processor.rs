@@ -122,6 +122,15 @@ impl StringProcessor for ShermanMorrison {
         (result_left + result_right) * 0.5 * self.gain
     }
 }
+impl ShermanMorrison {
+    pub fn set_hand_position_multiplier(&mut self, hand_position_multiplier: f32) {
+        let previous_length = self.string_and_hand.length();
+        self.string_and_hand.hand.fretting_position = hand_position_multiplier;
+        if previous_length != self.string_and_hand.length() {
+            self.initialize();
+        }
+    }
+}
 
 impl ShermanMorrison {
     fn initialize(&mut self) {
