@@ -1,6 +1,5 @@
 use crate::{
-    nemus_processor::NemusProcessor, processor::StringProcessor,
-    sherman_morrison_processor::ShermanMorrison, string::String,
+    processor::StringProcessor, sherman_morrison_processor::ShermanMorrison, string::String,
 };
 
 #[test]
