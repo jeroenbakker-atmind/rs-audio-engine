@@ -1,14 +1,20 @@
+use audio_engine_instruments::InstrumentLibrary;
 use audio_engine_tracker::{song::Song, song_state::SongState, tracker::Tracker};
 
 use audio_engine_tracker_songs::SongLibrary;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 
 fn main() -> Result<(), ()> {
+    play_instrument_test(InstrumentLibrary::BowedStringCello)
+}
+
+fn play_instrument_test(instrument: InstrumentLibrary) -> Result<(), ()> {
     let host = cpal::default_host();
     let device = host.default_output_device().unwrap();
     let config = device.default_output_config().unwrap();
 
-    let song = SongLibrary::InstrumentTest.create();
+    let mut song = SongLibrary::InstrumentTest.create();
+    song.instruments[0] = instrument.create();
 
     play_song(&device, &config.into(), song)
 }

@@ -80,7 +80,7 @@ pub struct NemusProcessor {
 }
 
 impl StringProcessor for NemusProcessor {
-     fn new(sample_rate: f32, string: &String) -> NemusProcessor {
+    fn new(sample_rate: f32, string: &String) -> NemusProcessor {
         let mut processor = NemusProcessor::default();
         processor.oversampling_factor = 1;
         processor.timestep = 1.0 / (sample_rate * processor.oversampling_factor as f32);
@@ -119,7 +119,7 @@ impl StringProcessor for NemusProcessor {
         processor
     }
 
-     fn reset_string_states(&mut self) {
+    fn reset_string_states(&mut self) {
         self.is_being_played = false;
         self.states[0].fill(0.0);
         self.states[1].fill(0.0);

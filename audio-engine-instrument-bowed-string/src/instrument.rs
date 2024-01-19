@@ -2,7 +2,6 @@ use audio_engine_common::digital_sound::{parameters::NoteParameters, sound::Soun
 
 use crate::instrument_state::BowedStringInstrumentState;
 
-
 #[derive(Debug, Default, Copy, Clone)]
 pub struct BowedStringInstrument {}
 
