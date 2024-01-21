@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, mem::swap};
+use std::{f64::consts::PI, mem::swap};
 
 use crate::{processor::StringProcessor, string::String};
 
@@ -6,84 +6,84 @@ use crate::{processor::StringProcessor, string::String};
 pub struct NemusProcessor {
     pub string: String,
     pub is_being_played: bool,
-    pub gain: f32,
+    pub gain: f64,
 
     // TODO: Don't store a copy of parameters if they don't change.
-    radius: f32,
-    density: f32,
-    tension: f32,
-    area: f32,
-    lin_density: f32,
-    c: f32,
-    young_mod: f32,
-    inertia: f32,
-    k: f32,
-    length: f32,
-    excit_position: f32,
-    read_position: f32,
-    damping_coeffs: Vec<f32>,
+    radius: f64,
+    density: f64,
+    tension: f64,
+    area: f64,
+    lin_density: f64,
+    c: f64,
+    young_mod: f64,
+    inertia: f64,
+    k: f64,
+    length: f64,
+    excit_position: f64,
+    read_position: f64,
+    damping_coeffs: Vec<f64>,
 
     // String states
-    states: Vec<Vec<f32>>,
+    states: Vec<Vec<f64>>,
     state_current: usize,
     state_new: usize,
 
     // Bow parameters
     // TODO: extract to own struct.
     /// Bow Pressure
-    pub fb: f32,
+    pub fb: f64,
     /// Bow Speed
-    pub vb: f32,
-    a: f32,
+    pub vb: f64,
+    a: f64,
 
     // FDS modal parameters
     // TODO: Remove
     oversampling_factor: i32,
-    pub timestep: f32,
+    pub timestep: f64,
     modes_number: i32,
-    eigen_frequencies: Vec<f32>,
+    eigen_frequencies: Vec<f64>,
     // TODO: Extract to own struct
-    modes_in: Vec<Vec<f32>>,
+    modes_in: Vec<Vec<f64>>,
     modes_in_current: usize,
     modes_in_new: usize,
 
-    modes_out: Vec<Vec<f32>>,
+    modes_out: Vec<Vec<f64>>,
     modes_out_current: usize,
     modes_out_new: usize,
 
-    t11: Vec<f32>,
-    t12: Vec<f32>,
-    t21: Vec<f32>,
-    t22: Vec<f32>,
+    t11: Vec<f64>,
+    t12: Vec<f64>,
+    t21: Vec<f64>,
+    t22: Vec<f64>,
 
-    schur_comp: Vec<f32>,
+    schur_comp: Vec<f64>,
 
-    b11: Vec<f32>,
-    b12: Vec<f32>,
-    b21: Vec<f32>,
-    b22: Vec<f32>,
+    b11: Vec<f64>,
+    b12: Vec<f64>,
+    b21: Vec<f64>,
+    b22: Vec<f64>,
 
-    zeta2: Vec<f32>,
-    b1: Vec<f32>,
-    b2: Vec<f32>,
+    zeta2: Vec<f64>,
+    b1: Vec<f64>,
+    b2: Vec<f64>,
 
-    z1: Vec<f32>,
-    inv_av1: Vec<f32>,
-    inv_av2: Vec<f32>,
+    z1: Vec<f64>,
+    inv_av1: Vec<f64>,
+    inv_av2: Vec<f64>,
 
-    y2: Vec<f32>,
-    z2: Vec<f32>,
-    inv_ab1: Vec<f32>,
-    inv_ab2: Vec<f32>,
+    y2: Vec<f64>,
+    z2: Vec<f64>,
+    inv_ab1: Vec<f64>,
+    inv_ab2: Vec<f64>,
 
-    previous_sample: f32,
+    previous_sample: f64,
 }
 
 impl StringProcessor for NemusProcessor {
-    fn new(sample_rate: f32, string: &String) -> NemusProcessor {
+    fn new(sample_rate: f64, string: &String) -> NemusProcessor {
         let mut processor = NemusProcessor::default();
         processor.oversampling_factor = 1;
-        processor.timestep = 1.0 / (sample_rate * processor.oversampling_factor as f32);
+        processor.timestep = 1.0 / (sample_rate * processor.oversampling_factor as f64);
 
         processor.string = string.clone();
         processor.radius = string.radius;
@@ -126,14 +126,14 @@ impl StringProcessor for NemusProcessor {
         self.previous_sample = 0.0;
     }
 
-    fn set_input_position(&mut self, input_position: f32) {
+    fn set_input_position(&mut self, input_position: f64) {
         assert!(input_position >= 0.0);
         assert!(input_position <= 1.0);
         self.excit_position = self.length * input_position;
         self.recompute_in_modes();
     }
 
-    fn set_read_position(&mut self, read_position: f32) {
+    fn set_read_position(&mut self, read_position: f64) {
         assert!(read_position >= 0.0);
         assert!(read_position <= 1.0);
         self.read_position = self.length * read_position;
@@ -150,7 +150,7 @@ impl StringProcessor for NemusProcessor {
                 self.modes_in[self.modes_in_current][mode_number]
                     * self.states[self.state_current][mode_number + self.modes_number as usize]
             })
-            .sum::<f32>();
+            .sum::<f64>();
         let eta = zeta_1 - self.vb;
         let d = (2.0 * self.a).sqrt() * (-self.a * eta * eta + 0.5).exp();
         let lambda = d * (1.0 - 2.0 * self.a * eta * eta);
@@ -202,14 +202,14 @@ impl StringProcessor for NemusProcessor {
 
         swap(&mut self.state_current, &mut self.state_new);
     }
-    fn read_output(&mut self) -> f32 {
+    fn read_output(&mut self) -> f64 {
         let result = if self.is_being_played {
             (0..self.modes_number as usize)
                 .map(|mode_number| {
                     self.modes_in[self.modes_in_current][mode_number]
                         * self.states[self.state_current][mode_number]
                 })
-                .sum::<f32>()
+                .sum::<f64>()
         } else {
             0.0
         };
@@ -221,8 +221,8 @@ impl StringProcessor for NemusProcessor {
 }
 
 impl NemusProcessor {
-    fn compute_eigen_frequency(&self, mode_number: i32) -> f32 {
-        let n = mode_number as f32 * PI / self.length;
+    fn compute_eigen_frequency(&self, mode_number: i32) -> f64 {
+        let n = mode_number as f64 * PI / self.length;
         ((self.tension / self.lin_density) * n * n
             + (self.young_mod * self.inertia / self.lin_density) * n * n * n * n)
             .sqrt()
@@ -230,7 +230,7 @@ impl NemusProcessor {
 
     fn recompute_modes_numbers(&mut self) {
         let mut result = 1;
-        const LIMIT_FREQUENCY: f32 = 20e3 * 2.0 * PI;
+        const LIMIT_FREQUENCY: f64 = 20e3 * 2.0 * PI;
         loop {
             let frequency = self.compute_eigen_frequency(result);
             if frequency > LIMIT_FREQUENCY {
@@ -246,10 +246,10 @@ impl NemusProcessor {
     fn recompute_eigen_frequencies(&mut self) {
         self.eigen_frequencies = (0..self.modes_number)
             .map(|mode_number| self.compute_eigen_frequency(mode_number + 1))
-            .collect::<Vec<f32>>();
+            .collect::<Vec<f64>>();
     }
 
-    fn compute_damping_coefficients(&self, frequency: f32) -> f32 {
+    fn compute_damping_coefficients(&self, frequency: f64) -> f64 {
         let rho_air = 1.225;
         let mu_air = 1.619e-5;
         let d0 = -2.0 * rho_air * mu_air / (self.density * self.radius * self.radius);
@@ -284,8 +284,8 @@ impl NemusProcessor {
 
         swap(&mut self.modes_in_current, &mut self.modes_in_new);
     }
-    fn compute_mode(&self, position: f32, mode_number: usize) -> f32 {
-        (2.0 / self.length).sqrt() * (mode_number as f32 * PI * position / self.length).sin()
+    fn compute_mode(&self, position: f64, mode_number: usize) -> f64 {
+        (2.0 / self.length).sqrt() * (mode_number as f64 * PI * position / self.length).sin()
     }
     fn initialize_out_modes(&mut self) {
         self.modes_out = vec![vec![0.0; self.modes_number as usize]; 2];
@@ -307,7 +307,7 @@ impl NemusProcessor {
                 let frequency = self.eigen_frequencies[mode_number as usize];
                 -self.compute_damping_coefficients(frequency)
             })
-            .collect::<Vec<f32>>();
+            .collect::<Vec<f64>>();
     }
     fn initialize_states(&mut self) {
         self.states

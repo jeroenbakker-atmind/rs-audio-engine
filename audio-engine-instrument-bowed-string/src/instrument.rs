@@ -35,7 +35,7 @@ impl BowedStringInstrument {
         self.string_pitches.push(string_pitch)
     }
 
-    fn init_processors(&self, sample_rate: f32, state: &mut BowedStringInstrumentState) {
+    fn init_processors(&self, sample_rate: f64, state: &mut BowedStringInstrumentState) {
         for string in &self.strings {
             let processor = ShermanMorrison::new(sample_rate, string);
             state.string_processors.push(processor);
@@ -53,7 +53,7 @@ impl Sound for BowedStringInstrument {
 
     fn sample(&self, parameters: &Self::Parameters, state: &mut BowedStringInstrumentState) -> f32 {
         if state.string_processors.is_empty() {
-            self.init_processors(parameters.sample_rate, state);
+            self.init_processors(parameters.sample_rate as f64, state);
         }
 
         let is_new_note = state.last_note_time > parameters.note_time;
@@ -116,7 +116,7 @@ impl Sound for BowedStringInstrument {
             if parameters.note_off.is_none() {
                 // Apply pressure and hand position to the string.
                 processor.bow.velocity = 0.2;
-                processor.bow.pressure = 10.0 * parameters.gain;
+                processor.bow.pressure = 10.0 * parameters.gain as f64;
             }
         }
 
@@ -131,12 +131,12 @@ impl Sound for BowedStringInstrument {
                 .string_processors
                 .iter_mut()
                 .map(|processor| processor.read_output())
-                .sum::<f32>()
+                .sum::<f64>()
                 * 10.0
         } else {
             let processor = &mut state.string_processors[state.last_string_index];
             processor.read_output() * 10.0
         };
-        result
+        result as f32
     }
 }

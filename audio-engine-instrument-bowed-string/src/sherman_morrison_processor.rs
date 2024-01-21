@@ -1,4 +1,4 @@
-use std::f32::consts::{PI, TAU};
+use std::f64::consts::{PI, TAU};
 
 use crate::{
     bow::{Bow, BOW_FREE_PARAMETER},
@@ -13,43 +13,43 @@ use crate::{
 pub struct ShermanMorrison {
     string_and_hand: StringAndHand,
     pub bow: Bow,
-    pub gain: f32,
-    sample_rate: f32,
+    pub gain: f64,
+    sample_rate: f64,
 
-    eigen_frequencies: Vec<f32>,
-    damping_profile: Vec<f32>,
+    eigen_frequencies: Vec<f64>,
+    damping_profile: Vec<f64>,
 
-    excit_position: f32,
-    output_position_left: f32,
-    output_position_right: f32,
+    excit_position: f64,
+    output_position_left: f64,
+    output_position_right: f64,
 
-    modes_in: Vec<f32>,
-    modes_out_left: Vec<f32>,
-    modes_out_right: Vec<f32>,
+    modes_in: Vec<f64>,
+    modes_out_left: Vec<f64>,
+    modes_out_right: Vec<f64>,
 
-    states: Vec<f32>,
+    states: Vec<f64>,
 
-    a11: f32,
-    a12: f32,
-    a21: Vec<f32>,
-    a22: f32,
+    a11: f64,
+    a12: f64,
+    a21: Vec<f64>,
+    a22: f64,
 
-    shur_comp: Vec<f32>,
+    shur_comp: Vec<f64>,
 
-    b11: f32,
-    b12: f32,
-    b21: Vec<f32>,
-    b22: f32,
+    b11: f64,
+    b12: f64,
+    b21: Vec<f64>,
+    b22: f64,
 
     // scratch space
-    inv_av1: Vec<f32>,
-    inv_av2: Vec<f32>,
-    inv_ab1: Vec<f32>,
-    inv_ab2: Vec<f32>,
+    inv_av1: Vec<f64>,
+    inv_av2: Vec<f64>,
+    inv_ab1: Vec<f64>,
+    inv_ab2: Vec<f64>,
 }
 
 impl StringProcessor for ShermanMorrison {
-    fn new(sample_rate: f32, string: &crate::string::String) -> Self {
+    fn new(sample_rate: f64, string: &crate::string::String) -> Self {
         let mut processor = ShermanMorrison::default();
         processor.string_and_hand.string = string.clone();
         // TODO: This should be string specific. Not sure why....
@@ -67,18 +67,18 @@ impl StringProcessor for ShermanMorrison {
         self.states.fill(0.0);
     }
 
-    fn set_input_position(&mut self, input_position: f32) {}
-    fn set_read_position(&mut self, read_position: f32) {}
+    fn set_input_position(&mut self, input_position: f64) {}
+    fn set_read_position(&mut self, read_position: f64) {}
     fn compute_state(&mut self) {
         // TODO: check current state with previous state
         // reset matrices and frequencies based on the actual change.
         // This will allow physical accurate reverbs by fast moving your finger.
     }
-    fn read_output(&mut self) -> f32 {
+    fn read_output(&mut self) -> f64 {
         let mode_len = self.mode_len();
         let zeta1 = (0..mode_len)
             .map(|mode| self.modes_in[mode] * self.states[mode + mode_len])
-            .sum::<f32>();
+            .sum::<f64>();
 
         // Bilbao friction
         let eta = zeta1 - self.bow.velocity;
@@ -122,16 +122,16 @@ impl StringProcessor for ShermanMorrison {
         // TODO: We should only output mono or support any amount of channels.
         let result_left = (0..mode_len)
             .map(|mode| self.modes_out_left[mode] * self.states[mode])
-            .sum::<f32>();
+            .sum::<f64>();
         let result_right = (0..mode_len)
             .map(|mode| self.modes_out_right[mode] * self.states[mode])
-            .sum::<f32>();
+            .sum::<f64>();
 
         (result_left + result_right) * 0.5 * self.gain
     }
 }
 impl ShermanMorrison {
-    pub fn set_hand_position_multiplier(&mut self, hand_position_multiplier: f32) {
+    pub fn set_hand_position_multiplier(&mut self, hand_position_multiplier: f64) {
         let previous_length = self.string_and_hand.length();
         self.string_and_hand.hand.fretting_position = hand_position_multiplier;
         if previous_length != self.string_and_hand.length() {
@@ -164,19 +164,19 @@ impl ShermanMorrison {
 
     fn initialize_modes(&mut self) {
         let mode_len = self.mode_len();
-        fn calc_mode(string_and_hand: &StringAndHand, position: f32, mode: usize) -> f32 {
+        fn calc_mode(string_and_hand: &StringAndHand, position: f64, mode: usize) -> f64 {
             (2.0 / string_and_hand.length()).sqrt()
-                * (mode as f32 * PI * position / string_and_hand.length()).sin()
+                * (mode as f64 * PI * position / string_and_hand.length()).sin()
         }
         self.modes_in = (1..=mode_len)
             .map(|mode| calc_mode(&self.string_and_hand, self.excit_position, mode))
-            .collect::<Vec<f32>>();
+            .collect::<Vec<f64>>();
         self.modes_out_left = (1..=mode_len)
             .map(|mode| calc_mode(&self.string_and_hand, self.output_position_left, mode))
-            .collect::<Vec<f32>>();
+            .collect::<Vec<f64>>();
         self.modes_out_right = (1..=mode_len)
             .map(|mode| calc_mode(&self.string_and_hand, self.output_position_right, mode))
-            .collect::<Vec<f32>>();
+            .collect::<Vec<f64>>();
     }
 
     fn initialize_matrices(&mut self) {
@@ -190,19 +190,19 @@ impl ShermanMorrison {
             .map(|eigen_frequency| {
                 -0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
             })
-            .collect::<Vec<f32>>();
+            .collect::<Vec<f64>>();
         self.a22 = 1.0;
         /*  self
         .damping_profile
         .iter()
         .map(|damping_coeefcient| 1.0 + 0.5 * self.k() * damping_coeefcient)
-        .collect::<Vec<f32>>();*/
+        .collect::<Vec<f64>>();*/
         // TODO a22 should be 1.0 ?
 
         // Optimize 1 - a21 *-0.5k
         self.shur_comp = (0..mode_len)
             .map(|mode| self.a22 - self.a21[mode] * self.a11 * self.a12)
-            .collect::<Vec<f32>>();
+            .collect::<Vec<f64>>();
 
         // Should still be checked with reference implementation.
         self.b11 = 1.0;
@@ -213,7 +213,7 @@ impl ShermanMorrison {
             .map(|eigen_frequency| {
                 0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
             })
-            .collect::<Vec<f32>>();
+            .collect::<Vec<f64>>();
         self.b22 = 1.0;
     }
 
@@ -240,7 +240,7 @@ impl ShermanMorrison {
         self.eigen_frequencies.len()
     }
 
-    fn sample_duration(&self) -> f32 {
+    fn sample_duration(&self) -> f64 {
         1.0 / self.sample_rate
     }
 }

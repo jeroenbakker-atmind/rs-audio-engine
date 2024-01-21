@@ -1,4 +1,4 @@
-use std::f32::consts::PI;
+use std::f64::consts::PI;
 
 use audio_engine_notes::Pitch;
 
@@ -64,31 +64,31 @@ pub static VIOLIN_STRING_G3: String = String {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct String {
     /// Radius of the string in meters.
-    pub radius: f32,
+    pub radius: f64,
     /// Density of the string in kg/m.
-    pub density: f32,
+    pub density: f64,
     /// Tension of the string in newtons.
-    pub tension: f32,
+    pub tension: f64,
     /// Young modulus of the string in Pa.
-    pub young_mod: f32,
+    pub young_mod: f64,
     /// Length of the string in meters.
-    pub length: f32,
+    pub length: f64,
 }
 
 impl String {
-    pub fn area(&self) -> f32 {
+    pub fn area(&self) -> f64 {
         PI * self.radius * self.radius
     }
 
-    pub fn lin_density(&self) -> f32 {
+    pub fn lin_density(&self) -> f64 {
         self.density * self.area()
     }
 
-    pub fn inertia(&self) -> f32 {
+    pub fn inertia(&self) -> f64 {
         PI * self.radius * self.radius * self.radius * self.radius / 4.0
     }
 
-    pub fn c(&self) -> f32 {
+    pub fn c(&self) -> f64 {
         self.tension / self.lin_density()
     }
 }
@@ -98,8 +98,8 @@ impl String {
 /// The multiplier is the location along the string where the string should be shortened.
 /// 1.0 means no shortening,
 /// 0.0 means no string left to shorten.
-pub fn calc_hand_position_multiplier(base_pitch: Pitch, note_pitch: Pitch) -> f32 {
-    (base_pitch.frequency / note_pitch.frequency) as f32
+pub fn calc_hand_position_multiplier(base_pitch: Pitch, note_pitch: Pitch) -> f64 {
+    (base_pitch.frequency / note_pitch.frequency) as f64
 }
 
 #[test]

@@ -3,7 +3,7 @@
 pub struct Hand {
     /// 1.0 = hand doesn't block the string,
     /// 0.5 = hand blocks string halfway (one octave up)
-    pub fretting_position: f32,
+    pub fretting_position: f64,
 }
 
 impl Default for Hand {

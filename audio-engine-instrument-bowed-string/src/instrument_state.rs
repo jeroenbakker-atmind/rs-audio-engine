@@ -5,7 +5,7 @@ use crate::sherman_morrison_processor::ShermanMorrison;
 #[derive(Debug, Clone)]
 pub struct BowedStringInstrumentState {
     pub string_processors: Vec<ShermanMorrison>,
-    pub last_hand_position: f32,
+    pub last_hand_position: f64,
     pub last_string_index: usize,
     pub last_note_time: NoteTime,
 }
