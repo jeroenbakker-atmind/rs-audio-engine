@@ -57,7 +57,7 @@ impl StringProcessor for ShermanMorrison {
         processor.output_position_left = processor.string_and_hand.length() * 0.53;
         processor.output_position_right = processor.string_and_hand.length() * 0.77;
         processor.sample_rate = sample_rate;
-        processor.gain = 1000.0;
+        processor.gain = 500.0;
         processor.initialize();
 
         processor
@@ -119,7 +119,6 @@ impl StringProcessor for ShermanMorrison {
                 self.inv_ab2[mode] - (1.0 / (1.0 + v1)) * self.inv_av2[mode] * v2;
         }
 
-        // TODO: We should only output mono or support any amount of channels.
         let result_left = (0..mode_len)
             .map(|mode| self.modes_out_left[mode] * self.states[mode])
             .sum::<f64>();
@@ -127,7 +126,7 @@ impl StringProcessor for ShermanMorrison {
             .map(|mode| self.modes_out_right[mode] * self.states[mode])
             .sum::<f64>();
 
-        (result_left + result_right) * 0.5 * self.gain
+        (result_left + result_right) * self.gain
     }
 }
 impl ShermanMorrison {
@@ -194,9 +193,9 @@ impl ShermanMorrison {
         self.a22 = 1.0;
         /*  self
         .damping_profile
-        .iter()
-        .map(|damping_coeefcient| 1.0 + 0.5 * self.k() * damping_coeefcient)
-        .collect::<Vec<f64>>();*/
+            .iter()
+            .map(|damping_coeefcient| 1.0 + 0.5 * self.k() * damping_coeefcient)
+            .collect::<Vec<f64>>();*/
         // TODO a22 should be 1.0 ?
 
         // Optimize 1 - a21 *-0.5k
