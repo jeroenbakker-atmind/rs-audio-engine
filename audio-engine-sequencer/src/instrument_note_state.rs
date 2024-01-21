@@ -16,6 +16,15 @@ pub enum InstrumentNoteState {
     BowedString(BowedStringInstrumentState),
 }
 
+impl InstrumentNoteState {
+    fn is_none(&self) -> bool {
+        match self {
+            InstrumentNoteState::None => true,
+            _ => false,
+        }
+    }
+}
+
 impl SoundState for InstrumentNoteState {}
 
 impl InstrumentNoteState {
@@ -28,9 +37,9 @@ impl InstrumentNoteState {
             }
             Some(Instrument::Piano(piano)) => *self = Self::Piano(piano.init_sound_state()),
             Some(Instrument::BowedString(instrument)) => {
-                //if self == InstrumentNoteState::None {
+                if self.is_none() {
                     *self = Self::BowedString(instrument.init_sound_state());
-                //}
+                }
             }
         }
     }

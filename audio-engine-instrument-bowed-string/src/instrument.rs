@@ -11,10 +11,19 @@ use crate::{
     string::{calc_hand_position_multiplier, String},
 };
 
+/// For testing purposes should we process each string, or only the active string.
+/// Still requires more testing the goal is to emulate strings/bow transition.
+/// for performance reasons we might only want to evaluate strings that have been played
+/// recently.
+const READ_ALL_STRINGS: bool = false;
+
+/// Output state changes to the console for debugging purposes.
+const DEBUG_STATE_CHANGES: bool = false;
+
 #[derive(Debug, Default, Clone)]
 pub struct BowedStringInstrument {
     pub strings: Vec<String>,
-    /// Thae base pitch for each string in strings attribute.
+    /// The base pitch for each string in strings attribute.
     pub string_pitches: Vec<Pitch>,
 }
 
@@ -22,6 +31,13 @@ impl BowedStringInstrument {
     pub fn add_string(&mut self, string: String, string_pitch: Pitch) {
         self.strings.push(string);
         self.string_pitches.push(string_pitch)
+    }
+
+    fn init_processors(&self, sample_rate: f32, state: &mut BowedStringInstrumentState) {
+        for string in &self.strings {
+            let processor = ShermanMorrison::new(sample_rate, string);
+            state.string_processors.push(processor);
+        }
     }
 }
 
@@ -35,11 +51,7 @@ impl Sound for BowedStringInstrument {
 
     fn sample(&self, parameters: &Self::Parameters, state: &mut BowedStringInstrumentState) -> f32 {
         if state.string_processors.is_empty() {
-            for string in &self.strings {
-                let mut processor = ShermanMorrison::new(parameters.sample_rate, string);
-                processor.gain = 1000000.0;
-                state.string_processors.push(processor);
-            }
+            self.init_processors(parameters.sample_rate, state);
         }
 
         // Remove pressure from all strings
@@ -51,6 +63,7 @@ impl Sound for BowedStringInstrument {
         });
 
         // TODO: Select a string, closest to the last played note that can play the current pitch.
+        // TODO: We should introduce playing styles
         let note_pitch = Pitch::from(parameters.note_pitch as f64);
         if let Some((string_index, base_pitch)) = self
             .string_pitches
@@ -58,30 +71,45 @@ impl Sound for BowedStringInstrument {
             .enumerate()
             .filter(|(_, base_pitch)| base_pitch.frequency < note_pitch.frequency)
             .max_by(|(_, a), (_, b)| {
-                if a.frequency < b.frequency {
+                if a.frequency > b.frequency {
                     Ordering::Greater
-                } else if a.frequency > b.frequency {
+                } else if a.frequency < b.frequency {
                     Ordering::Less
                 } else {
                     Ordering::Equal
                 }
             })
         {
-            let hand_position = calc_hand_position_multiplier(*base_pitch, note_pitch);
-            if state.last_string_index != string_index || state.last_hand_position != hand_position
-            {
-                state.last_string_index = string_index;
-                state.last_hand_position = hand_position;
-                println!(
-                    "position_altered(string_index={string_index},hand_position={hand_position})"
-                );
-                let processor = &mut state.string_processors[string_index];
-                if parameters.note_off.is_none() {
-                    // Apply pressure and hand position to the string.
-                    processor.bow.velocity = 0.1;
-                    processor.bow.pressure = 10.0 * parameters.gain;
-                    processor.set_hand_position_multiplier(hand_position);
+            if state.last_string_index != string_index {
+                if DEBUG_STATE_CHANGES {
+                    println!(
+                        "string_altered(previous={},new={string_index})",
+                        state.last_string_index
+                    );
                 }
+
+                state.last_string_index = string_index;
+                state.last_hand_position = 100.0;
+            }
+
+            let hand_position = calc_hand_position_multiplier(*base_pitch, note_pitch);
+            if state.last_hand_position != hand_position {
+                if DEBUG_STATE_CHANGES {
+                    println!(
+                        "position_altered(previous={},new={hand_position})",
+                        state.last_hand_position
+                    );
+                }
+                state.last_hand_position = hand_position;
+                let processor = &mut state.string_processors[string_index];
+                processor.set_hand_position_multiplier(hand_position);
+            }
+
+            let processor = &mut state.string_processors[string_index];
+            if parameters.note_off.is_none() {
+                // Apply pressure and hand position to the string.
+                processor.bow.velocity = 0.1;
+                processor.bow.pressure = 2.0 * parameters.gain;
             }
         }
 
@@ -90,8 +118,18 @@ impl Sound for BowedStringInstrument {
             .string_processors
             .iter_mut()
             .for_each(|processor| processor.compute_state());
-        let result = state.string_processors[state.last_string_index].read_output();
-        // println!("{result}");
+
+        let result = if READ_ALL_STRINGS {
+            state
+                .string_processors
+                .iter_mut()
+                .map(|processor| processor.read_output())
+                .sum::<f32>()
+                * 10.0
+        } else {
+            let processor = &mut state.string_processors[state.last_string_index];
+            processor.read_output() * 10.0
+        };
         result
     }
 }
