@@ -1240,6 +1240,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tuner"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-fourier",
+ "audio-engine-notes",
+ "clap",
+ "cpal",
+]
+
+[[package]]
 name = "unicode-bidi"
 version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"

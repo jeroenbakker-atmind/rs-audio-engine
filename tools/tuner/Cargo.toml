@@ -1,0 +1,12 @@
+[package]
+name = "tuner"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cpal="*"
+clap = { version = "4.4.12", features = ["derive"] }
+audio-engine-notes = {path="../../audio-engine-notes"}
+audio-engine-fourier = {path="../../audio-engine-fourier"}

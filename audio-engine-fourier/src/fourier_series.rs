@@ -10,6 +10,14 @@ use crate::parameters::Parameters;
 /// imaginary are kept for alignment with other materials about fourier
 /// transforms.
 pub type ComplexNumber = (f32, f32);
+pub trait ComplexNumberMethods {
+    fn amplitude(&self) -> f32;
+}
+impl ComplexNumberMethods for ComplexNumber {
+    fn amplitude(&self) -> f32 {
+        (self.0 * self.0 + self.1 * self.1).sqrt()
+    }
+}
 
 /// RadianSpeed of a frequency
 pub type RadianSpeed = f32;
@@ -35,5 +43,9 @@ impl FourierSeries {
             .zip(self.amplitudes.iter())
             .map(|(a, b)| (*a, *b))
             .collect::<Vec<(RadianSpeed, ComplexNumber)>>()
+    }
+
+    pub fn frequency(&self, step: usize) -> f32 {
+        1.0 / (step + 1) as f32
     }
 }
