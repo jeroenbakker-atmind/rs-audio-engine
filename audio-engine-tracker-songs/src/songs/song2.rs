@@ -434,9 +434,9 @@ pub fn create_song2() -> Song {
     song.phrases[0xFE].init(&["FE", "FE", "FE", "FE"]);
 
     song.tracks[0x00].init(&["00", "01"]);
-    song.tracks[0x00].level = 0.0;
+    song.tracks[0x00].level = 0.6;
     song.tracks[0x01].init(&["20", "21"]);
-    song.tracks[0x01].level = 0.0;
+    song.tracks[0x01].level = 0.6;
     song.tracks[0x04].init(&["80", "81"]);
     song.tracks[0x04].level = 0.6;
 
