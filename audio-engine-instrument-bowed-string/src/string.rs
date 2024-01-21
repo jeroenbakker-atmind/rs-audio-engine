@@ -2,6 +2,65 @@ use std::f32::consts::PI;
 
 use audio_engine_notes::Pitch;
 
+pub static CELLO_STRING_A3: String = String {
+    radius: 3.75e-04,
+    density: 3.7575e3,
+    tension: 153.0,
+    young_mod: 25e9,
+    length: 0.69,
+};
+pub static CELLO_STRING_D3: String = String {
+    radius: 4.4e-04,
+    density: 4.1104e3,
+    tension: 102.6,
+    young_mod: 25e9,
+    length: 0.69,
+};
+pub static CELLO_STRING_G2: String = String {
+    radius: 6.05e-04,
+    density: 5.3570e3,
+    tension: 112.67,
+    young_mod: 8.6e9,
+    length: 0.69,
+};
+pub static CELLO_STRING_C2: String = String {
+    radius: 7.2e-4,
+    density: 1.3017e4,
+    tension: 172.74,
+    young_mod: 22.4e9,
+    length: 0.69,
+};
+
+pub static VIOLIN_STRING_E5: String = String {
+    radius: 1.65e-04,
+    density: 4.7936e3,
+    tension: 73.0,
+    young_mod: 62.5e9,
+    length: 0.32,
+};
+
+pub static VIOLIN_STRING_A4: String = String {
+    radius: 3e-4,
+    density: 2.5465e+3,
+    tension: 57.1,
+    young_mod: 19.5e9,
+    length: 0.32,
+};
+pub static VIOLIN_STRING_D4: String = String {
+    radius: 4.4e-4,
+    density: 2.6471e3,
+    tension: 56.88,
+    young_mod: 4.56e9,
+    length: 0.32,
+};
+pub static VIOLIN_STRING_G3: String = String {
+    radius: 4.25e-4,
+    density: 4.9167e3,
+    tension: 43.9,
+    young_mod: 4.79e9,
+    length: 0.32,
+};
+
 #[derive(Debug, Default, Copy, Clone)]
 pub struct String {
     /// Radius of the string in meters.

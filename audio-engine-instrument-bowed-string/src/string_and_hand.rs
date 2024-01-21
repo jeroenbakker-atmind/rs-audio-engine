@@ -8,14 +8,9 @@ pub struct StringAndHand {
 
 impl StringAndHand {
     /// Get the actual length of the string that isn't blocked by the hand position.
+    /// Length of the string with the hand blockage applied.
     pub fn length(&self) -> f32 {
         self.string.length * self.hand.fretting_position
-    }
-
-    /// Length of the string with the hand blockage applied.
-    // TODO: should be replaced by length/unblocked length
-    pub fn upper_l(&self) -> f32 {
-        self.length()
     }
 
     pub fn upper_k(&self) -> f32 {

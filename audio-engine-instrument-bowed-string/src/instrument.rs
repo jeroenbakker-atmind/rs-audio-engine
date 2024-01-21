@@ -25,6 +25,8 @@ pub struct BowedStringInstrument {
     pub strings: Vec<String>,
     /// The base pitch for each string in strings attribute.
     pub string_pitches: Vec<Pitch>,
+    // TODO: Add bow velocity envelope
+    // TODO: Add bow pressure envelope
 }
 
 impl BowedStringInstrument {
@@ -54,13 +56,18 @@ impl Sound for BowedStringInstrument {
             self.init_processors(parameters.sample_rate, state);
         }
 
-        // Remove pressure from all strings
-        state.string_processors.iter_mut().for_each(|processor| {
-            processor.bow = Bow {
-                velocity: 0.0,
-                pressure: 0.0,
-            }
-        });
+        let is_new_note = state.last_note_time > parameters.note_time;
+        if is_new_note {
+            // Remove pressure from all strings
+            state.string_processors.iter_mut().for_each(|processor| {
+                processor.reset_string_states();
+                processor.bow = Bow {
+                    velocity: 0.0,
+                    pressure: 0.0,
+                }
+            });
+        }
+        state.last_note_time = parameters.note_time;
 
         // TODO: Select a string, closest to the last played note that can play the current pitch.
         // TODO: We should introduce playing styles
@@ -108,8 +115,8 @@ impl Sound for BowedStringInstrument {
             let processor = &mut state.string_processors[string_index];
             if parameters.note_off.is_none() {
                 // Apply pressure and hand position to the string.
-                processor.bow.velocity = 0.1;
-                processor.bow.pressure = 2.0 * parameters.gain;
+                processor.bow.velocity = 0.2;
+                processor.bow.pressure = 10.0 * parameters.gain;
             }
         }
 

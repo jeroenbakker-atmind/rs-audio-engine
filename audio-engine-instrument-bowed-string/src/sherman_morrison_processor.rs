@@ -52,9 +52,10 @@ impl StringProcessor for ShermanMorrison {
     fn new(sample_rate: f32, string: &crate::string::String) -> Self {
         let mut processor = ShermanMorrison::default();
         processor.string_and_hand.string = string.clone();
-        processor.excit_position = processor.string_and_hand.upper_l() * 0.733;
-        processor.output_position_left = processor.string_and_hand.upper_l() * 0.53;
-        processor.output_position_right = processor.string_and_hand.upper_l() * 0.77;
+        // TODO: This should be string specific. Not sure why....
+        processor.excit_position = processor.string_and_hand.length() * 0.733;
+        processor.output_position_left = processor.string_and_hand.length() * 0.53;
+        processor.output_position_right = processor.string_and_hand.length() * 0.77;
         processor.sample_rate = sample_rate;
         processor.gain = 1000.0;
         processor.initialize();
@@ -62,7 +63,10 @@ impl StringProcessor for ShermanMorrison {
         processor
     }
 
-    fn reset_string_states(&mut self) {}
+    fn reset_string_states(&mut self) {
+        self.states.fill(0.0);
+    }
+
     fn set_input_position(&mut self, input_position: f32) {}
     fn set_read_position(&mut self, read_position: f32) {}
     fn compute_state(&mut self) {
@@ -89,11 +93,15 @@ impl StringProcessor for ShermanMorrison {
             let b1 = self.b11 * self.states[mode] + self.b12 * self.states[mode + mode_len];
             let b2 = self.b21[mode] * self.states[mode]
                 + self.b22 * self.states[mode + mode_len]
-                + zeta2 * 0.5 * self.k() * self.bow.pressure * (lambda - 2.0 * d)
-                + self.k() * self.bow.pressure * d * self.modes_in[mode] * self.bow.velocity;
+                + zeta2 * 0.5 * self.sample_duration() * self.bow.pressure * (lambda - 2.0 * d)
+                + self.sample_duration()
+                    * self.bow.pressure
+                    * d
+                    * self.modes_in[mode]
+                    * self.bow.velocity;
 
             // Sherman Morrison Solver
-            let v = 0.5 * self.k() * self.bow.pressure * lambda * self.modes_in[mode];
+            let v = 0.5 * self.sample_duration() * self.bow.pressure * lambda * self.modes_in[mode];
             self.inv_av2[mode] = (1.0 / self.shur_comp[mode]) * v;
             self.inv_av1[mode] = self.a11 * self.a12 * self.inv_av2[mode];
             let y2 = self.a11 * b1;
@@ -175,11 +183,13 @@ impl ShermanMorrison {
         let mode_len = self.mode_len();
 
         self.a11 = 1.0;
-        self.a12 = -0.5 * self.k();
+        self.a12 = -0.5 * self.sample_duration();
         self.a21 = self
             .eigen_frequencies
             .iter()
-            .map(|eigen_frequency| -0.5 * self.k() * (-eigen_frequency * eigen_frequency))
+            .map(|eigen_frequency| {
+                -0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
+            })
             .collect::<Vec<f32>>();
         self.a22 = 1.0;
         /*  self
@@ -196,11 +206,13 @@ impl ShermanMorrison {
 
         // Should still be checked with reference implementation.
         self.b11 = 1.0;
-        self.b12 = 0.5 * self.k();
+        self.b12 = 0.5 * self.sample_duration();
         self.b21 = self
             .eigen_frequencies
             .iter()
-            .map(|eigen_frequency| 0.5 * self.k() * (-eigen_frequency * eigen_frequency))
+            .map(|eigen_frequency| {
+                0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
+            })
             .collect::<Vec<f32>>();
         self.b22 = 1.0;
     }
@@ -230,10 +242,5 @@ impl ShermanMorrison {
 
     fn sample_duration(&self) -> f32 {
         1.0 / self.sample_rate
-    }
-
-    // TODO rename to sample_duration
-    fn k(&self) -> f32 {
-        self.sample_duration()
     }
 }

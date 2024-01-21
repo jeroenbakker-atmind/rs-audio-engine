@@ -1,4 +1,4 @@
-use audio_engine_common::digital_sound::sound_state::SoundState;
+use audio_engine_common::{digital_sound::sound_state::SoundState, note_time::NoteTime};
 
 use crate::sherman_morrison_processor::ShermanMorrison;
 
@@ -7,6 +7,7 @@ pub struct BowedStringInstrumentState {
     pub string_processors: Vec<ShermanMorrison>,
     pub last_hand_position: f32,
     pub last_string_index: usize,
+    pub last_note_time: NoteTime,
 }
 impl Default for BowedStringInstrumentState {
     fn default() -> Self {
@@ -14,6 +15,7 @@ impl Default for BowedStringInstrumentState {
             string_processors: Vec::default(),
             last_hand_position: 1.0,
             last_string_index: 100,
+            last_note_time: NoteTime::default(),
         }
     }
 }

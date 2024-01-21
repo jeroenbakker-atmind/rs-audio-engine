@@ -13,3 +13,10 @@ pub mod string_and_hand;
 
 #[cfg(test)]
 mod test;
+
+// TODO: generate waveform png based on a property.
+// What happens when the fretting position changes.
+// What happens when the bow velocity changes.
+// What happens when the bow pressure changes.
+// TODO: Add low pass filter, remove all frequencies above 20Khz
+// TODO: When two notes are played in sequence the bow speed might switch direction?
