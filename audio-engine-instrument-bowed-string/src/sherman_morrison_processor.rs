@@ -15,6 +15,7 @@ pub struct ShermanMorrison {
     pub bow: Bow,
     pub gain: f64,
     sample_rate: f64,
+    oversampling: u32,
 
     eigen_frequencies: Vec<f64>,
     damping_profile: Vec<f64>,
@@ -58,6 +59,7 @@ impl StringProcessor for ShermanMorrison {
         processor.output_position_right = processor.string_and_hand.length() * 0.77;
         processor.sample_rate = sample_rate;
         processor.gain = 500.0;
+        processor.oversampling = 4;
         processor.initialize();
 
         processor
@@ -75,6 +77,23 @@ impl StringProcessor for ShermanMorrison {
         // This will allow physical accurate reverbs by fast moving your finger.
     }
     fn read_output(&mut self) -> f64 {
+        let mut result = 0.0;
+        for _ in 0..self.oversampling {
+            result += self.sample_next_state();
+        }
+        (result / self.oversampling as f64) * self.gain
+    }
+}
+impl ShermanMorrison {
+    pub fn set_hand_position_multiplier(&mut self, hand_position_multiplier: f64) {
+        let previous_length = self.string_and_hand.length();
+        self.string_and_hand.hand.fretting_position = hand_position_multiplier;
+        if previous_length != self.string_and_hand.length() {
+            self.initialize();
+        }
+    }
+
+    fn sample_next_state(&mut self) -> f64 {
         let mode_len = self.mode_len();
         let zeta1 = (0..mode_len)
             .map(|mode| self.modes_in[mode] * self.states[mode + mode_len])
@@ -126,16 +145,7 @@ impl StringProcessor for ShermanMorrison {
             .map(|mode| self.modes_out_right[mode] * self.states[mode])
             .sum::<f64>();
 
-        (result_left + result_right) * self.gain
-    }
-}
-impl ShermanMorrison {
-    pub fn set_hand_position_multiplier(&mut self, hand_position_multiplier: f64) {
-        let previous_length = self.string_and_hand.length();
-        self.string_and_hand.hand.fretting_position = hand_position_multiplier;
-        if previous_length != self.string_and_hand.length() {
-            self.initialize();
-        }
+        (result_left + result_right)
     }
 }
 
@@ -240,6 +250,6 @@ impl ShermanMorrison {
     }
 
     fn sample_duration(&self) -> f64 {
-        1.0 / self.sample_rate
+        1.0 / (self.sample_rate * self.oversampling as f64)
     }
 }
