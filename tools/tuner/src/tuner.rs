@@ -1,6 +1,11 @@
-use audio_engine_fourier::{fourier_series::FourierSeries, to_frequency_domain::ToFrequencyDomain};
+use std::{cmp::Ordering, thread::sleep, time::Duration};
+
+use audio_engine_fourier::{
+    fourier_series::{ComplexNumberMethods, FourierSeries},
+    to_frequency_domain::ToFrequencyDomain,
+};
 use cpal::{
-    traits::{DeviceTrait, HostTrait},
+    traits::{DeviceTrait, HostTrait, StreamTrait},
     Device, Host, SupportedStreamConfig,
 };
 
@@ -32,7 +37,26 @@ impl Tuner {
         }
     }
 
-    fn fill_recording_buffer(&mut self) {}
+    fn fill_recording_buffer(&mut self) {
+        let mut index = 0;
+        let input_stream = self.device.build_input_stream(
+            &self.config.config(),
+            move |data:&[f32],_: &_| {
+                data.chunks(self.config.channels() as usize).map(|a|a.iter().sum::<f32>() / a.len() as f32).for_each(|sample|
+                    if index < self.recording_buffer.len() {
+                        self.recording_buffer[index] = sample;
+                        index += 1;
+                    }
+                );
+            },
+            move |error| {},
+            None,
+        ).unwrap();
+        input_stream.play().unwrap();
+        while index < self.recording_buffer.len() {
+            sleep(Duration::new(0, 10000));
+        }
+    }
 
     pub fn sample_frequency(&mut self) -> f32 {
         self.fill_recording_buffer();
@@ -44,7 +68,8 @@ impl Tuner {
         let buffer_frequency = frequency_domain.frequency(step);
         let audio_frequency =
             buffer_frequency * (self.arguments.sample_rate / self.arguments.buffer_size as f32);
-        0.0
+
+        audio_frequency
     }
 }
 
