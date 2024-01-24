@@ -132,10 +132,9 @@ impl Sound for BowedStringInstrument {
                 .iter_mut()
                 .map(|processor| processor.read_output())
                 .sum::<f64>()
-                * 10.0
         } else {
             let processor = &mut state.string_processors[state.last_string_index];
-            processor.read_output() * 10.0
+            processor.read_output()
         };
         result as f32
     }

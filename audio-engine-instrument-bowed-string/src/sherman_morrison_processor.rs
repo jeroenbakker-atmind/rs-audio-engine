@@ -33,14 +33,14 @@ pub struct ShermanMorrison {
     a11: f64,
     a12: f64,
     a21: Vec<f64>,
-    a22: f64,
+    a22: Vec<f64>,
 
     shur_comp: Vec<f64>,
 
     b11: f64,
     b12: f64,
     b21: Vec<f64>,
-    b22: f64,
+    b22: Vec<f64>,
 
     // scratch space
     inv_av1: Vec<f64>,
@@ -55,11 +55,11 @@ impl StringProcessor for ShermanMorrison {
         processor.string_and_hand.string = string.clone();
         // TODO: This should be string specific. Not sure why....
         processor.excit_position = processor.string_and_hand.length() * 0.733;
-        processor.output_position_left = processor.string_and_hand.length() * 0.53;
-        processor.output_position_right = processor.string_and_hand.length() * 0.77;
+        processor.output_position_left = processor.string_and_hand.length() * 0.33;
+        processor.output_position_right = processor.string_and_hand.length() * 0.57;
         processor.sample_rate = sample_rate;
-        processor.gain = 500.0;
-        processor.oversampling = 4;
+        processor.gain = 1.0;
+        processor.oversampling = 1;
         processor.initialize();
 
         processor
@@ -111,7 +111,7 @@ impl ShermanMorrison {
             let zeta2 = self.modes_in[mode] * zeta1;
             let b1 = self.b11 * self.states[mode] + self.b12 * self.states[mode + mode_len];
             let b2 = self.b21[mode] * self.states[mode]
-                + self.b22 * self.states[mode + mode_len]
+                + self.b22[mode] * self.states[mode + mode_len]
                 + zeta2 * 0.5 * self.sample_duration() * self.bow.pressure * (lambda - 2.0 * d)
                 + self.sample_duration()
                     * self.bow.pressure
@@ -122,7 +122,7 @@ impl ShermanMorrison {
             // Sherman Morrison Solver
             let v = 0.5 * self.sample_duration() * self.bow.pressure * lambda * self.modes_in[mode];
             self.inv_av2[mode] = (1.0 / self.shur_comp[mode]) * v;
-            self.inv_av1[mode] = self.a11 * self.a12 * self.inv_av2[mode];
+            self.inv_av1[mode] = -self.a11 * self.a12 * self.inv_av2[mode];
             let y2 = self.a11 * b1;
             let z2 = b2 - self.a21[mode] * y2;
             self.inv_ab2[mode] = (1.0 / self.shur_comp[mode]) * z2;
@@ -132,10 +132,12 @@ impl ShermanMorrison {
             v2 += self.modes_in[mode] * self.inv_ab2[mode];
         }
 
+        let coeff = 1.0 / (1.0 + v1);
+
         for mode in 0..mode_len {
-            self.states[mode] = self.inv_ab1[mode] - (1.0 / (1.0 + v1)) * self.inv_av1[mode] * v2;
+            self.states[mode] = self.inv_ab1[mode] - coeff * self.inv_av1[mode] * v2;
             self.states[mode + mode_len] =
-                self.inv_ab2[mode] - (1.0 / (1.0 + v1)) * self.inv_av2[mode] * v2;
+                self.inv_ab2[mode] - coeff * self.inv_av2[mode] * v2;
         }
 
         let result_left = (0..mode_len)
@@ -200,17 +202,16 @@ impl ShermanMorrison {
                 -0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
             })
             .collect::<Vec<f64>>();
-        self.a22 = 1.0;
-        /*  self
+        self.a22 = self
         .damping_profile
             .iter()
-            .map(|damping_coeefcient| 1.0 + 0.5 * self.k() * damping_coeefcient)
-            .collect::<Vec<f64>>();*/
-        // TODO a22 should be 1.0 ?
+            .map(|damping_coeefcient| 1.0 + 0.5 * self.sample_duration() * damping_coeefcient)
+            .collect::<Vec<f64>>();
+        //self.a22 = vec![1.0;mode_len];
 
         // Optimize 1 - a21 *-0.5k
         self.shur_comp = (0..mode_len)
-            .map(|mode| self.a22 - self.a21[mode] * self.a11 * self.a12)
+            .map(|mode| self.a22[mode] - self.a21[mode] * self.a11 * self.a12)
             .collect::<Vec<f64>>();
 
         // Should still be checked with reference implementation.
@@ -223,7 +224,12 @@ impl ShermanMorrison {
                 0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
             })
             .collect::<Vec<f64>>();
-        self.b22 = 1.0;
+        self.b22 = self
+        .damping_profile
+            .iter()
+            .map(|damping_coeefcient| 1.0 - 0.5 * self.sample_duration() * damping_coeefcient)
+            .collect::<Vec<f64>>();
+        //self.b22 = vec![1.0;mode_len];
     }
 
     fn initialize_states(&mut self) {
