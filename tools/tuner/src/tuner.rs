@@ -5,8 +5,7 @@ use audio_engine_fourier::{
     to_frequency_domain::ToFrequencyDomain,
 };
 use cpal::{
-    traits::{DeviceTrait, HostTrait, StreamTrait},
-    Device, Host, SupportedStreamConfig,
+    traits::{DeviceTrait, HostTrait, StreamTrait}, BufferSize, Device, Host, StreamConfig, SupportedStreamConfig
 };
 
 use crate::arguments::Arguments;
@@ -39,24 +38,25 @@ impl Tuner {
 
     fn fill_recording_buffer(&mut self) {
         let mut index = 0;
+        let config = StreamConfig {
+            buffer_size: BufferSize::Fixed(4096*self.config.channels() as u32),
+            .. self.config.config()
+        };
+        let num_channels = self.config.channels() as usize;
         let input_stream = self.device.build_input_stream(
-            &self.config.config(),
-            move |data:&[f32],_: &_| {
-                data.chunks(self.config.channels() as usize).map(|a|a.iter().sum::<f32>() / a.len() as f32).for_each(|sample|
-                    if index < self.recording_buffer.len() {
-                        self.recording_buffer[index] = sample;
-                        index += 1;
-                    }
-                );
+            &config,
+             move|data:&[f32],_: &_| {
+                process_samples(data, num_channels);
             },
             move |error| {},
             None,
         ).unwrap();
         input_stream.play().unwrap();
-        while index < self.recording_buffer.len() {
+        loop {
             sleep(Duration::new(0, 10000));
         }
     }
+
 
     pub fn sample_frequency(&mut self) -> f32 {
         self.fill_recording_buffer();
@@ -72,6 +72,10 @@ impl Tuner {
         audio_frequency
     }
 }
+    fn process_samples(input_samples:&[f32], num_channels:usize){
+        let max_amplitude = input_samples.iter().map(|s|s.abs()).max_by(|a, b|if a > b {Ordering::Greater} else if a < b {Ordering::Less} else {Ordering::Equal}).unwrap_or_default();
+        println!("Max amplitude: {max_amplitude}");
+    }
 
 fn find_step_with_highest_amplitude(series: &FourierSeries) -> usize {
     series
