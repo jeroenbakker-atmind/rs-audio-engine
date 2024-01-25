@@ -19,6 +19,10 @@ pub struct Arguments {
     /// performance.
     #[arg(long, default_value_t = 4096)]
     pub steps: usize,
+
+    /// Minimum threshold of the volume to start tuning
+    #[arg(long, default_value_t = 0.001)]
+    pub threshold: f32,
 }
 
 impl Arguments {}
