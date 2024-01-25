@@ -44,13 +44,14 @@
 //!
 //! ```rust
 //! use audio_engine_fourier::fourier_series::FourierSeries;
-//! use audio_engine_fourier::parameters::Parameters;
+//! use audio_engine_fourier::parameters::{Parameters, StepType};
 //! use audio_engine_fourier::to_time_domain::ToTimeDomain;
 //!
 //! let series = FourierSeries {
 //!     parameters: Parameters {
 //!         data_len: 256,
 //!         steps: 2,
+//!         step_type: StepType::Semitones,
 //!     },
 //!     amplitudes: vec![(0.0, 0.0), (0.0, 1.0)],
 //! };

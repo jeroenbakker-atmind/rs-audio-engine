@@ -1,4 +1,4 @@
-use crate::{ChromaticTone, Note};
+use crate::{ChromaticTone, Note, Pitch};
 
 pub type ChromaticNote = Note<ChromaticTone>;
 
@@ -37,5 +37,46 @@ impl ChromaticNote {
     /// ```
     pub fn pitch(&self) -> f32 {
         self.tone.pitch_octave4() * self.multiplier_octave4()
+    }
+
+    /// Get the note one lower than the current instance.
+    ///
+    /// ```
+    /// use audio_engine_notes::{ChromaticNote, ChromaticTone};
+    /// assert_eq!(ChromaticNote::new(ChromaticTone::C, 4).one_note_lower(), ChromaticNote::new(ChromaticTone::B, 3));
+    /// ```
+    ///
+    pub fn one_note_lower(self) -> ChromaticNote {
+        if self.tone == ChromaticTone::C {
+            ChromaticNote::new(ChromaticTone::B, self.octave - 1)
+        } else {
+            ChromaticNote::new(ChromaticTone::from(u8::from(self.tone) - 1), self.octave)
+        }
+    }
+    pub fn one_note_higher(self) -> ChromaticNote {
+        if self.tone == ChromaticTone::B {
+            ChromaticNote::new(ChromaticTone::C, self.octave + 1)
+        } else {
+            ChromaticNote::new(ChromaticTone::from(u8::from(self.tone) + 1), self.octave)
+        }
+    }
+}
+
+impl From<Pitch> for ChromaticNote {
+    fn from(value: Pitch) -> Self {
+        let mut result = ChromaticNote::new(ChromaticTone::C, 0);
+        while value.frequency > result.pitch() as f64 {
+            result.octave += 1;
+        }
+        while value.frequency < result.pitch() as f64 {
+            result = result.one_note_lower();
+        }
+        if result.pitch() as f64 - value.frequency
+            > value.frequency - result.one_note_higher().pitch() as f64
+        {
+            result.one_note_higher()
+        } else {
+            result
+        }
     }
 }

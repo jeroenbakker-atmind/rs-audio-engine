@@ -4,6 +4,7 @@ use audio_engine_fourier::{
     parameters::{FrequencyRange, Parameters, StepType},
     to_frequency_domain::ToFrequencyDomain,
 };
+use audio_engine_notes::{ChromaticNote, Pitch};
 use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
     BufferSize, Device, StreamConfig, SupportedStreamConfig,
@@ -80,13 +81,13 @@ fn process_samples(input_samples: &[f32], sample_rate: f32, num_channels: usize,
     let frequency = frequency_domain.parameters.frequency(step);
     let amplitude = frequency_domain.amplitude(step);
     if amplitude > 0.01 {
-        let tuning_direction = if frequency < pitch {
-            "Tune UP"
-        } else {
-            "Tune DOWN"
+        let current_pitch = Pitch {
+            frequency: frequency as f64,
         };
+        let closest_note = ChromaticNote::from(current_pitch);
         println!(
-            "frequency={frequency}Hz,wanted={pitch}Hz,direction={tuning_direction}"
+            "current={closest_note:?}({frequency}Hz),wanted={:?}({pitch}Hz)",
+            args.chromatic_note
         );
     }
 }
