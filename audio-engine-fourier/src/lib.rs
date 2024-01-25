@@ -67,13 +67,14 @@ pub mod to_time_domain;
 #[test]
 fn frequency_to_time() {
     use fourier_series::FourierSeries;
-    use parameters::Parameters;
+    use parameters::{Parameters, StepType};
     use to_time_domain::ToTimeDomain;
 
     let series = FourierSeries {
         parameters: Parameters {
             data_len: 256,
             steps: 2,
+            step_type: StepType::Semitones,
         },
         amplitudes: vec![(0.0, 0.0), (0.0, 1.0)],
     };

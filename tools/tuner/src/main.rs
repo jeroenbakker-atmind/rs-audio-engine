@@ -13,12 +13,5 @@ fn main() {
     };
 
     let mut tuner = Tuner::new(arguments);
-
-    loop {
-        let audio_frequency = tuner.sample_frequency();
-        println!(
-            "input: {audio_frequency}Hz, target: {}Hz",
-            arguments.chromatic_note.pitch()
-        );
-    }
+    tuner.sample_frequency();
 }

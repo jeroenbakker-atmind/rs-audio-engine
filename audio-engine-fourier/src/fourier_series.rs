@@ -33,7 +33,7 @@ pub struct FourierSeries {
 impl FourierSeries {
     pub fn collect_radian_speed(parameters: &Parameters) -> Vec<RadianSpeed> {
         (0..parameters.steps)
-            .map(|integer_step| TAU * (integer_step as f32))
+            .map(|integer_step| TAU * parameters.semitone(integer_step))
             .collect::<Vec<f32>>()
     }
 
@@ -45,7 +45,11 @@ impl FourierSeries {
             .collect::<Vec<(RadianSpeed, ComplexNumber)>>()
     }
 
-    pub fn frequency(&self, step: usize) -> f32 {
-        1.0 / (step + 1) as f32
+    pub fn semitone(&self, step: usize) -> f32 {
+        (step + 1) as f32
+    }
+
+    pub fn amplitude(&self, step:usize) -> f32 {
+        self.amplitudes[step].amplitude()
     }
 }
