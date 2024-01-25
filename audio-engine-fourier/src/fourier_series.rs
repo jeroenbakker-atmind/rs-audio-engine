@@ -1,23 +1,9 @@
-use std::f32::consts::TAU;
+use std::{cmp::Ordering, f32::consts::TAU};
 
-use crate::parameters::Parameters;
-
-/// ComplexNumber can hold the real and imaginary part of a complex number.
-///
-/// Doing audio processing it isn't really necessary to know how complex
-/// number work. See the `real` part as being associated with cosine and
-/// the imaginary part with sine. The terms complex number, real and
-/// imaginary are kept for alignment with other materials about fourier
-/// transforms.
-pub type ComplexNumber = (f32, f32);
-pub trait ComplexNumberMethods {
-    fn amplitude(&self) -> f32;
-}
-impl ComplexNumberMethods for ComplexNumber {
-    fn amplitude(&self) -> f32 {
-        (self.0 * self.0 + self.1 * self.1).sqrt()
-    }
-}
+use crate::{
+    complex_number::{ComplexNumber, ComplexNumberMethods},
+    parameters::Parameters,
+};
 
 /// RadianSpeed of a frequency
 pub type RadianSpeed = f32;
@@ -33,7 +19,9 @@ pub struct FourierSeries {
 impl FourierSeries {
     pub fn collect_radian_speed(parameters: &Parameters) -> Vec<RadianSpeed> {
         (0..parameters.steps)
-            .map(|integer_step| TAU * parameters.semitone(integer_step))
+            .map(|integer_step| {
+                (parameters.steps as f32 / parameters.period_duration(integer_step)) * TAU
+            })
             .collect::<Vec<f32>>()
     }
 
@@ -49,7 +37,25 @@ impl FourierSeries {
         (step + 1) as f32
     }
 
-    pub fn amplitude(&self, step:usize) -> f32 {
+    pub fn amplitude(&self, step: usize) -> f32 {
         self.amplitudes[step].amplitude()
+    }
+
+    pub fn find_largest_amplitude(&self) -> usize {
+        self.amplitudes
+            .iter()
+            .map(|c| c.amplitude())
+            .enumerate()
+            .max_by(|a, b| {
+                if a.1 > b.1 {
+                    Ordering::Greater
+                } else if a.1 < b.1 {
+                    Ordering::Less
+                } else {
+                    Ordering::Equal
+                }
+            })
+            .map(|(i, _)| i)
+            .unwrap()
     }
 }

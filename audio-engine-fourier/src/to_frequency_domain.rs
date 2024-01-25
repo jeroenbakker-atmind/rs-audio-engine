@@ -1,6 +1,5 @@
 use crate::{
-    fourier_series::{ComplexNumber, FourierSeries, RadianSpeed},
-    parameters::Parameters,
+    complex_number::ComplexNumber, fourier_series::{ FourierSeries, RadianSpeed}, parameters::Parameters
 };
 
 // Similar to https://gist.github.com/anonymous/129d477ddb1c8025c9ac
