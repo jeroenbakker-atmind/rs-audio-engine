@@ -6,19 +6,15 @@ use audio_engine_fourier::{
 };
 use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
-    BufferSize, Device, Host, StreamConfig, SupportedStreamConfig,
+    BufferSize, Device, StreamConfig, SupportedStreamConfig,
 };
 
 use crate::arguments::Arguments;
 
 pub struct Tuner {
     arguments: Arguments,
-
-    host: Host,
     device: Device,
     config: SupportedStreamConfig,
-
-    recording_buffer: Vec<f32>,
 }
 
 impl Tuner {
@@ -26,19 +22,15 @@ impl Tuner {
         let host = cpal::default_host();
         let device = host.default_input_device().unwrap();
         let config = device.default_input_config().unwrap();
-        let recording_buffer = vec![0.0; arguments.buffer_size];
 
         Tuner {
             arguments,
-            host,
             device,
             config,
-            recording_buffer,
         }
     }
 
     pub fn start(&mut self) {
-        let mut index = 0;
         let config = StreamConfig {
             buffer_size: BufferSize::Fixed(4096 * self.config.channels() as u32),
             ..self.config.config()
@@ -53,7 +45,7 @@ impl Tuner {
                 move |data: &[f32], _: &_| {
                     process_samples(data, sample_rate, num_channels, args);
                 },
-                move |error| {},
+                move |_error| {},
                 None,
             )
             .unwrap();
