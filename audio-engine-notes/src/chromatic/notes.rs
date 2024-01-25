@@ -39,13 +39,12 @@ impl ChromaticNote {
         self.tone.pitch_octave4() * self.multiplier_octave4()
     }
 
-    /// Get the note one lower than the current instance.
+    /// Get the note one higher than the current instance.
     ///
     /// ```
     /// use audio_engine_notes::{ChromaticNote, ChromaticTone};
     /// assert_eq!(ChromaticNote::new(ChromaticTone::C, 4).one_note_lower(), ChromaticNote::new(ChromaticTone::B, 3));
     /// ```
-    ///
     pub fn one_note_lower(self) -> ChromaticNote {
         if self.tone == ChromaticTone::C {
             ChromaticNote::new(ChromaticTone::B, self.octave - 1)
@@ -53,6 +52,12 @@ impl ChromaticNote {
             ChromaticNote::new(ChromaticTone::from(u8::from(self.tone) - 1), self.octave)
         }
     }
+    /// Get the note one lower than the current instance.
+    ///
+    /// ```
+    /// use audio_engine_notes::{ChromaticNote, ChromaticTone};
+    /// assert_eq!(ChromaticNote::new(ChromaticTone::C, 4).one_note_higher(), ChromaticNote::new(ChromaticTone::CSharp, 4));
+    /// ```
     pub fn one_note_higher(self) -> ChromaticNote {
         if self.tone == ChromaticTone::B {
             ChromaticNote::new(ChromaticTone::C, self.octave + 1)

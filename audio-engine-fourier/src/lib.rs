@@ -60,11 +60,11 @@
 //! println!("{time_domain:#?}");
 //! ```
 
+pub mod complex_number;
 pub mod fourier_series;
 pub mod parameters;
 pub mod to_frequency_domain;
 pub mod to_time_domain;
-pub mod complex_number;
 
 #[cfg(test)]
 mod test;
