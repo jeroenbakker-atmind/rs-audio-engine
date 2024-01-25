@@ -21,7 +21,7 @@ pub enum StepType {
 #[derive(Debug, Clone, Copy)]
 pub struct FrequencyRange {
     pub start_frequency: f32,
-    pub end_frequenct: f32,
+    pub end_frequency: f32,
     pub sample_rate: f32,
 }
 
@@ -44,7 +44,7 @@ impl Parameters {
             },
             StepType::FrequencyRange(range)=> {
                 let step_f32 = step as f32 / self.steps as f32 ;
-                let frequency = range.end_frequenct * step_f32 + range.start_frequency * (1.0 - step_f32);
+                let frequency = range.end_frequency * step_f32 + range.start_frequency * (1.0 - step_f32);
                 frequency
             }
         }

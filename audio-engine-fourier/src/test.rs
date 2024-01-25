@@ -59,7 +59,7 @@ fn frequency_range() {
         steps: 4096,
         step_type: StepType::FrequencyRange(FrequencyRange {
             start_frequency: 400.0,
-            end_frequenct: 600.0,
+            end_frequency: 600.0,
             sample_rate: sample_rate,
         }),
     };

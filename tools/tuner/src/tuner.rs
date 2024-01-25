@@ -1,7 +1,7 @@
-use std::{cmp::Ordering, thread::sleep, time::Duration};
+use std::{thread::sleep, time::Duration};
 
 use audio_engine_fourier::{
-    fourier_series::{ComplexNumberMethods, FourierSeries},
+    parameters::{FrequencyRange, Parameters, StepType},
     to_frequency_domain::ToFrequencyDomain,
 };
 use cpal::{
@@ -37,19 +37,21 @@ impl Tuner {
         }
     }
 
-    fn fill_recording_buffer(&mut self) {
+    pub fn start(&mut self) {
         let mut index = 0;
         let config = StreamConfig {
             buffer_size: BufferSize::Fixed(4096 * self.config.channels() as u32),
             ..self.config.config()
         };
+        let sample_rate = config.sample_rate.0 as f32;
         let num_channels = self.config.channels() as usize;
+        let args = self.arguments.clone();
         let input_stream = self
             .device
             .build_input_stream(
                 &config,
                 move |data: &[f32], _: &_| {
-                    process_samples(data, num_channels);
+                    process_samples(data, sample_rate, num_channels, args);
                 },
                 move |error| {},
                 None,
@@ -60,52 +62,39 @@ impl Tuner {
             sleep(Duration::new(0, 10000));
         }
     }
-
-    pub fn sample_frequency(&mut self) -> f32 {
-        self.fill_recording_buffer();
-        let frequency_domain = self
-            .recording_buffer
-            .as_slice()
-            .to_frequency_domain(self.recording_buffer.len());
-        let step = find_step_with_highest_amplitude(&frequency_domain);
-        let buffer_frequency = frequency_domain.semitone(step);
-        let audio_frequency =
-            buffer_frequency * (self.arguments.sample_rate / self.arguments.buffer_size as f32);
-
-        audio_frequency
-    }
 }
-fn process_samples(input_samples: &[f32], num_channels: usize) {
+
+fn process_samples(input_samples: &[f32], sample_rate: f32, num_channels: usize, args: Arguments) {
     let mono_samples = input_samples
         .chunks(num_channels)
         .map(|samples| samples[0])
         .collect::<Vec<f32>>();
-    let frequency_domain = mono_samples.as_slice().to_frequency_domain(4096);
-    let step = find_step_with_highest_amplitude(&frequency_domain);
-    let semitone = frequency_domain.semitone(step);
+    let pitch = args.chromatic_note.pitch();
+    let start_frequency = pitch / 2.0;
+    let end_frequency = pitch * 2.0;
+    let parameters = Parameters {
+        data_len: mono_samples.len(),
+        steps: 4096,
+        step_type: StepType::FrequencyRange(FrequencyRange {
+            sample_rate,
+            start_frequency,
+            end_frequency,
+        }),
+    };
+    let frequency_domain = mono_samples
+        .as_slice()
+        .to_frequency_domain_with_parameters(parameters);
+    let step = frequency_domain.find_largest_amplitude();
+    let frequency = frequency_domain.parameters.frequency(step);
     let amplitude = frequency_domain.amplitude(step);
-
-    println!(
-        "Max amplitude: semitone_step={step}, complex_amplitude={amplitude}, semitone={semitone}"
-    );
-}
-
-fn find_step_with_highest_amplitude(series: &FourierSeries) -> usize {
-    series
-        .amplitudes
-        .iter()
-        .enumerate()
-        .max_by(|(_, a), (_, b)| {
-            let a_amplitude = a.amplitude();
-            let b_amplitude = b.amplitude();
-            if a_amplitude > b_amplitude {
-                Ordering::Greater
-            } else if a_amplitude < b_amplitude {
-                Ordering::Less
-            } else {
-                Ordering::Equal
-            }
-        })
-        .map(|(index, _complex)| index)
-        .unwrap_or_default()
+    if amplitude > 0.01 {
+        let tuning_direction = if frequency < pitch {
+            "Tune UP"
+        } else {
+            "Tune DOWN"
+        };
+        println!(
+            "frequency={frequency}Hz,wanted={pitch}Hz,direction={tuning_direction}"
+        );
+    }
 }
