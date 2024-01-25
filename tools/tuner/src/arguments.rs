@@ -1,7 +1,24 @@
 use audio_engine_notes::ChromaticNote;
+use clap::Parser;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Parser)]
 pub struct Arguments {
-    pub chromatic_note: ChromaticNote,
+    /// Note to tune towards.
+    ///
+    /// Note is specified in chromatic scale.
+    /// Example values are (C2, F#4, etc)
+    pub note: ChromaticNote,
+
+    /// Buffer size for recording.
+    #[arg(long, default_value_t = 4096)]
     pub buffer_size: usize,
+
+    /// Number of steps to use for detecting the pitch of the recorded audio.
+    ///
+    /// The higher the number the more steps are used, but would lead to lower
+    /// performance.
+    #[arg(long, default_value_t = 4096)]
+    pub steps: usize,
 }
+
+impl Arguments {}

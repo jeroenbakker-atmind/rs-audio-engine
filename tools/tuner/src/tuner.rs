@@ -62,12 +62,12 @@ fn process_samples(input_samples: &[f32], sample_rate: f32, num_channels: usize,
         .chunks(num_channels)
         .map(|samples| samples[0])
         .collect::<Vec<f32>>();
-    let pitch = args.chromatic_note.pitch();
+    let pitch = args.note.pitch();
     let start_frequency = pitch / 2.0;
     let end_frequency = pitch * 2.0;
     let parameters = Parameters {
         data_len: mono_samples.len(),
-        steps: 4096,
+        steps: args.steps,
         step_type: StepType::FrequencyRange(FrequencyRange {
             sample_rate,
             start_frequency,
@@ -85,7 +85,7 @@ fn process_samples(input_samples: &[f32], sample_rate: f32, num_channels: usize,
         let closest_note = ChromaticNote::from(current_pitch);
         println!(
             "current={closest_note:?}({frequency}Hz),wanted={:?}({pitch}Hz)",
-            args.chromatic_note
+            args.note
         );
     }
 }

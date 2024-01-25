@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{ChromaticTone, Note, Pitch};
 
 pub type ChromaticNote = Note<ChromaticTone>;
@@ -83,5 +85,21 @@ impl From<Pitch> for ChromaticNote {
         } else {
             result
         }
+    }
+}
+
+impl FromStr for ChromaticNote {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let octave = s[s.len() - 1..s.len()].parse::<u8>().unwrap();
+        let tone = s[0..s.len() - 1].parse::<ChromaticTone>().unwrap();
+        Ok(ChromaticNote::new(tone, octave))
+    }
+}
+
+impl From<&str> for ChromaticNote {
+    fn from(value: &str) -> Self {
+        value.parse::<ChromaticNote>().unwrap()
     }
 }
