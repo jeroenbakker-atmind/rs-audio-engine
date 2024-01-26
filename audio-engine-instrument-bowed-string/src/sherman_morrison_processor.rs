@@ -2,7 +2,7 @@ use std::f64::consts::{PI, TAU};
 
 use crate::{
     bow::{Bow, BOW_FREE_PARAMETER},
-    damping::DampingCoeffcient,
+    damping::DampingCoefficient,
     eigen_frequencies::EigenFrequency,
     processor::StringProcessor,
     string_and_hand::StringAndHand,
@@ -205,7 +205,7 @@ impl ShermanMorrison {
         self.a22 = self
         .damping_profile
             .iter()
-            .map(|damping_coeefcient| 1.0 + 0.5 * self.sample_duration() * damping_coeefcient)
+            .map(|damping_coefficient| 1.0 + 0.5 * self.sample_duration() * damping_coefficient)
             .collect::<Vec<f64>>();
         //self.a22 = vec![1.0;mode_len];
 
@@ -227,7 +227,7 @@ impl ShermanMorrison {
         self.b22 = self
         .damping_profile
             .iter()
-            .map(|damping_coeefcient| 1.0 - 0.5 * self.sample_duration() * damping_coeefcient)
+            .map(|damping_coefficient| 1.0 - 0.5 * self.sample_duration() * damping_coefficient)
             .collect::<Vec<f64>>();
         //self.b22 = vec![1.0;mode_len];
     }
@@ -245,7 +245,7 @@ impl ShermanMorrison {
         self.damping_profile = self
             .string_and_hand
             .string
-            .damping_coeffcients(&self.eigen_frequencies);
+            .damping_coefficients(&self.eigen_frequencies);
     }
 
     /// Get the number of modes in play.

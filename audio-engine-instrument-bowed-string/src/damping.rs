@@ -2,19 +2,19 @@ use std::f64::consts::PI;
 
 use crate::string::String;
 
-pub trait DampingCoeffcient {
-    fn damping_coeffcient(&self, eigen_frequency: f64) -> f64;
-    fn damping_coeffcients(&self, eigen_frequencies: &[f64]) -> Vec<f64> {
+pub trait DampingCoefficient {
+    fn damping_coefficient(&self, eigen_frequency: f64) -> f64;
+    fn damping_coefficients(&self, eigen_frequencies: &[f64]) -> Vec<f64> {
         eigen_frequencies
             .iter()
-            .map(|eigen_frequency| self.damping_coeffcient(*eigen_frequency))
+            .map(|eigen_frequency| self.damping_coefficient(*eigen_frequency))
             .collect::<Vec<f64>>()
     }
 }
 
-impl DampingCoeffcient for String {
+impl DampingCoefficient for String {
     /// Desvages damping coeffcients
-    fn damping_coeffcient(&self, eigen_frequency: f64) -> f64 {
+    fn damping_coefficient(&self, eigen_frequency: f64) -> f64 {
         const RHO_AIR: f64 = 1.225;
         const MU_AIR: f64 = 1.619e-5;
 
