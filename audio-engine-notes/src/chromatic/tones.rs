@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{tone::Tone, ChromaticScale};
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
@@ -81,5 +83,30 @@ impl ChromaticTone {
             ChromaticTone::ASharp => 466.16,
             ChromaticTone::B => 493.88,
         }
+    }
+}
+
+impl FromStr for ChromaticTone {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let tone = match s {
+            "C" => ChromaticTone::C,
+            "C#" => ChromaticTone::CSharp,
+            "D" => ChromaticTone::D,
+            "D#" => ChromaticTone::DSharp,
+            "E" => ChromaticTone::E,
+            "F" => ChromaticTone::F,
+            "F#" => ChromaticTone::FSharp,
+            "G" => ChromaticTone::G,
+            "G#" => ChromaticTone::GSharp,
+            "A" => ChromaticTone::A,
+            "A#" => ChromaticTone::ASharp,
+            "B" => ChromaticTone::B,
+            _ => {
+                return Err(());
+            }
+        };
+        Ok(tone)
     }
 }

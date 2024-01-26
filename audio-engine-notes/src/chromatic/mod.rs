@@ -1,6 +1,8 @@
 mod chords;
 mod notes;
 mod scale;
+#[cfg(test)]
+mod test;
 mod tones;
 
 pub use chords::*;

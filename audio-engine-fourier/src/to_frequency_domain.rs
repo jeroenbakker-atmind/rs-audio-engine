@@ -1,5 +1,6 @@
 use crate::{
-    fourier_series::{ComplexNumber, FourierSeries, RadianSpeed},
+    complex_number::ComplexNumber,
+    fourier_series::{FourierSeries, RadianSpeed},
     parameters::Parameters,
 };
 
@@ -17,6 +18,7 @@ impl ToFrequencyDomain for &[f32] {
         self.to_frequency_domain_with_parameters(Parameters {
             data_len: self.len(),
             steps,
+            step_type: crate::parameters::StepType::Semitones,
         })
     }
 

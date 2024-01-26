@@ -1,4 +1,6 @@
-use crate::{ChromaticTone, Note};
+use std::str::FromStr;
+
+use crate::{ChromaticTone, Note, Pitch};
 
 pub type ChromaticNote = Note<ChromaticTone>;
 
@@ -38,5 +40,71 @@ impl ChromaticNote {
     // TODO: Use Pitch as return type.
     pub fn pitch(&self) -> f32 {
         self.tone.pitch_octave4() * self.multiplier_octave4()
+    }
+
+    /// Get the note one higher than the current instance.
+    ///
+    /// ```
+    /// use audio_engine_notes::{ChromaticNote, ChromaticTone};
+    /// assert_eq!(ChromaticNote::new(ChromaticTone::C, 4).one_note_lower(), ChromaticNote::new(ChromaticTone::B, 3));
+    /// ```
+    pub fn one_note_lower(self) -> ChromaticNote {
+        if self.tone == ChromaticTone::C {
+            ChromaticNote::new(ChromaticTone::B, self.octave - 1)
+        } else {
+            ChromaticNote::new(self.tone as u8 - 1, self.octave)
+        }
+    }
+    /// Get the note one lower than the current instance.
+    ///
+    /// ```
+    /// use audio_engine_notes::{ChromaticNote, ChromaticTone};
+    /// assert_eq!(ChromaticNote::new(ChromaticTone::C, 4).one_note_higher(), ChromaticNote::new(ChromaticTone::CSharp, 4));
+    /// ```
+    pub fn one_note_higher(self) -> ChromaticNote {
+        if self.tone == ChromaticTone::B {
+            ChromaticNote::new(ChromaticTone::C, self.octave + 1)
+        } else {
+            ChromaticNote::new(self.tone as u8 + 1, self.octave)
+        }
+    }
+}
+
+impl<T> From<T> for ChromaticNote
+where
+    T: Into<Pitch> + Sized,
+{
+    fn from(value: T) -> Self {
+        let pitch = value.into();
+        let mut result = ChromaticNote::new(ChromaticTone::C, 0);
+        while pitch.frequency > result.pitch() as f64 {
+            result.octave += 1;
+        }
+        while pitch.frequency < result.pitch() as f64 {
+            result = result.one_note_lower();
+        }
+        if (result.pitch() as f64 - pitch.frequency).abs()
+            > (result.one_note_higher().pitch() as f64 - pitch.frequency).abs()
+        {
+            result.one_note_higher()
+        } else {
+            result
+        }
+    }
+}
+
+impl FromStr for ChromaticNote {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let octave = s[s.len() - 1..s.len()].parse::<u8>().unwrap();
+        let tone = s[0..s.len() - 1].parse::<ChromaticTone>().unwrap();
+        Ok(ChromaticNote::new(tone, octave))
+    }
+}
+
+impl From<&str> for ChromaticNote {
+    fn from(value: &str) -> Self {
+        value.parse::<ChromaticNote>().unwrap()
     }
 }

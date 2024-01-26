@@ -147,7 +147,7 @@ impl ShermanMorrison {
             .map(|mode| self.modes_out_right[mode] * self.states[mode])
             .sum::<f64>();
 
-        (result_left + result_right)
+        result_left + result_right
     }
 }
 

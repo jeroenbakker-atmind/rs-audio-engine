@@ -23,7 +23,7 @@ members = [
     # "audio-engine-export-video",
 
     "tools/wav2rs",
-    "tools/sample2fm",
+    "tools/sample2fm", "tools/tuner",
 ]
 
 resolver = "2"
