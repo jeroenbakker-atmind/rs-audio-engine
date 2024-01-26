@@ -69,7 +69,10 @@ impl ChromaticNote {
     }
 }
 
-impl<T> From<T> for ChromaticNote where T: Into<Pitch> + Sized {
+impl<T> From<T> for ChromaticNote
+where
+    T: Into<Pitch> + Sized,
+{
     fn from(value: T) -> Self {
         let pitch = value.into();
         let mut result = ChromaticNote::new(ChromaticTone::C, 0);

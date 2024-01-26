@@ -1,4 +1,4 @@
-use crate::{ChromaticNote, Pitch};
+use crate::ChromaticNote;
 
 /// Test that converts each chromatic note into a pitch and back. The chromatic notes should match.
 #[test]
