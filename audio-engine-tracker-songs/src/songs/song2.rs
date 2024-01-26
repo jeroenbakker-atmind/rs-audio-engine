@@ -130,7 +130,7 @@ pub fn create_song2() -> Song {
             &["--- -- --", "--- -- --"],
             &["--- -- --", "--- -- --"],
             &["--- -- --", "--- -- --"],
-            &["E 4 -- FF", "A 3 -- FF"],
+            &["E 4 -- FF", "A 2 -- FF"],
             &["--- -- --", "--- -- --"],
             &["--- -- --", "--- -- --"],
             &["--- -- --", "--- -- --"],
@@ -655,7 +655,7 @@ pub fn create_song2() -> Song {
         ],
     );
     song.init_patterns(
-        &[ 0x84],
+        &[ 0x85],
         &[
             &["E 2 -- FF"],
             &["--- -- --"],
@@ -684,7 +684,7 @@ pub fn create_song2() -> Song {
         ]
     );
     song.init_patterns(
-        &[ 0x85],
+        &[ 0x86],
         &[
             &["D 2 -- FF"],
             &["--- -- --"],
@@ -713,7 +713,7 @@ pub fn create_song2() -> Song {
         ]
     );
     song.init_patterns(
-        &[ 0x86],
+        &[ 0x87],
         &[
 
             // Measure
@@ -785,14 +785,14 @@ pub fn create_song2() -> Song {
 
     song.phrases[0x02].init(&["06"]);
     song.phrases[0x22].init(&["06"]);
-    song.phrases[0x82].init(&["84", "85", "84", "85", "84", "86", "84", "84"]);
+    song.phrases[0x82].init(&["85", "86", "85", "86", "85", "87", "85", "85"]);
 
     song.phrases[0xFE].init(&["FE", "FE", "FE", "FE"]);
 
     song.tracks[0x00].init(&["00", "01", "02"]);
-    song.tracks[0x00].level = 0.0;
+    song.tracks[0x00].level = 0.6;
     song.tracks[0x01].init(&["20", "21", "22"]);
-    song.tracks[0x01].level = 0.0;
+    song.tracks[0x01].level = 0.6;
     song.tracks[0x04].init(&["80", "81", "82"]);
     song.tracks[0x04].level = 0.6;
 
