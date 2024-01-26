@@ -4,7 +4,7 @@ use audio_engine_fourier::{
     parameters::{FrequencyRange, Parameters, StepType},
     to_frequency_domain::ToFrequencyDomain,
 };
-use audio_engine_notes::{ChromaticNote, Pitch};
+use audio_engine_notes::ChromaticNote;
 use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
     BufferSize, Device, StreamConfig, SupportedStreamConfig,

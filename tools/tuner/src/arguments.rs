@@ -2,6 +2,10 @@ use audio_engine_notes::ChromaticNote;
 use clap::Parser;
 
 #[derive(Debug, Copy, Clone, Parser)]
+#[command(
+    about = "Instrument tuner",
+    long_about = "Tool for tuning instruments by listening to an audio source and determine the pitch with the most amplitude."
+)]
 pub struct Arguments {
     /// Note to tune towards.
     ///
