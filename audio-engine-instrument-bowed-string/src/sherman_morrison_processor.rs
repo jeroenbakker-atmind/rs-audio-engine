@@ -82,6 +82,7 @@ impl StringProcessor for ShermanMorrison {
             result += self.sample_next_state();
         }
         (result / self.oversampling as f64) * self.gain
+        //todo!("nemus divides the result by the sample_duration and uses a lower gain. It also only outputs the difference. ")
     }
 }
 impl ShermanMorrison {
