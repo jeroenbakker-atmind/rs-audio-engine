@@ -81,8 +81,7 @@ fn process_samples(input_samples: &[f32], sample_rate: f32, num_channels: usize,
     let frequency = frequency_domain.parameters.frequency(step);
     let amplitude = frequency_domain.amplitude(step);
     if amplitude > args.threshold {
-        let current_pitch = Pitch::from(frequency);
-        let closest_note = ChromaticNote::from(current_pitch);
+        let closest_note = ChromaticNote::from(frequency);
         println!(
             "current={closest_note:?}({frequency}Hz),wanted={:?}({pitch}Hz)",
             args.note

@@ -69,17 +69,18 @@ impl ChromaticNote {
     }
 }
 
-impl From<Pitch> for ChromaticNote {
-    fn from(value: Pitch) -> Self {
+impl<T> From<T> for ChromaticNote where T: Into<Pitch> + Sized {
+    fn from(value: T) -> Self {
+        let pitch = value.into();
         let mut result = ChromaticNote::new(ChromaticTone::C, 0);
-        while value.frequency > result.pitch() as f64 {
+        while pitch.frequency > result.pitch() as f64 {
             result.octave += 1;
         }
-        while value.frequency < result.pitch() as f64 {
+        while pitch.frequency < result.pitch() as f64 {
             result = result.one_note_lower();
         }
-        if (result.pitch() as f64 - value.frequency).abs()
-            > (result.one_note_higher().pitch() as f64 - value.frequency).abs()
+        if (result.pitch() as f64 - pitch.frequency).abs()
+            > (result.one_note_higher().pitch() as f64 - pitch.frequency).abs()
         {
             result.one_note_higher()
         } else {
