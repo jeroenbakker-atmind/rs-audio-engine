@@ -51,7 +51,7 @@ impl ChromaticNote {
         if self.tone == ChromaticTone::C {
             ChromaticNote::new(ChromaticTone::B, self.octave - 1)
         } else {
-            ChromaticNote::new(ChromaticTone::from(u8::from(self.tone) - 1), self.octave)
+            ChromaticNote::new(self.tone as u8 - 1, self.octave)
         }
     }
     /// Get the note one lower than the current instance.
@@ -64,7 +64,7 @@ impl ChromaticNote {
         if self.tone == ChromaticTone::B {
             ChromaticNote::new(ChromaticTone::C, self.octave + 1)
         } else {
-            ChromaticNote::new(ChromaticTone::from(u8::from(self.tone) + 1), self.octave)
+            ChromaticNote::new(self.tone as u8 + 1, self.octave)
         }
     }
 }
@@ -78,8 +78,8 @@ impl From<Pitch> for ChromaticNote {
         while value.frequency < result.pitch() as f64 {
             result = result.one_note_lower();
         }
-        if result.pitch() as f64 - value.frequency
-            > value.frequency - result.one_note_higher().pitch() as f64
+        if (result.pitch() as f64 - value.frequency).abs()
+            > (result.one_note_higher().pitch() as f64 - value.frequency).abs()
         {
             result.one_note_higher()
         } else {
