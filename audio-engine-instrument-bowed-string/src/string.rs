@@ -8,6 +8,9 @@ pub static CELLO_STRING_A3: String = String {
     tension: 153.0,
     young_mod: 25e9,
     length: 0.69,
+    excit_position: InOutPosition::Fixed(0.833),
+    output_position_left: InOutPosition::Factor(0.33),
+    output_position_right: InOutPosition::Factor(0.77),
 };
 pub static CELLO_STRING_D3: String = String {
     radius: 4.4e-04,
@@ -15,6 +18,9 @@ pub static CELLO_STRING_D3: String = String {
     tension: 102.6,
     young_mod: 25e9,
     length: 0.69,
+    excit_position: InOutPosition::Fixed(0.833),
+    output_position_left: InOutPosition::Factor(0.33),
+    output_position_right: InOutPosition::Factor(0.77),
 };
 pub static CELLO_STRING_G2: String = String {
     radius: 6.05e-04,
@@ -22,6 +28,9 @@ pub static CELLO_STRING_G2: String = String {
     tension: 112.67,
     young_mod: 8.6e9,
     length: 0.69,
+    excit_position: InOutPosition::Factor(0.733),
+    output_position_left: InOutPosition::Factor(0.53),
+    output_position_right: InOutPosition::Factor(0.77),
 };
 pub static CELLO_STRING_C2: String = String {
     radius: 7.2e-4,
@@ -29,6 +38,9 @@ pub static CELLO_STRING_C2: String = String {
     tension: 172.74,
     young_mod: 22.4e9,
     length: 0.69,
+    excit_position: InOutPosition::Factor(0.733),
+    output_position_left: InOutPosition::Factor(0.33),
+    output_position_right: InOutPosition::Factor(0.57),
 };
 
 pub static VIOLIN_STRING_E5: String = String {
@@ -37,6 +49,9 @@ pub static VIOLIN_STRING_E5: String = String {
     tension: 73.0,
     young_mod: 62.5e9,
     length: 0.32,
+    excit_position: InOutPosition::Fixed(0.833),
+    output_position_left: InOutPosition::Factor(0.33),
+    output_position_right: InOutPosition::Factor(0.77),
 };
 
 pub static VIOLIN_STRING_A4: String = String {
@@ -45,6 +60,9 @@ pub static VIOLIN_STRING_A4: String = String {
     tension: 57.1,
     young_mod: 19.5e9,
     length: 0.32,
+    excit_position: InOutPosition::Fixed(0.833),
+    output_position_left: InOutPosition::Factor(0.33),
+    output_position_right: InOutPosition::Factor(0.77),
 };
 pub static VIOLIN_STRING_D4: String = String {
     radius: 4.4e-4,
@@ -52,6 +70,9 @@ pub static VIOLIN_STRING_D4: String = String {
     tension: 56.88,
     young_mod: 4.56e9,
     length: 0.32,
+    excit_position: InOutPosition::Factor(0.733),
+    output_position_left: InOutPosition::Factor(0.53),
+    output_position_right: InOutPosition::Factor(0.77),
 };
 pub static VIOLIN_STRING_G3: String = String {
     radius: 4.25e-4,
@@ -59,7 +80,31 @@ pub static VIOLIN_STRING_G3: String = String {
     tension: 43.9,
     young_mod: 4.79e9,
     length: 0.32,
+    excit_position: InOutPosition::Factor(0.733),
+    output_position_left: InOutPosition::Factor(0.53),
+    output_position_right: InOutPosition::Factor(0.77),
 };
+
+#[derive(Debug, Copy, Clone)]
+pub enum InOutPosition {
+    Fixed(f64),
+    Factor(f64),
+}
+
+impl InOutPosition {
+    pub fn get_value(&self, length: f64) -> f64 {
+        match self {
+            InOutPosition::Factor(factor) => length * factor,
+            InOutPosition::Fixed(value) => *value,
+        }
+    }
+}
+
+impl Default for InOutPosition {
+    fn default() -> Self {
+        InOutPosition::Fixed(0.833)
+    }
+}
 
 #[derive(Debug, Default, Copy, Clone)]
 pub struct String {
@@ -73,6 +118,10 @@ pub struct String {
     pub young_mod: f64,
     /// Length of the string in meters.
     pub length: f64,
+
+    pub excit_position: InOutPosition,
+    pub output_position_left: InOutPosition,
+    pub output_position_right: InOutPosition,
 }
 
 impl String {

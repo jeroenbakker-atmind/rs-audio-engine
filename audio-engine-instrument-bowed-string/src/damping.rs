@@ -7,7 +7,7 @@ pub trait DampingCoefficient {
     fn damping_coefficients(&self, eigen_frequencies: &[f64]) -> Vec<f64> {
         eigen_frequencies
             .iter()
-            .map(|eigen_frequency| self.damping_coefficient(*eigen_frequency))
+            .map(|eigen_frequency| -self.damping_coefficient(*eigen_frequency))
             .collect::<Vec<f64>>()
     }
 }

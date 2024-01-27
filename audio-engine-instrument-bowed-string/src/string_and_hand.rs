@@ -17,4 +17,14 @@ impl StringAndHand {
         self.string.inertia() * self.string.young_mod
             / (self.string.lin_density() * self.length().powi(4)).sqrt()
     }
+
+    pub fn excit_position(&self) -> f64 {
+        self.string.excit_position.get_value(self.length())
+    }
+    pub fn output_position_left(&self) -> f64 {
+        self.string.output_position_left.get_value(self.length())
+    }
+    pub fn output_position_right(&self) -> f64 {
+        self.string.output_position_right.get_value(self.length())
+    }
 }

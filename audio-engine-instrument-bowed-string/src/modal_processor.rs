@@ -9,15 +9,8 @@ use crate::{
 };
 // friction can become a trait.
 
-/// Original implementation always uses sample derivative and it is commented that this is done to increase the precision of the samples.
-///
-/// Although they can be right, I want to research the actual reason what makes the precision not accurate
-const USE_SAMPLE_DERIVATIVE: bool = false;
-
-const USE_DAMPING_PROFILE_IN_MAT: bool = false;
-
 #[derive(Default, Debug, Clone)]
-pub struct ShermanMorrison {
+pub struct ModalProcessor {
     string_and_hand: StringAndHand,
     pub bow: Bow,
     pub gain: f64,
@@ -58,14 +51,14 @@ pub struct ShermanMorrison {
     inv_ab2: Vec<f64>,
 }
 
-impl StringProcessor for ShermanMorrison {
+impl StringProcessor for ModalProcessor {
     fn new(sample_rate: f64, string: &crate::string::String) -> Self {
-        let mut processor = ShermanMorrison::default();
+        let mut processor = ModalProcessor::default();
         processor.string_and_hand.string = string.clone();
         // TODO: This should be string specific. Not sure why....
-        processor.excit_position = processor.string_and_hand.length() * 0.733;
-        processor.output_position_left = processor.string_and_hand.length() * 0.33;
-        processor.output_position_right = processor.string_and_hand.length() * 0.57;
+        processor.excit_position = processor.string_and_hand.excit_position();
+        processor.output_position_left = processor.string_and_hand.output_position_left();
+        processor.output_position_right = processor.string_and_hand.output_position_right();
         processor.sample_rate = sample_rate;
         processor.gain = 1.0;
         processor.oversampling = 1;
@@ -79,31 +72,17 @@ impl StringProcessor for ShermanMorrison {
         self.previous_sample = 0.0;
     }
 
-    fn set_input_position(&mut self, input_position: f64) {}
-    fn set_read_position(&mut self, read_position: f64) {}
-    fn compute_state(&mut self) {
-        // TODO: check current state with previous state
-        // reset matrices and frequencies based on the actual change.
-        // This will allow physical accurate reverbs by fast moving your finger.
-    }
     fn read_output(&mut self) -> f64 {
         let mut result = 0.0;
         for _ in 0..self.oversampling {
             result += self.sample_next_state();
         }
 
-        if USE_SAMPLE_DERIVATIVE {
-            // Documentation is a bit hard to find. It is mentioned that this is done to imporve the audio quality.
-            // But would like to see any proof. Technically the values are quite small.
-            let derivate = self.gain * (result - self.previous_sample) / self.sample_duration();
-            self.previous_sample = derivate;
-            derivate
-        } else {
-            (result) * self.gain
-        }
+        (result / self.oversampling as f64) * self.gain
     }
 }
-impl ShermanMorrison {
+
+impl ModalProcessor {
     pub fn set_hand_position_multiplier(&mut self, hand_position_multiplier: f64) {
         let previous_length = self.string_and_hand.length();
         self.string_and_hand.hand.fretting_position = hand_position_multiplier;
@@ -169,7 +148,7 @@ impl ShermanMorrison {
     }
 }
 
-impl ShermanMorrison {
+impl ModalProcessor {
     fn initialize(&mut self) {
         self.initialize_eigen_frequencies();
         self.initialize_modes();
@@ -179,13 +158,16 @@ impl ShermanMorrison {
     }
 
     fn initialize_eigen_frequencies(&mut self) {
+        const EIGEN_THRESHOLD: f64 = 20e3 * TAU;
         let mut mode = 1;
         let mut eigen_frequencies = Vec::with_capacity(200);
 
-        while *eigen_frequencies.last().unwrap_or(&0.0) < 20e3 * TAU {
+        while *eigen_frequencies.last().unwrap_or(&0.0) < EIGEN_THRESHOLD {
             eigen_frequencies.push(self.string_and_hand.calc_eigen_frequency(mode));
             mode += 1;
         }
+        // Last calculated frequency would be above the threshold of 20Khz.
+        eigen_frequencies.pop().unwrap();
 
         eigen_frequencies.shrink_to_fit();
         self.eigen_frequencies = eigen_frequencies;
@@ -220,16 +202,11 @@ impl ShermanMorrison {
                 -0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
             })
             .collect::<Vec<f64>>();
-
-        if USE_DAMPING_PROFILE_IN_MAT {
-            self.a22 = self
-                .damping_profile
-                .iter()
-                .map(|damping_coefficient| 1.0 + 0.5 * self.sample_duration() * damping_coefficient)
-                .collect::<Vec<f64>>();
-        } else {
-            self.a22 = vec![1.0; mode_len];
-        }
+        self.a22 = self
+            .damping_profile
+            .iter()
+            .map(|damping_coefficient| 1.0 + 0.5 * self.sample_duration() * damping_coefficient)
+            .collect::<Vec<f64>>();
 
         // Optimize 1 - a21 *-0.5k
         self.shur_comp = (0..mode_len)
@@ -246,15 +223,11 @@ impl ShermanMorrison {
                 0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
             })
             .collect::<Vec<f64>>();
-        if USE_DAMPING_PROFILE_IN_MAT {
-            self.b22 = self
-                .damping_profile
-                .iter()
-                .map(|damping_coefficient| 1.0 - 0.5 * self.sample_duration() * damping_coefficient)
-                .collect::<Vec<f64>>();
-        } else {
-            self.b22 = vec![1.0; mode_len];
-        }
+        self.b22 = self
+            .damping_profile
+            .iter()
+            .map(|damping_coefficient| 1.0 - 0.5 * self.sample_duration() * damping_coefficient)
+            .collect::<Vec<f64>>();
     }
 
     fn initialize_states(&mut self) {

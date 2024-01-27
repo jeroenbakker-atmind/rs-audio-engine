@@ -6,8 +6,8 @@ use audio_engine_notes::Pitch;
 use crate::{
     bow::Bow,
     instrument_state::BowedStringInstrumentState,
+    modal_processor::ModalProcessor,
     processor::StringProcessor,
-    sherman_morrison_processor::ShermanMorrison,
     string::{calc_hand_position_multiplier, String},
 };
 
@@ -15,7 +15,7 @@ use crate::{
 /// Still requires more testing the goal is to emulate strings/bow transition.
 /// for performance reasons we might only want to evaluate strings that have been played
 /// recently.
-const READ_ALL_STRINGS: bool = false;
+const READ_ALL_STRINGS: bool = true;
 
 /// Output state changes to the console for debugging purposes.
 const DEBUG_STATE_CHANGES: bool = false;
@@ -40,7 +40,7 @@ impl BowedStringInstrument {
 
     fn init_processors(&self, sample_rate: f64, state: &mut BowedStringInstrumentState) {
         for string in &self.strings {
-            let mut processor = ShermanMorrison::new(sample_rate, string);
+            let mut processor = ModalProcessor::new(sample_rate, string);
             processor.gain = 1000.0;
             state.string_processors.push(processor);
         }
@@ -124,12 +124,7 @@ impl Sound for BowedStringInstrument {
             }
         }
 
-        // Sample the state of all strings
-        state
-            .string_processors
-            .iter_mut()
-            .for_each(|processor| processor.compute_state());
-
+        // Sample the strings
         let result = if READ_ALL_STRINGS {
             state
                 .string_processors
