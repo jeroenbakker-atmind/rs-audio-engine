@@ -9,6 +9,13 @@ use crate::{
 };
 // friction can become a trait.
 
+/// Original implementation always uses sample derivative and it is commented that this is done to increase the precision of the samples.
+///
+/// Although they can be right, I want to research the actual reason what makes the precision not accurate
+const USE_SAMPLE_DERIVATIVE: bool = false;
+
+const USE_DAMPING_PROFILE_IN_MAT: bool = false;
+
 #[derive(Default, Debug, Clone)]
 pub struct ShermanMorrison {
     string_and_hand: StringAndHand,
@@ -42,6 +49,8 @@ pub struct ShermanMorrison {
     b21: Vec<f64>,
     b22: Vec<f64>,
 
+    previous_sample: f64,
+
     // scratch space
     inv_av1: Vec<f64>,
     inv_av2: Vec<f64>,
@@ -67,6 +76,7 @@ impl StringProcessor for ShermanMorrison {
 
     fn reset_string_states(&mut self) {
         self.states.fill(0.0);
+        self.previous_sample = 0.0;
     }
 
     fn set_input_position(&mut self, input_position: f64) {}
@@ -81,8 +91,16 @@ impl StringProcessor for ShermanMorrison {
         for _ in 0..self.oversampling {
             result += self.sample_next_state();
         }
-        (result / self.oversampling as f64) * self.gain
-        //todo!("nemus divides the result by the sample_duration and uses a lower gain. It also only outputs the difference. ")
+
+        if USE_SAMPLE_DERIVATIVE {
+            // Documentation is a bit hard to find. It is mentioned that this is done to imporve the audio quality.
+            // But would like to see any proof. Technically the values are quite small.
+            let derivate = self.gain * (result - self.previous_sample) / self.sample_duration();
+            self.previous_sample = derivate;
+            derivate
+        } else {
+            (result) * self.gain
+        }
     }
 }
 impl ShermanMorrison {
@@ -137,8 +155,7 @@ impl ShermanMorrison {
 
         for mode in 0..mode_len {
             self.states[mode] = self.inv_ab1[mode] - coeff * self.inv_av1[mode] * v2;
-            self.states[mode + mode_len] =
-                self.inv_ab2[mode] - coeff * self.inv_av2[mode] * v2;
+            self.states[mode + mode_len] = self.inv_ab2[mode] - coeff * self.inv_av2[mode] * v2;
         }
 
         let result_left = (0..mode_len)
@@ -203,12 +220,16 @@ impl ShermanMorrison {
                 -0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
             })
             .collect::<Vec<f64>>();
-        self.a22 = self
-        .damping_profile
-            .iter()
-            .map(|damping_coefficient| 1.0 + 0.5 * self.sample_duration() * damping_coefficient)
-            .collect::<Vec<f64>>();
-        //self.a22 = vec![1.0;mode_len];
+
+        if USE_DAMPING_PROFILE_IN_MAT {
+            self.a22 = self
+                .damping_profile
+                .iter()
+                .map(|damping_coefficient| 1.0 + 0.5 * self.sample_duration() * damping_coefficient)
+                .collect::<Vec<f64>>();
+        } else {
+            self.a22 = vec![1.0; mode_len];
+        }
 
         // Optimize 1 - a21 *-0.5k
         self.shur_comp = (0..mode_len)
@@ -225,12 +246,15 @@ impl ShermanMorrison {
                 0.5 * self.sample_duration() * (-eigen_frequency * eigen_frequency)
             })
             .collect::<Vec<f64>>();
-        self.b22 = self
-        .damping_profile
-            .iter()
-            .map(|damping_coefficient| 1.0 - 0.5 * self.sample_duration() * damping_coefficient)
-            .collect::<Vec<f64>>();
-        //self.b22 = vec![1.0;mode_len];
+        if USE_DAMPING_PROFILE_IN_MAT {
+            self.b22 = self
+                .damping_profile
+                .iter()
+                .map(|damping_coefficient| 1.0 - 0.5 * self.sample_duration() * damping_coefficient)
+                .collect::<Vec<f64>>();
+        } else {
+            self.b22 = vec![1.0; mode_len];
+        }
     }
 
     fn initialize_states(&mut self) {

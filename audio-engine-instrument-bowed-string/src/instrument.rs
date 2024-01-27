@@ -30,14 +30,18 @@ pub struct BowedStringInstrument {
 }
 
 impl BowedStringInstrument {
-    pub fn add_string(&mut self, string: String, string_pitch: Pitch) {
+    pub fn add_string<P>(&mut self, string: String, string_pitch: P)
+    where
+        P: Into<Pitch> + Sized,
+    {
         self.strings.push(string);
-        self.string_pitches.push(string_pitch)
+        self.string_pitches.push(string_pitch.into())
     }
 
     fn init_processors(&self, sample_rate: f64, state: &mut BowedStringInstrumentState) {
         for string in &self.strings {
-            let processor = ShermanMorrison::new(sample_rate, string);
+            let mut processor = ShermanMorrison::new(sample_rate, string);
+            processor.gain = 1000.0;
             state.string_processors.push(processor);
         }
     }
