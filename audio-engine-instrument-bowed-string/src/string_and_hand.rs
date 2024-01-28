@@ -13,11 +13,6 @@ impl StringAndHand {
         self.string.length * self.hand.fretting_position
     }
 
-    pub fn upper_k(&self) -> f64 {
-        self.string.inertia() * self.string.young_mod
-            / (self.string.lin_density() * self.length().powi(4)).sqrt()
-    }
-
     pub fn excit_position(&self) -> f64 {
         self.string.excit_position.get_value(self.length())
     }
