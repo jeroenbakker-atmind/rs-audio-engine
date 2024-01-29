@@ -1,6 +1,8 @@
 use crate::{level::Level, note_time::NoteTime};
 
-pub trait SoundParameters {}
+pub trait SoundParameters {
+    fn get_sample_rate(&self) -> f32;
+}
 
 /// Default Parameters for digital sound.
 pub struct NoteParameters {
@@ -16,4 +18,8 @@ pub struct NoteParameters {
     pub sample_rate: f32,
 }
 
-impl SoundParameters for NoteParameters {}
+impl SoundParameters for NoteParameters {
+    fn get_sample_rate(&self) -> f32 {
+        self.sample_rate
+    }
+}
