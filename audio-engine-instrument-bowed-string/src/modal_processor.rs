@@ -87,6 +87,7 @@ impl ModalProcessor {
         let previous_length = self.string_and_hand.length();
         self.string_and_hand.hand.fretting_position = hand_position_multiplier;
         if previous_length != self.string_and_hand.length() {
+            // Find out if new modes are needed and try to migrate the current state to the new state.
             self.initialize();
         }
     }

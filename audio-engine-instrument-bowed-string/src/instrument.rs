@@ -15,7 +15,7 @@ use crate::{
 /// Still requires more testing the goal is to emulate strings/bow transition.
 /// for performance reasons we might only want to evaluate strings that have been played
 /// recently.
-const READ_ALL_STRINGS: bool = true;
+const READ_ALL_STRINGS: bool = false;
 
 /// Output state changes to the console for debugging purposes.
 const DEBUG_STATE_CHANGES: bool = false;
