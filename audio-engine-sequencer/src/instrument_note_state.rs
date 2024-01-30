@@ -1,5 +1,7 @@
 use audio_engine_common::digital_sound::{sound::Sound, sound_state::SoundState};
-use audio_engine_instrument_bowed_string::instrument_state::BowedStringInstrumentState;
+use audio_engine_instrument_bowed_string::{
+    instrument_state::BowedStringInstrumentState, processor::DefaultStringProcessor,
+};
 use audio_engine_instrument_fm::instrument::FMInstrumentNoteState;
 use audio_engine_instrument_piano::note_state::PianoNoteState;
 use audio_engine_instrument_sample::sample_note_state::SampleNoteState;
@@ -13,7 +15,7 @@ pub enum InstrumentNoteState {
     FM(FMInstrumentNoteState),
     Sample(SampleNoteState),
     Piano(PianoNoteState),
-    BowedString(BowedStringInstrumentState),
+    BowedString(BowedStringInstrumentState<DefaultStringProcessor>),
 }
 
 impl InstrumentNoteState {

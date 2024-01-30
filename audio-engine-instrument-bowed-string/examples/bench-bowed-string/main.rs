@@ -2,12 +2,12 @@ use audio_engine_common::digital_sound::{
     benchmark::bench_realtime_factor_single, parameters::NoteParameters,
 };
 use audio_engine_instrument_bowed_string::{
-    instrument::BowedStringInstrument, string::CELLO_STRING_G2,
+    instrument::BowedStringInstrument, modal_processor::ModalProcessor, processor::{ DefaultStringProcessor, StringProcessor}, string::CELLO_STRING_G2
 };
 use audio_engine_notes::{ChromaticNote, ChromaticTone};
 
-fn main() {
-    let mut sound = BowedStringInstrument::default();
+fn bench_string<P>() -> f32 where P:StringProcessor+Sized+Clone+Default{
+    let mut sound = BowedStringInstrument::<P>::default();
     let pitch = ChromaticNote::new(ChromaticTone::G, 2).pitch();
     sound.add_string(CELLO_STRING_G2, pitch);
 
@@ -19,6 +19,11 @@ fn main() {
         sample_rate: 44100.0,
     };
 
-    let realtime_factor = bench_realtime_factor_single(&sound, &mut parameters, 5.0);
-    println!("Benchmark BowedString: realtime_factor={realtime_factor}");
+    bench_realtime_factor_single(&sound, &mut parameters, 5.0)
+}
+fn main() {
+    let realtime_factor = bench_string::<DefaultStringProcessor>();
+    println!("Benchmark DefaultStringProcessor: realtime_factor={realtime_factor}");
+    let realtime_factor = bench_string::<ModalProcessor>();
+    println!("Benchmark ModalProcessor:         realtime_factor={realtime_factor}");
 }

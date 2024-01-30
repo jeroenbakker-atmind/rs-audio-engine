@@ -3,7 +3,9 @@ use audio_engine_common::{
     envelope::delay_attack_hold_decay_sustain_release::DelayAttackHoldDecaySustainRelease,
     id::ID,
 };
-use audio_engine_instrument_bowed_string::instrument::BowedStringInstrument;
+use audio_engine_instrument_bowed_string::{
+    instrument::BowedStringInstrument, processor::DefaultStringProcessor,
+};
 use audio_engine_instrument_fm::instrument::FMInstrument;
 use audio_engine_instrument_piano::instrument::PianoInstrument;
 use audio_engine_instrument_sample::sample::Sample;
@@ -17,7 +19,7 @@ pub enum Instrument {
     FM(FMInstrument<DelayAttackHoldDecaySustainRelease>),
     Sample(Sample),
     Piano(PianoInstrument),
-    BowedString(BowedStringInstrument),
+    BowedString(BowedStringInstrument<DefaultStringProcessor>),
 }
 
 pub type InstrumentID = ID;

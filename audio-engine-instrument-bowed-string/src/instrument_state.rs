@@ -1,16 +1,22 @@
 use audio_engine_common::{digital_sound::sound_state::SoundState, note_time::NoteTime};
 
-use crate::modal_processor::ModalProcessor;
+use crate::processor::StringProcessor;
 
 #[derive(Debug, Clone)]
-pub struct BowedStringInstrumentState {
-    pub string_processors: Vec<ModalProcessor>,
+pub struct BowedStringInstrumentState<P>
+where
+    P: StringProcessor + Sized + Clone,
+{
+    pub string_processors: Vec<P>,
     pub last_hand_position: f64,
     pub last_string_index: usize,
     pub last_note_time: NoteTime,
 }
 
-impl Default for BowedStringInstrumentState {
+impl<P> Default for BowedStringInstrumentState<P>
+where
+    P: StringProcessor + Sized + Clone,
+{
     fn default() -> Self {
         Self {
             string_processors: Vec::default(),
@@ -20,4 +26,4 @@ impl Default for BowedStringInstrumentState {
         }
     }
 }
-impl SoundState for BowedStringInstrumentState {}
+impl<P> SoundState for BowedStringInstrumentState<P> where P: StringProcessor + Sized + Clone {}

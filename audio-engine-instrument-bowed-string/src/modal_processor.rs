@@ -67,6 +67,21 @@ impl StringProcessor for ModalProcessor {
         processor
     }
 
+    fn set_gain(&mut self, value: f64) {
+        self.gain = value;
+    }
+    fn update_bow(&mut self, bow: Bow) {
+        self.bow = bow;
+    }
+    fn set_hand_position_multiplier(&mut self, hand_position_multiplier: f64) {
+        let previous_length = self.string_and_hand.length();
+        self.string_and_hand.hand.fretting_position = hand_position_multiplier;
+        if previous_length != self.string_and_hand.length() {
+            // Find out if new modes are needed and try to migrate the current state to the new state.
+            self.initialize();
+        }
+    }
+
     fn reset_string_states(&mut self) {
         self.states.fill(0.0);
         self.previous_sample = 0.0;
@@ -83,15 +98,6 @@ impl StringProcessor for ModalProcessor {
 }
 
 impl ModalProcessor {
-    pub fn set_hand_position_multiplier(&mut self, hand_position_multiplier: f64) {
-        let previous_length = self.string_and_hand.length();
-        self.string_and_hand.hand.fretting_position = hand_position_multiplier;
-        if previous_length != self.string_and_hand.length() {
-            // Find out if new modes are needed and try to migrate the current state to the new state.
-            self.initialize();
-        }
-    }
-
     fn sample_next_state(&mut self) -> f64 {
         let mode_len = self.mode_len();
         let zeta1 = (0..mode_len)
@@ -119,7 +125,11 @@ impl ModalProcessor {
                     * self.bow.velocity;
 
             // Sherman Morrison Solver
-            let v = 0.5 * self.sample_duration() * self.bow.pressure * lambda * self.modes_in.modes[mode];
+            let v = 0.5
+                * self.sample_duration()
+                * self.bow.pressure
+                * lambda
+                * self.modes_in.modes[mode];
             self.inv_av2[mode] = (1.0 / self.shur_comp[mode]) * v;
             self.inv_av1[mode] = -self.a11 * self.a12 * self.inv_av2[mode];
             let y2 = self.a11 * b1;
@@ -183,7 +193,7 @@ impl ModalProcessor {
             (2.0 / string_and_hand.length()).sqrt()
                 * (mode as f64 * PI * position / string_and_hand.length()).sin()
         }
-        self.modes_in.modes= (1..=mode_len)
+        self.modes_in.modes = (1..=mode_len)
             .map(|mode| calc_mode(&self.string_and_hand, self.excit_position, mode))
             .collect::<Vec<f64>>();
 
