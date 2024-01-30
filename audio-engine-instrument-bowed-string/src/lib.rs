@@ -8,9 +8,6 @@ pub mod processor;
 pub mod string;
 pub mod string_and_hand;
 
-#[cfg(test)]
-mod test;
-
 // TODO: generate waveform png based on a property.
 // What happens when the fretting position changes.
 // What happens when the bow velocity changes.

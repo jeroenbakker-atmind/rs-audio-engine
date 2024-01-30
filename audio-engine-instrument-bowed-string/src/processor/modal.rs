@@ -7,6 +7,8 @@ use crate::{
     processor::StringProcessor,
     string_and_hand::StringAndHand,
 };
+
+const DEBUG_VALUES: bool = false;
 // friction can become a trait.
 
 #[derive(Default, Debug, Clone)]
@@ -146,6 +148,19 @@ impl ModalProcessor {
         for mode in 0..mode_len {
             self.states[mode] = self.inv_ab1[mode] - coeff * self.inv_av1[mode] * v2;
             self.states[mode + mode_len] = self.inv_ab2[mode] - coeff * self.inv_av2[mode] * v2;
+        }
+
+        if DEBUG_VALUES {
+            for output in &self.outputs {
+                let value = output
+                    .modes
+                    .iter()
+                    .zip(&self.states)
+                    .map(|(m, s)| m * s)
+                    .sum::<f64>();
+                print!("{value:?}, ");
+            }
+            println!();
         }
 
         let result = self

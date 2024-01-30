@@ -1,5 +1,7 @@
 use crate::{bow::Bow, string::String};
 pub mod modal;
+#[cfg(test)]
+mod test;
 
 pub trait StringProcessor {
     fn new(sample_rate: f64, string: &String) -> Self;
