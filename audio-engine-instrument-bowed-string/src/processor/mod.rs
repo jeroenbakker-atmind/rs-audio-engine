@@ -1,4 +1,5 @@
-use crate::{bow::Bow, modal_processor::ModalProcessor, string::String};
+use crate::{bow::Bow, string::String};
+pub mod modal;
 
 pub trait StringProcessor {
     fn new(sample_rate: f64, string: &String) -> Self;
@@ -9,4 +10,4 @@ pub trait StringProcessor {
     fn read_output(&mut self) -> f64;
 }
 
-pub type DefaultStringProcessor = ModalProcessor;
+pub type DefaultStringProcessor = modal::ModalProcessor;

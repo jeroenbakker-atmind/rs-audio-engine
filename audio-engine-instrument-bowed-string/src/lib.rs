@@ -4,7 +4,6 @@ pub mod eigen_frequencies;
 pub mod hand;
 pub mod instrument;
 pub mod instrument_state;
-pub mod modal_processor;
 pub mod processor;
 pub mod string;
 pub mod string_and_hand;

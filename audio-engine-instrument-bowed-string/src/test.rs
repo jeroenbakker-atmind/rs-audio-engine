@@ -1,9 +1,11 @@
-use crate::{modal_processor::ModalProcessor, processor::StringProcessor, string::CELLO_STRING_G2};
+use crate::{
+    processor::DefaultStringProcessor, processor::StringProcessor, string::CELLO_STRING_G2,
+};
 
 #[test]
 fn string_processor() {
     let string = CELLO_STRING_G2;
-    let mut string_processor = ModalProcessor::new(44100.0, &string);
+    let mut string_processor = DefaultStringProcessor::new(44100.0, &string);
     string_processor.bow.velocity = 0.2;
     string_processor.bow.pressure = 10.0;
     string_processor.gain = 1000.0;
