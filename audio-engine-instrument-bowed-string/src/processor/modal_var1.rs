@@ -17,7 +17,7 @@ struct Modes {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct ModalProcessor {
+pub struct ModalVar1Processor {
     string_and_hand: StringAndHand,
     pub bow: Bow,
     pub gain: f64,
@@ -34,28 +34,23 @@ pub struct ModalProcessor {
 
     states: Vec<f64>,
 
-    a11: f64,
-    a12: f64,
     a21: Vec<f64>,
     a22: Vec<f64>,
 
-    shur_comp: Vec<f64>,
+    inv_shur_comp: Vec<f64>,
 
-    b11: f64,
-    b12: f64,
     b21: Vec<f64>,
     b22: Vec<f64>,
 
     previous_sample: f64,
 
     // scratch space
-    inv_av1: Vec<f64>,
     inv_av2: Vec<f64>,
     inv_ab1: Vec<f64>,
     inv_ab2: Vec<f64>,
 }
 
-impl StringProcessor for ModalProcessor {
+impl StringProcessor for ModalVar1Processor {
     fn new(sample_rate: f64, string: &crate::string::String) -> Self {
         let mut processor = Self::default();
         processor.string_and_hand.string = string.clone();
@@ -99,7 +94,7 @@ impl StringProcessor for ModalProcessor {
     }
 }
 
-impl ModalProcessor {
+impl ModalVar1Processor {
     fn sample_next_state(&mut self) -> f64 {
         let mode_len = self.mode_len();
         let zeta1 = (0..mode_len)
@@ -114,39 +109,36 @@ impl ModalProcessor {
         let mut v1 = 0.0;
         let mut v2 = 0.0;
 
+        let sample_duration = self.sample_duration();
+
         for mode in 0..mode_len {
-            let zeta2 = self.modes_in.modes[mode] * zeta1;
-            let b1 = self.b11 * self.states[mode] + self.b12 * self.states[mode + mode_len];
-            let b2 = self.b21[mode] * self.states[mode]
-                + self.b22[mode] * self.states[mode + mode_len]
-                + zeta2 * 0.5 * self.sample_duration() * self.bow.pressure * (lambda - 2.0 * d)
-                + self.sample_duration()
-                    * self.bow.pressure
-                    * d
-                    * self.modes_in.modes[mode]
-                    * self.bow.velocity;
+            let state_0 = self.states[mode];
+            let state_1 = self.states[mode + mode_len];
+            let mode_in = self.modes_in.modes[mode];
+            let zeta2 = mode_in * zeta1;
+            let b1 = self.b11() * state_0 + self.b12() * state_1;
+            let b2 = self.b21[mode] * state_0
+                + self.b22[mode] * state_1
+                + zeta2 * 0.5 * sample_duration * self.bow.pressure * (lambda - 2.0 * d)
+                + sample_duration * self.bow.pressure * d * mode_in * self.bow.velocity;
 
-            // Sherman Morrison Solver
-            let v = 0.5
-                * self.sample_duration()
-                * self.bow.pressure
-                * lambda
-                * self.modes_in.modes[mode];
-            self.inv_av2[mode] = (1.0 / self.shur_comp[mode]) * v;
-            self.inv_av1[mode] = -self.a11 * self.a12 * self.inv_av2[mode];
-            let y2 = self.a11 * b1;
+            let v = 0.5 * sample_duration * self.bow.pressure * lambda * mode_in;
+            let inv_shur = self.inv_shur_comp[mode];
+            self.inv_av2[mode] = inv_shur * v;
+
+            let y2 = self.a11() * b1;
             let z2 = b2 - self.a21[mode] * y2;
-            self.inv_ab2[mode] = (1.0 / self.shur_comp[mode]) * z2;
-            self.inv_ab1[mode] = y2 - self.a11 * self.a12 * self.inv_ab2[mode];
+            self.inv_ab2[mode] = inv_shur * z2;
+            self.inv_ab1[mode] = y2 - self.a11() * self.a12() * self.inv_ab2[mode];
 
-            v1 += self.modes_in.modes[mode] * self.inv_av2[mode];
-            v2 += self.modes_in.modes[mode] * self.inv_ab2[mode];
+            v1 += mode_in * self.inv_av2[mode];
+            v2 += mode_in * self.inv_ab2[mode];
         }
-
         let coeff = 1.0 / (1.0 + v1);
 
         for mode in 0..mode_len {
-            self.states[mode] = self.inv_ab1[mode] - coeff * self.inv_av1[mode] * v2;
+            let inv_av1 = -self.a11() * self.a12() * self.inv_av2[mode];
+            self.states[mode] = self.inv_ab1[mode] - coeff * inv_av1 * v2;
             self.states[mode + mode_len] = self.inv_ab2[mode] - coeff * self.inv_av2[mode] * v2;
         }
 
@@ -177,7 +169,7 @@ impl ModalProcessor {
     }
 }
 
-impl ModalProcessor {
+impl ModalVar1Processor {
     fn initialize(&mut self) {
         self.initialize_eigen_frequencies();
         self.initialize_modes();
@@ -223,11 +215,22 @@ impl ModalProcessor {
         }
     }
 
+    fn a11(&self) -> f64 {
+        1.0
+    }
+    fn a12(&self) -> f64 {
+        -0.5 * self.sample_duration()
+    }
+    fn b11(&self) -> f64 {
+        1.0
+    }
+    fn b12(&self) -> f64 {
+        0.5 * self.sample_duration()
+    }
+
     fn initialize_matrices(&mut self) {
         let mode_len = self.mode_len();
 
-        self.a11 = 1.0;
-        self.a12 = -0.5 * self.sample_duration();
         self.a21 = self
             .eigen_frequencies
             .iter()
@@ -241,14 +244,12 @@ impl ModalProcessor {
             .map(|damping_coefficient| 1.0 + 0.5 * self.sample_duration() * damping_coefficient)
             .collect::<Vec<f64>>();
 
-        // Optimize 1 - a21 *-0.5k
-        self.shur_comp = (0..mode_len)
-            .map(|mode| self.a22[mode] - self.a21[mode] * self.a11 * self.a12)
+        self.inv_shur_comp = (0..mode_len)
+            .map(|mode| self.a22[mode] - self.a21[mode] * self.a11() * self.a12())
+            .map(|shur_comp| 1.0 / shur_comp)
             .collect::<Vec<f64>>();
 
         // Should still be checked with reference implementation.
-        self.b11 = 1.0;
-        self.b12 = 0.5 * self.sample_duration();
         self.b21 = self
             .eigen_frequencies
             .iter()
@@ -268,7 +269,6 @@ impl ModalProcessor {
         self.states = vec![0.0; mode_len * 2];
         self.inv_ab1 = vec![0.0; mode_len];
         self.inv_ab2 = vec![0.0; mode_len];
-        self.inv_av1 = vec![0.0; mode_len];
         self.inv_av2 = vec![0.0; mode_len];
     }
 

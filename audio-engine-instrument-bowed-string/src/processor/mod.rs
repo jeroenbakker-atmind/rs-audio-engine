@@ -1,5 +1,6 @@
 use crate::{bow::Bow, string::String};
 pub mod modal;
+pub mod modal_var1;
 #[cfg(test)]
 mod test;
 

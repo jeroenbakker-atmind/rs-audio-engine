@@ -4,7 +4,7 @@ use audio_engine_common::digital_sound::{
 use audio_engine_instrument_bowed_string::{
     instrument::BowedStringInstrument,
     processor::modal::ModalProcessor,
-    processor::{DefaultStringProcessor, StringProcessor},
+    processor::{modal_var1::ModalVar1Processor, DefaultStringProcessor, StringProcessor},
     string::CELLO_STRING_G2,
 };
 use audio_engine_notes::{ChromaticNote, ChromaticTone};
@@ -33,4 +33,6 @@ fn main() {
     println!("Benchmark DefaultStringProcessor: realtime_factor={realtime_factor}");
     let realtime_factor = bench_string::<ModalProcessor>();
     println!("Benchmark ModalProcessor:         realtime_factor={realtime_factor}");
+    let realtime_factor = bench_string::<ModalVar1Processor>();
+    println!("Benchmark ModalVar1Processor:     realtime_factor={realtime_factor}");
 }

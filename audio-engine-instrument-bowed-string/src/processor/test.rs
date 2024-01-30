@@ -18,7 +18,7 @@ fn string_processor() {
 mod validation {
     //! Validate the first 50 samples to be "same" as the output from mathlab.
     use crate::{
-        processor::{modal::ModalProcessor, DefaultStringProcessor, StringProcessor},
+        processor::{modal::ModalProcessor, modal_var1::ModalVar1Processor, DefaultStringProcessor, StringProcessor},
         string::CELLO_STRING_G2,
     };
 
@@ -103,5 +103,10 @@ mod validation {
     #[test]
     fn validate_modal_processor() {
         validate::<ModalProcessor>();
+    }
+
+    #[test]
+    fn validate_modal_var1_processor() {
+        validate::<ModalVar1Processor>();
     }
 }
