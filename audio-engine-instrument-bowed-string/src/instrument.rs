@@ -80,7 +80,9 @@ impl Sound for BowedStringInstrument {
             .string_pitches
             .iter()
             .enumerate()
-            .filter(|(_, base_pitch)| base_pitch.frequency < note_pitch.frequency)
+            .filter(|(_, base_pitch)| 
+            // Use not larger then to include equal frequencies.
+            !(base_pitch.frequency > note_pitch.frequency))
             .max_by(|(_, a), (_, b)| {
                 if a.frequency > b.frequency {
                     Ordering::Greater

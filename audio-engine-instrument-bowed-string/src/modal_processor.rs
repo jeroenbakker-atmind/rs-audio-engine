@@ -10,6 +10,11 @@ use crate::{
 // friction can become a trait.
 
 #[derive(Default, Debug, Clone)]
+struct Modes {
+    modes: Vec<f64>,
+}
+
+#[derive(Default, Debug, Clone)]
 pub struct ModalProcessor {
     string_and_hand: StringAndHand,
     pub bow: Bow,
@@ -21,12 +26,9 @@ pub struct ModalProcessor {
     damping_profile: Vec<f64>,
 
     excit_position: f64,
-    output_position_left: f64,
-    output_position_right: f64,
 
-    modes_in: Vec<f64>,
-    modes_out_left: Vec<f64>,
-    modes_out_right: Vec<f64>,
+    modes_in: Modes,
+    outputs: Vec<Modes>,
 
     states: Vec<f64>,
 
@@ -57,8 +59,6 @@ impl StringProcessor for ModalProcessor {
         processor.string_and_hand.string = string.clone();
         // TODO: This should be string specific. Not sure why....
         processor.excit_position = processor.string_and_hand.excit_position();
-        processor.output_position_left = processor.string_and_hand.output_position_left();
-        processor.output_position_right = processor.string_and_hand.output_position_right();
         processor.sample_rate = sample_rate;
         processor.gain = 1.0;
         processor.oversampling = 1;
@@ -95,7 +95,7 @@ impl ModalProcessor {
     fn sample_next_state(&mut self) -> f64 {
         let mode_len = self.mode_len();
         let zeta1 = (0..mode_len)
-            .map(|mode| self.modes_in[mode] * self.states[mode + mode_len])
+            .map(|mode| self.modes_in.modes[mode] * self.states[mode + mode_len])
             .sum::<f64>();
 
         // Bilbao friction
@@ -107,7 +107,7 @@ impl ModalProcessor {
         let mut v2 = 0.0;
 
         for mode in 0..mode_len {
-            let zeta2 = self.modes_in[mode] * zeta1;
+            let zeta2 = self.modes_in.modes[mode] * zeta1;
             let b1 = self.b11 * self.states[mode] + self.b12 * self.states[mode + mode_len];
             let b2 = self.b21[mode] * self.states[mode]
                 + self.b22[mode] * self.states[mode + mode_len]
@@ -115,11 +115,11 @@ impl ModalProcessor {
                 + self.sample_duration()
                     * self.bow.pressure
                     * d
-                    * self.modes_in[mode]
+                    * self.modes_in.modes[mode]
                     * self.bow.velocity;
 
             // Sherman Morrison Solver
-            let v = 0.5 * self.sample_duration() * self.bow.pressure * lambda * self.modes_in[mode];
+            let v = 0.5 * self.sample_duration() * self.bow.pressure * lambda * self.modes_in.modes[mode];
             self.inv_av2[mode] = (1.0 / self.shur_comp[mode]) * v;
             self.inv_av1[mode] = -self.a11 * self.a12 * self.inv_av2[mode];
             let y2 = self.a11 * b1;
@@ -127,8 +127,8 @@ impl ModalProcessor {
             self.inv_ab2[mode] = (1.0 / self.shur_comp[mode]) * z2;
             self.inv_ab1[mode] = y2 - self.a11 * self.a12 * self.inv_ab2[mode];
 
-            v1 += self.modes_in[mode] * self.inv_av2[mode];
-            v2 += self.modes_in[mode] * self.inv_ab2[mode];
+            v1 += self.modes_in.modes[mode] * self.inv_av2[mode];
+            v2 += self.modes_in.modes[mode] * self.inv_ab2[mode];
         }
 
         let coeff = 1.0 / (1.0 + v1);
@@ -138,14 +138,17 @@ impl ModalProcessor {
             self.states[mode + mode_len] = self.inv_ab2[mode] - coeff * self.inv_av2[mode] * v2;
         }
 
-        let result_left = (0..mode_len)
-            .map(|mode| self.modes_out_left[mode] * self.states[mode])
+        let result = self
+            .outputs
+            .iter()
+            .map(|output| {
+                // TODO use zip
+                (0..mode_len)
+                    .map(|mode| output.modes[mode] * self.states[mode])
+                    .sum::<f64>()
+            })
             .sum::<f64>();
-        let result_right = (0..mode_len)
-            .map(|mode| self.modes_out_right[mode] * self.states[mode])
-            .sum::<f64>();
-
-        result_left + result_right
+        result
     }
 }
 
@@ -180,15 +183,19 @@ impl ModalProcessor {
             (2.0 / string_and_hand.length()).sqrt()
                 * (mode as f64 * PI * position / string_and_hand.length()).sin()
         }
-        self.modes_in = (1..=mode_len)
+        self.modes_in.modes= (1..=mode_len)
             .map(|mode| calc_mode(&self.string_and_hand, self.excit_position, mode))
             .collect::<Vec<f64>>();
-        self.modes_out_left = (1..=mode_len)
-            .map(|mode| calc_mode(&self.string_and_hand, self.output_position_left, mode))
-            .collect::<Vec<f64>>();
-        self.modes_out_right = (1..=mode_len)
-            .map(|mode| calc_mode(&self.string_and_hand, self.output_position_right, mode))
-            .collect::<Vec<f64>>();
+
+        let num_outputs = 2;
+        self.outputs.resize(num_outputs, Modes::default());
+        for (index, output) in self.outputs.iter_mut().enumerate() {
+            let position = self.string_and_hand.output_position(index);
+            // TODO: could this be optimized by resizing and mutating inline?
+            output.modes = (1..=mode_len)
+                .map(|mode| calc_mode(&self.string_and_hand, position, mode))
+                .collect::<Vec<f64>>();
+        }
     }
 
     fn initialize_matrices(&mut self) {

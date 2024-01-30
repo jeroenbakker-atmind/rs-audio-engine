@@ -7,8 +7,11 @@ use super::{
     sound::Sound,
 };
 
-
-pub fn bench_realtime_factor_single<T>(sound: &T, parameters: &mut T::Parameters, time: Duration) -> f32
+pub fn bench_realtime_factor_single<T>(
+    sound: &T,
+    parameters: &mut T::Parameters,
+    time: Duration,
+) -> f32
 where
     T: Sound + Sized,
     T::Parameters: BenchmarkParameters,
@@ -65,7 +68,7 @@ fn test_benchmark() {
         gain: 1.0,
         sample_rate: 44100.0,
     };
-    
+
     let realtime_factor = bench_realtime_factor(&sound, &mut parameters, 5.0);
     println!("Benchmark Sound: realtime_factor={realtime_factor}");
 }

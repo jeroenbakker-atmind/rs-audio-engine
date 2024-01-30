@@ -1,6 +1,6 @@
 use crate::{hand::Hand, string::String};
 
-#[derive(Default, Debug, Copy, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct StringAndHand {
     pub string: String,
     pub hand: Hand,
@@ -21,10 +21,12 @@ impl StringAndHand {
     pub fn excit_position(&self) -> f64 {
         self.string.excit_position.get_value(self.length())
     }
-    pub fn output_position_left(&self) -> f64 {
-        self.string.output_position_left.get_value(self.length())
-    }
-    pub fn output_position_right(&self) -> f64 {
-        self.string.output_position_right.get_value(self.length())
+    pub fn output_position(&self, index: usize) -> f64 {
+        let position = if index == 0 {
+            self.string.output_position_left
+        } else {
+            self.string.output_position_right
+        };
+        position.get_value(self.length())
     }
 }

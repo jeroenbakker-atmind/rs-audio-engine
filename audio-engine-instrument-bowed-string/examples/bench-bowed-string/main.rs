@@ -1,5 +1,9 @@
-use audio_engine_common::digital_sound::{benchmark::bench_realtime_factor_single, parameters::NoteParameters};
-use audio_engine_instrument_bowed_string::{instrument::BowedStringInstrument, string::CELLO_STRING_G2};
+use audio_engine_common::digital_sound::{
+    benchmark::bench_realtime_factor_single, parameters::NoteParameters,
+};
+use audio_engine_instrument_bowed_string::{
+    instrument::BowedStringInstrument, string::CELLO_STRING_G2,
+};
 use audio_engine_notes::{ChromaticNote, ChromaticTone};
 
 fn main() {
@@ -14,8 +18,7 @@ fn main() {
         gain: 1.0,
         sample_rate: 44100.0,
     };
-    
+
     let realtime_factor = bench_realtime_factor_single(&sound, &mut parameters, 5.0);
     println!("Benchmark BowedString: realtime_factor={realtime_factor}");
-
 }
