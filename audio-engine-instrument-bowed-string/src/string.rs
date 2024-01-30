@@ -136,10 +136,6 @@ impl String {
     pub fn inertia(&self) -> f64 {
         PI * self.radius * self.radius * self.radius * self.radius / 4.0
     }
-
-    pub fn c(&self) -> f64 {
-        self.tension / self.lin_density()
-    }
 }
 
 /// Calculate the hand position from the base pitch of the string and the pitch of the note.
