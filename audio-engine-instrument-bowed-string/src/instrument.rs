@@ -1,6 +1,9 @@
 use std::{cmp::Ordering, marker::PhantomData};
 
-use audio_engine_common::digital_sound::{parameters::NoteParameters, sound::Sound};
+use audio_engine_common::{
+    digital_sound::{parameters::NoteParameters, sound::Sound},
+    envelope::{trapezoid::Trapezoid, Envelope},
+};
 use audio_engine_notes::Pitch;
 
 use crate::{
@@ -19,14 +22,32 @@ const READ_ALL_STRINGS: bool = false;
 /// Output state changes to the console for debugging purposes.
 const DEBUG_STATE_CHANGES: bool = false;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct BowedStringInstrument<P> {
     pub strings: Vec<String>,
     /// The base pitch for each string in strings attribute.
     pub string_pitches: Vec<Pitch>,
-    // TODO: Add bow velocity envelope
+    // Velocity envelope. Actual velocity should be included in the envelope in meters per second.
+    pub velocity_envelope: Trapezoid,
     // TODO: Add bow pressure envelope
     _processor: PhantomData<P>,
+}
+
+impl<P> Default for BowedStringInstrument<P> {
+    fn default() -> Self {
+        Self {
+            strings: Default::default(),
+            string_pitches: Default::default(),
+            velocity_envelope: Trapezoid {
+                start: 0.1,
+                attack: 0.2,
+                hold: 0.2,
+                release: 0.5,
+                end: 0.05,
+            },
+            _processor: Default::default(),
+        }
+    }
 }
 
 impl<P> BowedStringInstrument<P>
@@ -128,7 +149,10 @@ where
                 // Apply pressure and hand position to the string.
                 processor.update_bow(Bow {
                     pressure: 10.0 * parameters.gain as f64,
-                    velocity: 0.2,
+                    velocity: self
+                        .velocity_envelope
+                        .level(parameters.note_time, parameters.note_off)
+                        as f64,
                 });
             }
         }
