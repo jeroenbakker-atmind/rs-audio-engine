@@ -16,6 +16,15 @@ struct Modes {
     modes: Vec<f64>,
 }
 
+/// This is an optimized version of ModalProcessor.
+/// 
+/// The optimizations include:
+/// * move constant parts of the matrices to functions
+/// * change scope of variables in inner loop to hint compilers to what can be optimized into registers
+/// * remove scratch space that could be calculated when used.
+/// * inverse the shur comp
+/// * change scope of some inner loop constant expressions
+/// 
 #[derive(Default, Debug, Clone)]
 pub struct ModalVar1Processor {
     string_and_hand: StringAndHand,
@@ -113,6 +122,11 @@ impl ModalVar1Processor {
         let b12 = self.b12();
         let a12 = self.a12();
 
+        let b2_pressure = 0.5 * sample_duration * self.bow.pressure * (lambda - 2.0 * d);
+        let b2_velocity = sample_duration * self.bow.pressure * d * self.bow.velocity;
+        let v_pressure = 
+            0.5 * sample_duration * self.bow.pressure * lambda;
+
         for mode in 0..mode_len {
             let state_0 = self.states[mode];
             let state_1 = self.states[mode + mode_len];
@@ -121,10 +135,10 @@ impl ModalVar1Processor {
             let b1 = self.b11() * state_0 + b12 * state_1;
             let b2 = self.b21[mode] * state_0
                 + self.b22[mode] * state_1
-                + zeta2 * 0.5 * sample_duration * self.bow.pressure * (lambda - 2.0 * d)
-                + sample_duration * self.bow.pressure * d * mode_in * self.bow.velocity;
+                + zeta2 * b2_pressure
+                + mode_in * b2_velocity;
 
-            let v = 0.5 * sample_duration * self.bow.pressure * lambda * mode_in;
+            let v = mode_in * v_pressure;
             let inv_shur = self.inv_shur_comp[mode];
             self.inv_av2[mode] = inv_shur * v;
 
