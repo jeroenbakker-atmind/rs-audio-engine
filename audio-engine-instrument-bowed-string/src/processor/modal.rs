@@ -1,9 +1,13 @@
-use std::f64::consts::{PI, TAU};
+use std::{
+    f64::consts::{PI, TAU},
+    marker::PhantomData,
+};
 
 use crate::{
     bow::{Bow, BOW_FREE_PARAMETER},
     damping::DampingCoefficient,
     eigen_frequencies::EigenFrequency,
+    friction::Friction,
     processor::StringProcessor,
     string_and_hand::StringAndHand,
 };
@@ -17,7 +21,10 @@ struct Modes {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct ModalProcessor {
+pub struct ModalProcessor<F>
+where
+    F: Friction,
+{
     string_and_hand: StringAndHand,
     pub bow: Bow,
     pub gain: f64,
@@ -53,9 +60,14 @@ pub struct ModalProcessor {
     inv_av2: Vec<f64>,
     inv_ab1: Vec<f64>,
     inv_ab2: Vec<f64>,
+
+    _friction: PhantomData<F>,
 }
 
-impl StringProcessor for ModalProcessor {
+impl<F> StringProcessor for ModalProcessor<F>
+where
+    F: Friction + Default,
+{
     fn new(sample_rate: f64, string: &crate::string::String) -> Self {
         let mut processor = Self::default();
         processor.string_and_hand.string = string.clone();
@@ -99,17 +111,16 @@ impl StringProcessor for ModalProcessor {
     }
 }
 
-impl ModalProcessor {
+impl<F> ModalProcessor<F>
+where
+    F: Friction,
+{
     fn sample_next_state(&mut self) -> f64 {
         let mode_len = self.mode_len();
         let zeta1 = (0..mode_len)
             .map(|mode| self.modes_in.modes[mode] * self.states[mode + mode_len])
             .sum::<f64>();
-
-        // Bilbao friction
-        let eta = zeta1 - self.bow.velocity;
-        let d = (2.0 * BOW_FREE_PARAMETER).sqrt() * (-BOW_FREE_PARAMETER * eta * eta + 0.5).exp();
-        let lambda = d * (1.0 - 2.0 * BOW_FREE_PARAMETER * eta.powi(2));
+        let friction = F::calculate_friction(zeta1, &self.bow);
 
         let mut v1 = 0.0;
         let mut v2 = 0.0;
@@ -119,10 +130,14 @@ impl ModalProcessor {
             let b1 = self.b11 * self.states[mode] + self.b12 * self.states[mode + mode_len];
             let b2 = self.b21[mode] * self.states[mode]
                 + self.b22[mode] * self.states[mode + mode_len]
-                + zeta2 * 0.5 * self.sample_duration() * self.bow.pressure * (lambda - 2.0 * d)
+                + zeta2
+                    * 0.5
+                    * self.sample_duration()
+                    * self.bow.pressure
+                    * (friction.lambda - 2.0 * friction.d)
                 + self.sample_duration()
                     * self.bow.pressure
-                    * d
+                    * friction.d
                     * self.modes_in.modes[mode]
                     * self.bow.velocity;
 
@@ -130,7 +145,7 @@ impl ModalProcessor {
             let v = 0.5
                 * self.sample_duration()
                 * self.bow.pressure
-                * lambda
+                * friction.lambda
                 * self.modes_in.modes[mode];
             self.inv_av2[mode] = (1.0 / self.shur_comp[mode]) * v;
             self.inv_av1[mode] = -self.a11 * self.a12 * self.inv_av2[mode];
@@ -177,7 +192,10 @@ impl ModalProcessor {
     }
 }
 
-impl ModalProcessor {
+impl<F> ModalProcessor<F>
+where
+    F: Friction,
+{
     fn initialize(&mut self) {
         self.initialize_eigen_frequencies();
         self.initialize_modes();

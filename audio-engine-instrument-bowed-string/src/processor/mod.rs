@@ -1,4 +1,8 @@
-use crate::{bow::Bow, string::String};
+use crate::{
+    bow::Bow,
+    friction::{bilboa::Bilbao, desvages::Desvages},
+    string::String,
+};
 pub mod modal;
 pub mod modal_var1;
 #[cfg(test)]
@@ -13,4 +17,4 @@ pub trait StringProcessor {
     fn read_output(&mut self) -> f64;
 }
 
-pub type DefaultStringProcessor = modal_var1::ModalVar1Processor;
+pub type DefaultStringProcessor = modal_var1::ModalVar1Processor<Bilbao>;

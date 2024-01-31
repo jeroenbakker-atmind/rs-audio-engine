@@ -1,6 +1,7 @@
 pub mod bow;
 pub mod damping;
 pub mod eigen_frequencies;
+pub mod friction;
 pub mod hand;
 pub mod instrument;
 pub mod instrument_state;

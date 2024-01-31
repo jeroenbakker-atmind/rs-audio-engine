@@ -2,6 +2,7 @@ use audio_engine_common::digital_sound::{
     benchmark::bench_realtime_factor_single, parameters::NoteParameters,
 };
 use audio_engine_instrument_bowed_string::{
+    friction::bilboa::Bilbao,
     instrument::BowedStringInstrument,
     processor::modal::ModalProcessor,
     processor::{modal_var1::ModalVar1Processor, DefaultStringProcessor, StringProcessor},
@@ -31,8 +32,8 @@ where
 fn main() {
     let realtime_factor = bench_string::<DefaultStringProcessor>();
     println!("Benchmark DefaultStringProcessor: realtime_factor={realtime_factor}");
-    let realtime_factor = bench_string::<ModalProcessor>();
+    let realtime_factor = bench_string::<ModalProcessor<Bilbao>>();
     println!("Benchmark ModalProcessor:         realtime_factor={realtime_factor}");
-    let realtime_factor = bench_string::<ModalVar1Processor>();
+    let realtime_factor = bench_string::<ModalVar1Processor<Bilbao>>();
     println!("Benchmark ModalVar1Processor:     realtime_factor={realtime_factor}");
 }

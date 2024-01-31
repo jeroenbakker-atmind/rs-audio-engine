@@ -1,9 +1,13 @@
-use std::f64::consts::{PI, TAU};
+use std::{
+    f64::consts::{PI, TAU},
+    marker::PhantomData,
+};
 
 use crate::{
     bow::{Bow, BOW_FREE_PARAMETER},
     damping::DampingCoefficient,
     eigen_frequencies::EigenFrequency,
+    friction::Friction,
     processor::StringProcessor,
     string_and_hand::StringAndHand,
 };
@@ -17,18 +21,21 @@ struct Modes {
 }
 
 /// This is an optimized version of ModalProcessor.
-/// 
+///
 /// The optimizations include:
 /// * move constant parts of the matrices to functions
 /// * change scope of variables in inner loop to hint compilers to what can be optimized into registers
 /// * remove scratch space that could be calculated when used.
 /// * inverse the shur comp
 /// * change scope of some inner loop constant expressions
-/// 
+///
 /// In the end the performance increased by 80%
-/// 
+///
 #[derive(Default, Debug, Clone)]
-pub struct ModalVar1Processor {
+pub struct ModalVar1Processor<F>
+where
+    F: Friction,
+{
     string_and_hand: StringAndHand,
     pub bow: Bow,
     pub gain: f64,
@@ -59,9 +66,13 @@ pub struct ModalVar1Processor {
     inv_av2: Vec<f64>,
     inv_ab1: Vec<f64>,
     inv_ab2: Vec<f64>,
+    _friction: PhantomData<F>,
 }
 
-impl StringProcessor for ModalVar1Processor {
+impl<F> StringProcessor for ModalVar1Processor<F>
+where
+    F: Friction + Default,
+{
     fn new(sample_rate: f64, string: &crate::string::String) -> Self {
         let mut processor = Self::default();
         processor.string_and_hand.string = string.clone();
@@ -105,17 +116,17 @@ impl StringProcessor for ModalVar1Processor {
     }
 }
 
-impl ModalVar1Processor {
+impl<F> ModalVar1Processor<F>
+where
+    F: Friction,
+{
     fn sample_next_state(&mut self) -> f64 {
         let mode_len = self.mode_len();
         let zeta1 = (0..mode_len)
             .map(|mode| self.modes_in.modes[mode] * self.states[mode + mode_len])
             .sum::<f64>();
 
-        // Bilbao friction
-        let eta = zeta1 - self.bow.velocity;
-        let d = (2.0 * BOW_FREE_PARAMETER).sqrt() * (-BOW_FREE_PARAMETER * eta * eta + 0.5).exp();
-        let lambda = d * (1.0 - 2.0 * BOW_FREE_PARAMETER * eta.powi(2));
+        let friction = F::calculate_friction(zeta1, &self.bow);
 
         let mut v1 = 0.0;
         let mut v2 = 0.0;
@@ -124,10 +135,10 @@ impl ModalVar1Processor {
         let b12 = self.b12();
         let a12 = self.a12();
 
-        let b2_pressure = 0.5 * sample_duration * self.bow.pressure * (lambda - 2.0 * d);
-        let b2_velocity = sample_duration * self.bow.pressure * d * self.bow.velocity;
-        let v_pressure = 
-            0.5 * sample_duration * self.bow.pressure * lambda;
+        let b2_pressure =
+            0.5 * sample_duration * self.bow.pressure * (friction.lambda - 2.0 * friction.d);
+        let b2_velocity = sample_duration * self.bow.pressure * friction.d * self.bow.velocity;
+        let v_pressure = 0.5 * sample_duration * self.bow.pressure * friction.lambda;
 
         for mode in 0..mode_len {
             let state_0 = self.states[mode];
@@ -187,7 +198,10 @@ impl ModalVar1Processor {
     }
 }
 
-impl ModalVar1Processor {
+impl<F> ModalVar1Processor<F>
+where
+    F: Friction,
+{
     fn initialize(&mut self) {
         self.initialize_eigen_frequencies();
         self.initialize_modes();
