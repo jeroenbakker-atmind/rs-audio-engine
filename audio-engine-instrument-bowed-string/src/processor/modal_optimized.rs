@@ -4,16 +4,11 @@ use std::{
 };
 
 use crate::{
-    bow::{Bow, BOW_FREE_PARAMETER},
-    damping::DampingCoefficient,
-    eigen_frequencies::EigenFrequency,
-    friction::Friction,
-    processor::StringProcessor,
-    string_and_hand::StringAndHand,
+    bow::Bow, damping::DampingCoefficient, eigen_frequencies::EigenFrequency, friction::Friction,
+    processor::StringProcessor, string_and_hand::StringAndHand,
 };
 
 const DEBUG_VALUES: bool = false;
-// friction can become a trait.
 
 #[derive(Default, Debug, Clone)]
 struct Modes {
@@ -32,7 +27,7 @@ struct Modes {
 /// In the end the performance increased by 80%
 ///
 #[derive(Default, Debug, Clone)]
-pub struct ModalVar1Processor<F>
+pub struct OptimizedModalProcessor<F>
 where
     F: Friction,
 {
@@ -69,7 +64,7 @@ where
     _friction: PhantomData<F>,
 }
 
-impl<F> StringProcessor for ModalVar1Processor<F>
+impl<F> StringProcessor for OptimizedModalProcessor<F>
 where
     F: Friction + Default,
 {
@@ -116,7 +111,7 @@ where
     }
 }
 
-impl<F> ModalVar1Processor<F>
+impl<F> OptimizedModalProcessor<F>
 where
     F: Friction,
 {
@@ -198,7 +193,7 @@ where
     }
 }
 
-impl<F> ModalVar1Processor<F>
+impl<F> OptimizedModalProcessor<F>
 where
     F: Friction,
 {
@@ -281,7 +276,6 @@ where
             .map(|shur_comp| 1.0 / shur_comp)
             .collect::<Vec<f64>>();
 
-        // Should still be checked with reference implementation.
         self.b21 = self
             .eigen_frequencies
             .iter()

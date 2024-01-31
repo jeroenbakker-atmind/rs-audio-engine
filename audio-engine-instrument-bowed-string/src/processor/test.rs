@@ -1,6 +1,6 @@
-use crate::{
-    processor::DefaultStringProcessor, processor::StringProcessor, string::CELLO_STRING_G2,
-};
+use crate::{processor::DefaultStringProcessor, string::CELLO_STRING_G2};
+
+use super::StringProcessor;
 
 #[test]
 fn string_processor() {
@@ -19,10 +19,7 @@ mod validation {
     //! Validate the first 50 samples to be "same" as the output from mathlab.
     use crate::{
         friction::bilboa::Bilbao,
-        processor::{
-            modal::ModalProcessor, modal_var1::ModalVar1Processor, DefaultStringProcessor,
-            StringProcessor,
-        },
+        processor::{modal::ModalProcessor, modal_optimized::OptimizedModalProcessor, StringProcessor},
         string::CELLO_STRING_G2,
     };
 
@@ -105,7 +102,7 @@ mod validation {
     }
 
     #[test]
-    fn validate_modal_var1_processor() {
-        validate::<ModalVar1Processor<Bilbao>>();
+    fn validate_optimized_modal_processor() {
+        validate::<OptimizedModalProcessor<Bilbao>>();
     }
 }

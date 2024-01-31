@@ -5,7 +5,7 @@ use audio_engine_instrument_bowed_string::{
     friction::bilboa::Bilbao,
     instrument::BowedStringInstrument,
     processor::modal::ModalProcessor,
-    processor::{modal_var1::ModalVar1Processor, DefaultStringProcessor, StringProcessor},
+    processor::{modal_optimized::OptimizedModalProcessor, DefaultStringProcessor, StringProcessor},
     string::CELLO_STRING_G2,
 };
 use audio_engine_notes::{ChromaticNote, ChromaticTone};
@@ -31,9 +31,9 @@ where
 
 fn main() {
     let realtime_factor = bench_string::<DefaultStringProcessor>();
-    println!("Benchmark DefaultStringProcessor: realtime_factor={realtime_factor}");
+    println!("Benchmark DefaultStringProcessor:  realtime_factor={realtime_factor}");
     let realtime_factor = bench_string::<ModalProcessor<Bilbao>>();
-    println!("Benchmark ModalProcessor:         realtime_factor={realtime_factor}");
-    let realtime_factor = bench_string::<ModalVar1Processor<Bilbao>>();
-    println!("Benchmark ModalVar1Processor:     realtime_factor={realtime_factor}");
+    println!("Benchmark ModalProcessor:          realtime_factor={realtime_factor}");
+    let realtime_factor = bench_string::<OptimizedModalProcessor<Bilbao>>();
+    println!("Benchmark OptimizedModalProcessor: realtime_factor={realtime_factor}");
 }

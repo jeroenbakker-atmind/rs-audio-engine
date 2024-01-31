@@ -4,16 +4,11 @@ use std::{
 };
 
 use crate::{
-    bow::{Bow, BOW_FREE_PARAMETER},
-    damping::DampingCoefficient,
-    eigen_frequencies::EigenFrequency,
-    friction::Friction,
-    processor::StringProcessor,
-    string_and_hand::StringAndHand,
+    bow::Bow, damping::DampingCoefficient, eigen_frequencies::EigenFrequency, friction::Friction,
+    processor::StringProcessor, string_and_hand::StringAndHand,
 };
 
 const DEBUG_VALUES: bool = false;
-// friction can become a trait.
 
 #[derive(Default, Debug, Clone)]
 struct Modes {
@@ -41,15 +36,15 @@ where
 
     states: Vec<f64>,
 
-    a11: f64,
-    a12: f64,
+    a11: Vec<f64>,
+    a12: Vec<f64>,
     a21: Vec<f64>,
     a22: Vec<f64>,
 
     shur_comp: Vec<f64>,
 
-    b11: f64,
-    b12: f64,
+    b11: Vec<f64>,
+    b12: Vec<f64>,
     b21: Vec<f64>,
     b22: Vec<f64>,
 
@@ -127,7 +122,8 @@ where
 
         for mode in 0..mode_len {
             let zeta2 = self.modes_in.modes[mode] * zeta1;
-            let b1 = self.b11 * self.states[mode] + self.b12 * self.states[mode + mode_len];
+            let b1 =
+                self.b11[mode] * self.states[mode] + self.b12[mode] * self.states[mode + mode_len];
             let b2 = self.b21[mode] * self.states[mode]
                 + self.b22[mode] * self.states[mode + mode_len]
                 + zeta2
@@ -148,11 +144,11 @@ where
                 * friction.lambda
                 * self.modes_in.modes[mode];
             self.inv_av2[mode] = (1.0 / self.shur_comp[mode]) * v;
-            self.inv_av1[mode] = -self.a11 * self.a12 * self.inv_av2[mode];
-            let y2 = self.a11 * b1;
+            self.inv_av1[mode] = -self.a11[mode] * self.a12[mode] * self.inv_av2[mode];
+            let y2 = self.a11[mode] * b1;
             let z2 = b2 - self.a21[mode] * y2;
             self.inv_ab2[mode] = (1.0 / self.shur_comp[mode]) * z2;
-            self.inv_ab1[mode] = y2 - self.a11 * self.a12 * self.inv_ab2[mode];
+            self.inv_ab1[mode] = y2 - self.a11[mode] * self.a12[mode] * self.inv_ab2[mode];
 
             v1 += self.modes_in.modes[mode] * self.inv_av2[mode];
             v2 += self.modes_in.modes[mode] * self.inv_ab2[mode];
@@ -244,8 +240,8 @@ where
     fn initialize_matrices(&mut self) {
         let mode_len = self.mode_len();
 
-        self.a11 = 1.0;
-        self.a12 = -0.5 * self.sample_duration();
+        self.a11 = vec![1.0; mode_len];
+        self.a12 = vec![-0.5 * self.sample_duration(); mode_len];
         self.a21 = self
             .eigen_frequencies
             .iter()
@@ -261,12 +257,12 @@ where
 
         // Optimize 1 - a21 *-0.5k
         self.shur_comp = (0..mode_len)
-            .map(|mode| self.a22[mode] - self.a21[mode] * self.a11 * self.a12)
+            .map(|mode| self.a22[mode] - self.a21[mode] * self.a11[mode] * self.a12[mode])
             .collect::<Vec<f64>>();
 
         // Should still be checked with reference implementation.
-        self.b11 = 1.0;
-        self.b12 = 0.5 * self.sample_duration();
+        self.b11 = vec![1.0; mode_len];
+        self.b12 = vec![0.5 * self.sample_duration(); mode_len];
         self.b21 = self
             .eigen_frequencies
             .iter()
