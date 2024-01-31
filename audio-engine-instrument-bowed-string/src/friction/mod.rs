@@ -3,6 +3,7 @@ use crate::bow::Bow;
 pub mod bilboa;
 pub mod desvages;
 
+#[derive(Debug)]
 pub struct FrictionData {
     pub d: f64,
     pub lambda: f64,

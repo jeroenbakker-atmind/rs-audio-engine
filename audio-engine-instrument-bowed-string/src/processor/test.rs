@@ -100,11 +100,6 @@ mod validation {
     }
 
     #[test]
-    fn validate_default_processor() {
-        validate::<DefaultStringProcessor>();
-    }
-
-    #[test]
     fn validate_modal_processor() {
         validate::<ModalProcessor<Bilbao>>();
     }

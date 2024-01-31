@@ -17,4 +17,4 @@ pub trait StringProcessor {
     fn read_output(&mut self) -> f64;
 }
 
-pub type DefaultStringProcessor = modal_var1::ModalVar1Processor<Bilbao>;
+pub type DefaultStringProcessor = modal_var1::ModalVar1Processor<Desvages>;
