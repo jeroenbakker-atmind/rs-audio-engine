@@ -9,6 +9,7 @@ use crate::{
 };
 
 const DEBUG_VALUES: bool = false;
+const USE_EXCIT_AS_OUTPUT: bool = false;
 
 #[derive(Default, Debug, Clone)]
 struct Modes {
@@ -40,8 +41,6 @@ where
     eigen_frequencies: Vec<f64>,
     damping_profile: Vec<f64>,
 
-    excit_position: f64,
-
     modes_in: Modes,
     outputs: Vec<Modes>,
 
@@ -72,7 +71,6 @@ where
         let mut processor = Self::default();
         processor.string_and_hand.string = string.clone();
         // TODO: This should be string specific. Not sure why....
-        processor.excit_position = processor.string_and_hand.excit_position();
         processor.sample_rate = sample_rate;
         processor.gain = 1.0;
         processor.oversampling = 1;
@@ -227,18 +225,24 @@ where
             (2.0 / string_and_hand.length()).sqrt()
                 * (mode as f64 * PI * position / string_and_hand.length()).sin()
         }
+
+        let excit_position = self.string_and_hand.excit_position();
         self.modes_in.modes = (1..=mode_len)
-            .map(|mode| calc_mode(&self.string_and_hand, self.excit_position, mode))
+            .map(|mode| calc_mode(&self.string_and_hand, excit_position, mode))
             .collect::<Vec<f64>>();
 
-        let num_outputs = 2;
-        self.outputs.resize(num_outputs, Modes::default());
-        for (index, output) in self.outputs.iter_mut().enumerate() {
-            let position = self.string_and_hand.output_position(index);
-            // TODO: could this be optimized by resizing and mutating inline?
-            output.modes = (1..=mode_len)
-                .map(|mode| calc_mode(&self.string_and_hand, position, mode))
-                .collect::<Vec<f64>>();
+        if USE_EXCIT_AS_OUTPUT {
+            self.outputs = vec![self.modes_in.clone()];
+        } else {
+            let num_outputs = 2;
+            self.outputs.resize(num_outputs, Modes::default());
+            for (index, output) in self.outputs.iter_mut().enumerate() {
+                let position = self.string_and_hand.output_position(index);
+                // TODO: could this be optimized by resizing and mutating inline?
+                output.modes = (1..=mode_len)
+                    .map(|mode| calc_mode(&self.string_and_hand, position, mode))
+                    .collect::<Vec<f64>>();
+            }
         }
     }
 
