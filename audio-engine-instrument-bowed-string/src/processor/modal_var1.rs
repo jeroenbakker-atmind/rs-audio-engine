@@ -110,13 +110,15 @@ impl ModalVar1Processor {
         let mut v2 = 0.0;
 
         let sample_duration = self.sample_duration();
+        let b12 = self.b12();
+        let a12 = self.a12();
 
         for mode in 0..mode_len {
             let state_0 = self.states[mode];
             let state_1 = self.states[mode + mode_len];
             let mode_in = self.modes_in.modes[mode];
             let zeta2 = mode_in * zeta1;
-            let b1 = self.b11() * state_0 + self.b12() * state_1;
+            let b1 = self.b11() * state_0 + b12 * state_1;
             let b2 = self.b21[mode] * state_0
                 + self.b22[mode] * state_1
                 + zeta2 * 0.5 * sample_duration * self.bow.pressure * (lambda - 2.0 * d)
@@ -129,7 +131,7 @@ impl ModalVar1Processor {
             let y2 = self.a11() * b1;
             let z2 = b2 - self.a21[mode] * y2;
             self.inv_ab2[mode] = inv_shur * z2;
-            self.inv_ab1[mode] = y2 - self.a11() * self.a12() * self.inv_ab2[mode];
+            self.inv_ab1[mode] = y2 - self.a11() * a12 * self.inv_ab2[mode];
 
             v1 += mode_in * self.inv_av2[mode];
             v2 += mode_in * self.inv_ab2[mode];
@@ -137,7 +139,7 @@ impl ModalVar1Processor {
         let coeff = 1.0 / (1.0 + v1);
 
         for mode in 0..mode_len {
-            let inv_av1 = -self.a11() * self.a12() * self.inv_av2[mode];
+            let inv_av1 = -self.a11() * a12 * self.inv_av2[mode];
             self.states[mode] = self.inv_ab1[mode] - coeff * inv_av1 * v2;
             self.states[mode + mode_len] = self.inv_ab2[mode] - coeff * self.inv_av2[mode] * v2;
         }
