@@ -1,3 +1,4 @@
+//! Envelope in the shape of a trapezoid.
 use crate::{level::Level, note_time::NoteTime};
 
 use super::Envelope;
