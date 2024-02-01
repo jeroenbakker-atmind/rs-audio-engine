@@ -1,3 +1,10 @@
+//! RingBuffer
+//! 
+//! Rust has a ring buffer (#std::collections::VecDeque). Our implementation adds
+//! methods to that are specific to audio processing.
+//! 
+//! When pushing a new value to the buffer an operation can be specified how the
+//! value is applied to the existing value in the buffer.
 use std::{collections::VecDeque, ops::AddAssign};
 
 #[derive(Debug, Clone)]
@@ -19,9 +26,12 @@ where
     }
 }
 
+/// Operation to perform when pushing a new value to a ring buffer.
 #[derive(Copy, Clone)]
 pub enum PushOperation {
+    /// Value will overwrite the current value in the buffer.
     Replace,
+    /// Value will be added to the current value in the buffer. 
     Add,
 }
 
