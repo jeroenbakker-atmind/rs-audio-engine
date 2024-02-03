@@ -18,12 +18,14 @@ members = [
     "audio-engine-sequencer",
     "audio-engine-tracker",
     "audio-engine-tracker-songs",
+    "audio-engine-midinous",
+    "audio-engine-midinous-songs",
     "audio-engine-player",
 
     # "audio-engine-export-video",
 
     "tools/wav2rs",
-    "tools/sample2fm", "tools/tuner",
+    "tools/sample2fm", "tools/tuner", 
 ]
 
 resolver = "2"

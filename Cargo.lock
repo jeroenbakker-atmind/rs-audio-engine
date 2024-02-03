@@ -185,6 +185,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "audio-engine-midinous"
+version = "0.1.0"
+dependencies = [
+ "audio-engine-common",
+ "audio-engine-instruments",
+ "audio-engine-notes",
+ "audio-engine-player",
+ "audio-engine-sequencer",
+]
+
+[[package]]
 name = "audio-engine-notes"
 version = "0.1.0"
 
