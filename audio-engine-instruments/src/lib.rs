@@ -101,3 +101,9 @@ impl InstrumentLibrary {
         }
     }
 }
+
+impl Into<Instrument> for InstrumentLibrary {
+    fn into(self) -> Instrument {
+        self.create()
+    }
+}

@@ -7,8 +7,12 @@
 //! but kept to its core. There is no GUI or interactive elements.
 //! Please sponsor the developer of midinous!
 
+pub mod builder;
 pub mod link;
+pub mod link_index;
+pub mod link_selection;
 pub mod node;
+pub mod node_index;
+pub mod player;
 pub mod song;
 pub mod traveler;
-pub mod player;

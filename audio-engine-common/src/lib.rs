@@ -5,6 +5,7 @@ pub mod duration;
 pub mod envelope;
 pub mod id;
 pub mod level;
+pub mod note_duration;
 pub mod note_time;
 pub mod phase_time;
 pub mod song_time;
