@@ -82,7 +82,11 @@ impl SongBuilder {
         match self.last_added_node_index.clone() {
             None => {}
             Some(last_node_index) => {
-                self.link(LinkBuilder::between(last_node_index, new_node_index).build());
+                self.link(
+                    *LinkBuilder::new()
+                        .from_node(last_node_index)
+                        .to_node(new_node_index),
+                );
             }
         }
         self.node(node);
@@ -104,6 +108,7 @@ impl SongBuilder {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct NodeBuilder {
     node: Node,
 }
@@ -180,6 +185,7 @@ impl Builder for NodeBuilder {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct LinkBuilder {
     link: Link,
 }
@@ -202,20 +208,6 @@ impl Builder for LinkBuilder {
 }
 
 impl LinkBuilder {
-    pub fn between<From, To>(from: From, to: To) -> LinkBuilder
-    where
-        From: Into<NodeIndex> + Sized,
-        To: Into<NodeIndex> + Sized,
-    {
-        LinkBuilder {
-            link: Link {
-                from_node: from.into(),
-                to_node: to.into(),
-                weight: 1.0,
-            },
-        }
-    }
-
     pub fn from_node<N>(&mut self, node_index: N) -> &mut Self
     where
         N: Into<NodeIndex>,
@@ -228,6 +220,11 @@ impl LinkBuilder {
         N: Into<NodeIndex>,
     {
         self.link.to_node = node_index.into();
+        self
+    }
+
+    pub fn weight(&mut self, weight: f64) -> &mut Self {
+        self.link.weight = weight;
         self
     }
 
@@ -269,7 +266,7 @@ mod test {
             .connect_to_last(NodeBuilder::new())
             .connect_to_last(NodeBuilder::new())
             .connect_to_last(NodeBuilder::new())
-            .link(LinkBuilder::between(3, 0).build())
+            .link(*LinkBuilder::new().from_node(3).to_node(0))
             .build();
     }
 }
