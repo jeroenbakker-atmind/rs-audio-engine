@@ -33,10 +33,14 @@ impl Player {
 
 impl Player {
     pub fn sample(&mut self, buffer: &mut [f32]) {
-        if self.travelers.is_empty() {
-            self.first_sample();
-        }
+        let mut first_sample = self.travelers.is_empty();
         for sample_index in 0..buffer.len() {
+            if first_sample {
+                self.first_sample();
+                first_sample = false;
+            } else {
+                self.move_travelers();
+            }
             buffer[sample_index] = self.read_sample();
         }
     }
@@ -55,6 +59,13 @@ impl Player {
         }
     }
 
+    fn move_travelers(&mut self) {
+        // for traveler.
+        // move traveler among links.
+        // trigger nodes (and remove traveler)
+        // add new traveler to player.
+    }
+
     fn read_sample(&mut self) -> f32 {
         let mut result = 0.0;
         for (node, node_state) in self.song.nodes.iter().zip(&mut self.node_states) {
@@ -71,6 +82,8 @@ fn trigger_node(
     new_travelers: &mut Vec<Traveler>,
 ) {
     // init node for playing
+    node_state.node_time = 0.0;
+    node_state.is_active = true;
     // create new travelers
 }
 
