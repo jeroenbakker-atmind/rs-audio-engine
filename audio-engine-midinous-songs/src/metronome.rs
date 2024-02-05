@@ -10,25 +10,25 @@ pub fn create_metronome_song() -> Song {
         .instrument(InstrumentLibrary::PianoPiano)
         .entry_point(
             *NodeBuilder::new()
-                .location(-2.0, 2.0)
-                .note_pitch(ChromaticNote::new(ChromaticTone::G, 4).pitch())
+                .location(0.0, 0.0)
+                .note_pitch(ChromaticNote::new(ChromaticTone::E, 4).pitch())
                 .note_level(1.0),
         )
         .connect_to_last(
             *NodeBuilder::new()
-                .location(2.0, 2.0)
+                .location(1.0, 0.0)
                 .note_pitch(ChromaticNote::new(ChromaticTone::C, 4).pitch())
                 .note_level(0.6),
         )
         .connect_to_last(
             *NodeBuilder::new()
-                .location(2.0, -2.0)
+                .location(1.0, 1.0)
                 .note_pitch(ChromaticNote::new(ChromaticTone::C, 4).pitch())
-                .note_level(0.6),
+                .note_level(0.8),
         )
         .connect_to_last(
             *NodeBuilder::new()
-                .location(-2.0, -2.0)
+                .location(0.0, 1.0)
                 .note_pitch(ChromaticNote::new(ChromaticTone::C, 4).pitch())
                 .note_level(0.6),
         )

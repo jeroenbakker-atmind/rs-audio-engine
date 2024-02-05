@@ -4,6 +4,7 @@ pub trait Builder {
     fn build(&self) -> Self::Inner;
 }
 
+// TODO: move to tests folder as they are integration tests.
 #[cfg(test)]
 mod test {
 

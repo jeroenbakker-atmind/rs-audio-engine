@@ -4,6 +4,6 @@ use crate::{link_path::LinkPath, node_index::NodeIndex};
 pub struct Link {
     pub from_node: NodeIndex,
     pub to_node: NodeIndex,
-    pub weight: f64,
+    pub weight: f32,
     pub path: LinkPath,
 }

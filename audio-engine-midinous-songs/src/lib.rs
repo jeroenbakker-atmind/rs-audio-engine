@@ -3,14 +3,14 @@ use metronome::create_metronome_song;
 
 mod metronome;
 
-pub enum Songs {
+pub enum SongLibrary {
     Metronome,
 }
 
-impl Songs {
+impl SongLibrary {
     pub fn create(&self) -> Song {
         match self {
-            Songs::Metronome => create_metronome_song(),
+            SongLibrary::Metronome => create_metronome_song(),
         }
     }
 }

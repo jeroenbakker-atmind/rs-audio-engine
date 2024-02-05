@@ -202,6 +202,7 @@ dependencies = [
  "audio-engine-instruments",
  "audio-engine-midinous",
  "audio-engine-notes",
+ "cpal",
 ]
 
 [[package]]

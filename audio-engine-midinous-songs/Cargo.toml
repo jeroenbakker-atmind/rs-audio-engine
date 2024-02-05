@@ -9,3 +9,5 @@ edition = "2021"
 audio-engine-midinous = {path="../audio-engine-midinous"}
 audio-engine-notes = {path="../audio-engine-notes"}
 audio-engine-instruments = {path="../audio-engine-instruments"}
+
+cpal="*"

@@ -39,7 +39,7 @@ impl LinkBuilder {
         self
     }
 
-    pub fn weight(&mut self, weight: f64) -> &mut Self {
+    pub fn weight(&mut self, weight: f32) -> &mut Self {
         self.link.weight = weight;
         self
     }
