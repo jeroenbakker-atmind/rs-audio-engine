@@ -7,6 +7,7 @@ use audio_engine_notes::{ChromaticNote, ChromaticTone};
 
 pub fn create_metronome_song() -> Song {
     SongBuilder::new()
+        .beats_per_minute(104.0)
         .instrument(InstrumentLibrary::PianoPiano)
         .entry_point(
             *NodeBuilder::new()

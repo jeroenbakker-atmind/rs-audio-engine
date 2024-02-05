@@ -1,3 +1,4 @@
+use audio_engine_common::beats_per_minute::BeatsPerMinute;
 use audio_engine_sequencer::{instrument::Instrument, instrument_index::InstrumentIndex};
 
 use crate::{link::Link, link_index::LinkIndex, node::Node, node_index::NodeIndex};
@@ -8,6 +9,7 @@ pub struct Song {
     pub links: Vec<Link>,
     pub start_nodes: Vec<NodeIndex>,
     pub instruments: Vec<Instrument>,
+    pub beats_per_minute: BeatsPerMinute,
 }
 
 impl Song {

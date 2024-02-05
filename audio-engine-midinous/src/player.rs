@@ -1,11 +1,10 @@
 use audio_engine_common::{
-    beats_per_minute::BeatsPerMinute,
     digital_sound::{parameters::NoteParameters, sound::Sound},
     song_time::SongTime,
 };
 
 use crate::{
-    link_path::LinkPath, link_selection::LinkSelection, link_state::LinkState, node::Node,
+    link_path::LinkPath, link_selection::LinkSelection, link_state::LinkState,
     node_index::NodeIndex, node_state::NodeState, song::Song, traveler::Traveler,
 };
 
@@ -15,7 +14,6 @@ pub struct Player {
     link_states: Vec<LinkState>,
     travelers: Vec<Traveler>,
     sample_rate: f32,
-    beats_per_minute: BeatsPerMinute,
 }
 
 impl Player {
@@ -28,7 +26,6 @@ impl Player {
             link_states,
             travelers: Vec::with_capacity(32),
             sample_rate,
-            beats_per_minute: 120.0,
         }
     }
 
@@ -95,7 +92,7 @@ impl Player {
         self.trigger_nodes(&triggers);
     }
     fn move_travelers(&mut self) {
-        let beats_per_second = self.beats_per_minute / 60.0;
+        let beats_per_second = self.song.beats_per_minute / 60.0;
         let beats_per_sample = beats_per_second / self.sample_rate;
         self.travelers
             .iter_mut()

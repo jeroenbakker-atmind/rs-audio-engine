@@ -1,6 +1,10 @@
+use audio_engine_common::beats_per_minute::BeatsPerMinute;
 use audio_engine_sequencer::instrument::Instrument;
 
-use crate::{builder::Builder, builder_link::LinkBuilder, link::Link, node::Node, node_index::NodeIndex, song::Song};
+use crate::{
+    builder::Builder, builder_link::LinkBuilder, link::Link, node::Node, node_index::NodeIndex,
+    song::Song,
+};
 
 #[derive(Default)]
 pub struct SongBuilder {
@@ -83,6 +87,13 @@ impl SongBuilder {
         L: Into<Link>,
     {
         self.song.links.push(link.into());
+        self
+    }
+}
+
+impl SongBuilder {
+    pub fn beats_per_minute(&mut self, beats_per_minute: BeatsPerMinute) -> &mut Self {
+        self.song.beats_per_minute = beats_per_minute;
         self
     }
 }
