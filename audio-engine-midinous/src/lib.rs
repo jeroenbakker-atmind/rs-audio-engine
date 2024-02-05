@@ -21,4 +21,5 @@ pub mod node_index;
 pub mod node_state;
 pub mod player;
 pub mod song;
+pub mod song_state;
 pub mod traveler;

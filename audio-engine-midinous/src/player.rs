@@ -4,27 +4,27 @@ use audio_engine_common::{
 };
 
 use crate::{
-    link_path::LinkPath, link_selection::LinkSelection, link_state::LinkState,
-    node_index::NodeIndex, node_state::NodeState, song::Song, traveler::Traveler,
+    link_index::LinkIndex, link_path::LinkPath, link_selection::LinkSelection,
+    link_state::LinkState, node_index::NodeIndex, node_state::NodeState, song::Song,
+    song_state::SongState, traveler::Traveler,
 };
 
 pub struct Player {
     song: Song,
-    node_states: Vec<NodeState>,
-    link_states: Vec<LinkState>,
-    travelers: Vec<Traveler>,
+    song_state: SongState,
     sample_rate: f32,
 }
 
 impl Player {
     pub fn new(song: Song, sample_rate: f32) -> Player {
-        let node_states = Player::create_node_states(&song);
-        let link_states = Player::create_link_states(&song);
+        let song_state = SongState {
+            node_states: Player::create_node_states(&song),
+            link_states: Player::create_link_states(&song),
+            travelers: Vec::new(),
+        };
         Player {
             song,
-            node_states,
-            link_states,
-            travelers: Vec::with_capacity(32),
+            song_state,
             sample_rate,
         }
     }
@@ -57,7 +57,7 @@ impl Player {
                     (dx * dx + dy * dy).sqrt()
                 }
             };
-            result.push(LinkState { length: length })
+            result.push(LinkState { length })
         }
         result
     }
@@ -65,10 +65,11 @@ impl Player {
 
 impl Player {
     pub fn sample(&mut self, buffer: &mut [f32]) {
-        let mut first_sample = self.travelers.is_empty();
+        // This will also restart the song when all travelers are depleted.
+        let mut first_sample = self.song_state.travelers.is_empty();
         for sample_index in 0..buffer.len() {
             if first_sample {
-                self.first_sample();
+                self.init_travelers();
                 first_sample = false;
             } else {
                 self.update_travelers();
@@ -77,13 +78,13 @@ impl Player {
         }
     }
 
-    fn first_sample(&mut self) {
+    fn init_travelers(&mut self) {
         let trigger = Traveler::default();
         let mut new_travelers = Vec::new();
         for node_index in self.song.start_nodes.clone() {
             self.trigger_node(node_index, &trigger, &mut new_travelers);
         }
-        self.travelers.append(&mut new_travelers);
+        self.song_state.travelers.append(&mut new_travelers);
     }
 
     fn update_travelers(&mut self) {
@@ -91,31 +92,35 @@ impl Player {
         let triggers = self.extract_triggers();
         self.trigger_nodes(&triggers);
     }
+
+    /// Move travelers along the links for the period of a single sample.
     fn move_travelers(&mut self) {
         let beats_per_second = self.song.beats_per_minute / 60.0;
         let beats_per_sample = beats_per_second / self.sample_rate;
-        self.travelers
+        self.song_state
+            .travelers
             .iter_mut()
             .for_each(|traveler| traveler.distance_traveled += beats_per_sample);
     }
+
     fn extract_triggers(&mut self) -> Vec<Traveler> {
         let triggering_indices = self
+            .song_state
             .travelers
             .iter()
             .enumerate()
             .filter(|(_index, traveler)| {
-                let link_distance = self.song.link(traveler.link).weight
-                    * self.link_states[traveler.link.as_usize()].length;
+                let link_distance = self.link_distance(traveler.link);
                 traveler.distance_traveled > link_distance
             })
             .map(|(index, _traveler)| index)
             .collect::<Vec<usize>>();
         let triggers = triggering_indices
             .iter()
-            .map(|index| self.travelers[*index])
+            .map(|index| self.song_state.travelers[*index])
             .collect::<Vec<Traveler>>();
         for index in (0..triggering_indices.len()).rev() {
-            self.travelers.remove(triggering_indices[index]);
+            self.song_state.travelers.remove(triggering_indices[index]);
         }
         triggers
     }
@@ -126,7 +131,7 @@ impl Player {
             let node_index = self.song.link(trigger.link).to_node;
             self.trigger_node(node_index, trigger, &mut new_travelers);
         }
-        self.travelers.append(&mut new_travelers);
+        self.song_state.travelers.append(&mut new_travelers);
     }
 
     fn trigger_node(
@@ -135,7 +140,7 @@ impl Player {
         trigger: &Traveler,
         new_travelers: &mut Vec<Traveler>,
     ) {
-        let node_state = &mut self.node_states[node_index.as_usize()];
+        let node_state = self.song_state.node_mut(node_index);
         let node = self.song.node(node_index);
         // init node for playing
         node_state.node_time = 0.0;
@@ -144,8 +149,7 @@ impl Player {
         node_state.note_state = instrument.init_sound_state();
         node_state.note_pitch = node.note_pitch;
         // TODO copy carrier from trigger.
-        let mut cascade_travelers = Vec::new();
-        // create new travelers
+
         let outgoing_links = match node.link_selection {
             LinkSelection::Sequential => {
                 let next_link = node_state.next_sequential_link;
@@ -160,21 +164,22 @@ impl Player {
             }
         };
 
+        let mut cascade_triggers = Vec::new();
         for link_index in outgoing_links {
-            let link_weight =
-                self.link_states[link_index.as_usize()].length * self.song.link(link_index).weight;
             let traveler = Traveler {
                 link: link_index,
                 distance_traveled: 0.0,
             };
-            if link_weight == 0.0 {
-                cascade_travelers.push(traveler);
+
+            let link_distance = self.link_distance(link_index);
+            if link_distance == 0.0 {
+                cascade_triggers.push(traveler);
             } else {
                 new_travelers.push(traveler);
             }
         }
 
-        for trigger in cascade_travelers {
+        for trigger in cascade_triggers {
             let link = self.song.link(trigger.link);
             self.trigger_node(link.to_node, &trigger, new_travelers)
         }
@@ -183,9 +188,14 @@ impl Player {
     fn read_sample(&mut self) -> f32 {
         let mut result = 0.0;
         // TODO: split in two loops?
-        for (node, node_state) in self.song.nodes.iter().zip(&mut self.node_states) {
-            node_state.node_time += 1.0 / self.sample_rate;
-            // TODO: check if node is finished.
+        for (node, node_state) in self.song.nodes.iter().zip(&mut self.song_state.node_states) {
+            let prev_node_time = node_state.node_time;
+            let new_node_time = prev_node_time + 1.0 / self.sample_rate;
+            node_state.node_time = new_node_time;
+            if new_node_time > self.song.node_duration(node) {
+                node_state.is_active = false;
+            }
+            // TODO: check for repeats.
 
             let instrument = self.song.instrument(node.instrument);
             let parameters = NoteParameters {
@@ -199,6 +209,13 @@ impl Player {
             result += sample;
         }
         result
+    }
+
+    fn link_distance<L>(&self, link_index: L) -> f32
+    where
+        L: Into<LinkIndex> + Copy,
+    {
+        self.song.link(link_index).weight * self.song_state.link(link_index).length
     }
 }
 

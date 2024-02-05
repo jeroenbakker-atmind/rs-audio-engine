@@ -1,4 +1,4 @@
-use audio_engine_common::beats_per_minute::BeatsPerMinute;
+use audio_engine_common::{beats_per_minute::BeatsPerMinute, note_time::NoteTime};
 use audio_engine_sequencer::{instrument::Instrument, instrument_index::InstrumentIndex};
 
 use crate::{link::Link, link_index::LinkIndex, node::Node, node_index::NodeIndex};
@@ -13,15 +13,31 @@ pub struct Song {
 }
 
 impl Song {
-    pub fn node(&self, index: NodeIndex) -> &Node {
-        &self.nodes[index.as_usize()]
+    pub fn node<N>(&self, index: N) -> &Node
+    where
+        N: Into<NodeIndex> + Sized,
+    {
+        &self.nodes[index.into().as_usize()]
     }
 
-    pub fn link(&self, index: LinkIndex) -> &Link {
-        &self.links[index.as_usize()]
+    pub fn link<L>(&self, index: L) -> &Link
+    where
+        L: Into<LinkIndex> + Sized,
+    {
+        &self.links[index.into().as_usize()]
     }
 
-    pub fn instrument(&self, index: InstrumentIndex) -> &Instrument {
-        &self.instruments[index.as_usize()]
+    pub fn instrument<I>(&self, index: I) -> &Instrument
+    where
+        I: Into<InstrumentIndex>,
+    {
+        &self.instruments[index.into().as_usize()]
+    }
+}
+
+impl Song {
+    pub fn node_duration(&self, node: &Node) -> NoteTime {
+        // TODO: add measure to song.
+        10.0
     }
 }
