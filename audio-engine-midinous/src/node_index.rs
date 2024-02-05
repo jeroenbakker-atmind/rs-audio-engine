@@ -3,8 +3,8 @@ pub struct NodeIndex {
     index: usize,
 }
 impl NodeIndex {
-    pub fn as_usize(&self)->usize {
-self.index
+    pub fn as_usize(&self) -> usize {
+        self.index
     }
 }
 
@@ -13,4 +13,3 @@ impl Into<NodeIndex> for usize {
         NodeIndex { index: self }
     }
 }
-

@@ -1,31 +1,58 @@
 use crate::{
-    link_index::LinkIndex, node::Node, node_state::NodeState, song::Song, traveler::Traveler,
+    link_index::LinkIndex, link_path::LinkPath, link_selection::LinkSelection,
+    link_state::LinkState, node::Node, node_state::NodeState, song::Song, traveler::Traveler,
 };
 
 pub struct Player {
     song: Song,
-    outgoing_link_lookup: Vec<Vec<LinkIndex>>,
     node_states: Vec<NodeState>,
+    link_states: Vec<LinkState>,
     travelers: Vec<Traveler>,
+    sample_rate: f32,
 }
 
 impl Player {
-    pub fn new(song: Song) -> Player {
-        let num_nodes = song.nodes.len();
-        let outgoing_link_lookup = Player::create_link_lookup(&song);
+    pub fn new(song: Song, sample_rate: f32) -> Player {
+        let node_states = Player::create_node_states(&song);
+        let link_states = Player::create_link_states(&song);
         Player {
             song,
-            outgoing_link_lookup,
-            node_states: vec![NodeState::default(); num_nodes],
+            node_states,
+            link_states,
             travelers: Vec::with_capacity(32),
+            sample_rate,
         }
     }
 
-    fn create_link_lookup(song: &Song) -> Vec<Vec<LinkIndex>> {
+    fn create_node_states(song: &Song) -> Vec<NodeState> {
         let mut result = Vec::new();
-        result.resize(song.nodes.len(), Vec::new());
+        result.resize(song.nodes.len(), NodeState::default());
         for (link_index, link) in song.links.iter().enumerate() {
-            result[link.from_node.as_usize()].push(link_index.into());
+            result[link.from_node.as_usize()]
+                .outgoing_links
+                .push(link_index.into());
+        }
+        result
+    }
+
+    fn create_link_states(song: &Song) -> Vec<LinkState> {
+        let mut result = Vec::new();
+        for link in &song.links {
+            let from_node = song.node(link.from_node);
+            let to_node = song.node(link.to_node);
+            let length = match link.path {
+                LinkPath::Grid => {
+                    let dx = from_node.grid_location.0 - to_node.grid_location.0;
+                    let dy = from_node.grid_location.1 - to_node.grid_location.1;
+                    dx.abs() + dy.abs()
+                }
+                LinkPath::Straight => {
+                    let dx = from_node.grid_location.0 - to_node.grid_location.0;
+                    let dy = from_node.grid_location.1 - to_node.grid_location.1;
+                    (dx * dx + dy * dy).sqrt()
+                }
+            };
+            result.push(LinkState { length: length })
         }
         result
     }
@@ -56,6 +83,7 @@ impl Player {
                 &trigger,
                 &mut new_travelers,
             );
+            // Check for cascading travelers (link weight*distance == 0.0)
         }
     }
 
@@ -85,10 +113,28 @@ fn trigger_node(
     node_state.node_time = 0.0;
     node_state.is_active = true;
     // create new travelers
+    match node.link_selection {
+        LinkSelection::Sequential => {
+            todo!()
+        }
+        LinkSelection::All => {
+            for link in &node_state.outgoing_links {
+                // check weight * distance and put it in cascade or new_travelers.
+                new_travelers.push(Traveler {
+                    link: *link,
+                    distance_traveled: 0.0,
+                })
+            }
+        }
+        LinkSelection::Random => {
+            todo!()
+        }
+    }
 }
 
 fn read_node_sample(node: &Node, node_state: &mut NodeState) -> f32 {
     // check if node_state is playing if not return 0.0
+    // check if playing is finished if so finish and return 0.0
     // if is update the note state
     // read the sample.
     0.0
