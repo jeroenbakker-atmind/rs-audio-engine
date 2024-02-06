@@ -4,9 +4,9 @@ use audio_engine_common::{
 };
 
 use crate::{
-    link_index::LinkIndex, link_path::LinkPath, link_selection::LinkSelection,
-    link_state::LinkState, node_index::NodeIndex, node_state::NodeState, song::Song,
-    song_state::SongState, traveler::Traveler,
+    link_index::LinkIndex, link_selection::LinkSelection, link_state::LinkState,
+    node_index::NodeIndex, node_state::NodeState, song::Song, song_state::SongState,
+    traveler::Traveler,
 };
 
 pub struct Player {
@@ -45,18 +45,7 @@ impl Player {
         for link in &song.links {
             let from_node = song.node(link.from_node);
             let to_node = song.node(link.to_node);
-            let length = match link.path {
-                LinkPath::Grid => {
-                    let dx = from_node.grid_location.0 - to_node.grid_location.0;
-                    let dy = from_node.grid_location.1 - to_node.grid_location.1;
-                    dx.abs() + dy.abs()
-                }
-                LinkPath::Straight => {
-                    let dx = from_node.grid_location.0 - to_node.grid_location.0;
-                    let dy = from_node.grid_location.1 - to_node.grid_location.1;
-                    (dx * dx + dy * dy).sqrt()
-                }
-            };
+            let length = link.path.distance(from_node, to_node);
             result.push(LinkState { length })
         }
         result
@@ -66,6 +55,7 @@ impl Player {
 impl Player {
     pub fn sample(&mut self, buffer: &mut [f32]) {
         // This will also restart the song when all travelers are depleted.
+        // Might be useful, but not always needed.
         let mut first_sample = self.song_state.travelers.is_empty();
         for sample_index in 0..buffer.len() {
             if first_sample {
