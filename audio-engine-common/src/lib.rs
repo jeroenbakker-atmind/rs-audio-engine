@@ -1,5 +1,6 @@
 pub mod beats_per_minute;
 pub mod buffer;
+pub mod convolve;
 pub mod digital_sound;
 pub mod duration;
 pub mod envelope;
