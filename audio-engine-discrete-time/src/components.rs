@@ -11,6 +11,10 @@ pub struct Components {
 }
 
 impl Components {
+    pub fn len(&self) -> usize {
+        self.components.len()
+    }
+
     pub fn pow(&self, exponent: i32) -> Components {
         let mut result = self.clone();
         for _ in 1..exponent {

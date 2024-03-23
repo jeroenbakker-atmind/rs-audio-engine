@@ -7,6 +7,7 @@
 pub mod component;
 pub mod components;
 pub mod transfer_function;
+pub mod filter;
 
 #[cfg(test)]
 pub mod transfer_function_test;

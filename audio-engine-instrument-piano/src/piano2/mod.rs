@@ -3,9 +3,7 @@
 use std::{f64::consts::TAU, ops::Range};
 
 use audio_engine_common::convolve::Convolution;
-use audio_engine_discrete_time::transfer_function::TransferFunction;
-
-use crate::piano::filter::Filter;
+use audio_engine_discrete_time::{filter::Filter, transfer_function::TransferFunction};
 
 use self::piano_ir::PIANO_IR_SAMPLES;
 mod piano_ir;
@@ -210,10 +208,29 @@ pub struct PianoNote {
     pub c: f64,
     pub i0: i32,
     pub m: i32,
+    pub strings: Vec<PianoString>,
+    pub sample_index: usize,
 }
 
+impl PianoNote {
+    fn filter(&mut self, value_in: f64) -> f64 {
+        let mut result = 0.0;
+        for string in &mut self.strings {
+            result += string.filter(value_in);
+        }
+        result
+    }
+}
+
+#[derive(Debug)]
 pub struct PianoString {
     filter: Filter,
+}
+
+impl PianoString {
+    fn filter(&mut self, value_in: f64) -> f64 {
+        self.filter.filter(value_in)
+    }
 }
 
 impl Piano {
@@ -393,6 +410,27 @@ impl Piano {
         let dw1 = &dl1 / (1.0 + &h1 * &dl12dl22) + -1.0 * &dl1dl22 / (1.0 + &h1 * &dl12dl22);
         let dw2 = &dl1 / (1.0 + &h2 * &dl12dl22) + -1.0 * &dl1dl22 / (1.0 + &h2 * &dl12dl22);
         let dw3 = &dl1 / (1.0 + &h3 * &dl12dl22) + -1.0 * &dl1dl22 / (1.0 + &h3 * &dl12dl22);
+
+        self.note.strings.clear();
+        self.note.strings.push(PianoString {
+            filter: Filter::from(&dw1),
+        });
+        self.note.strings.push(PianoString {
+            filter: Filter::from(&dw2),
+        });
+        self.note.strings.push(PianoString {
+            filter: Filter::from(&dw3),
+        });
+        self.note.sample_index = 0;
+    }
+    // #endregion
+
+    // #region sample
+    pub fn sample(&mut self) -> f64 {
+        let sample_in = self.v[self.note.sample_index];
+        let sample_out = self.note.filter(sample_in);
+        self.note.sample_index += 1;
+        sample_out
     }
     // #endregion
 }
@@ -401,4 +439,8 @@ impl Piano {
 fn piano() {
     let mut piano = Piano::new();
     piano.init_note(440.0);
+    for i in 0..10000 {
+        let sample = piano.sample();
+        println!("{i}: {sample}");
+    }
 }
