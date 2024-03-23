@@ -3,6 +3,9 @@
 use std::{f64::consts::TAU, ops::Range};
 
 use audio_engine_common::convolve::Convolution;
+use audio_engine_discrete_time::transfer_function::TransferFunction;
+
+use crate::piano::filter::Filter;
 
 use self::piano_ir::PIANO_IR_SAMPLES;
 mod piano_ir;
@@ -74,7 +77,7 @@ pub type FrequencyRange = Range<f64>;
 #[derive(Debug, Default, Copy, Clone)]
 pub struct StringGroupConfiguration {
     pub detune: f64,
-    pub ap_num: f64,
+    pub ap_num: i32,
     pub gl: f64,
 }
 
@@ -86,7 +89,7 @@ impl Default for StringGroupConfigurations {
                     0.0..120.0,
                     StringGroupConfiguration {
                         detune: 0.25,
-                        ap_num: 20.0,
+                        ap_num: 20,
                         gl: -0.96,
                     },
                 ),
@@ -94,7 +97,7 @@ impl Default for StringGroupConfigurations {
                     120.0..150.0,
                     StringGroupConfiguration {
                         detune: 0.18,
-                        ap_num: 20.0,
+                        ap_num: 20,
                         gl: -0.968,
                     },
                 ),
@@ -102,7 +105,7 @@ impl Default for StringGroupConfigurations {
                     150.0..200.0,
                     StringGroupConfiguration {
                         detune: 0.13,
-                        ap_num: 18.0,
+                        ap_num: 18,
                         gl: -0.975,
                     },
                 ),
@@ -110,7 +113,7 @@ impl Default for StringGroupConfigurations {
                     200.0..261.626,
                     StringGroupConfiguration {
                         detune: 0.09,
-                        ap_num: 16.0,
+                        ap_num: 16,
                         gl: -0.98,
                     },
                 ),
@@ -118,7 +121,7 @@ impl Default for StringGroupConfigurations {
                     261.626..390.0,
                     StringGroupConfiguration {
                         detune: 0.06,
-                        ap_num: 14.0,
+                        ap_num: 14,
                         gl: -0.985,
                     },
                 ),
@@ -126,7 +129,7 @@ impl Default for StringGroupConfigurations {
                     390.0..750.0,
                     StringGroupConfiguration {
                         detune: 0.04,
-                        ap_num: 12.0,
+                        ap_num: 12,
                         gl: -0.99,
                     },
                 ),
@@ -134,7 +137,7 @@ impl Default for StringGroupConfigurations {
                     750.0..980.0,
                     StringGroupConfiguration {
                         detune: 0.03,
-                        ap_num: 8.0,
+                        ap_num: 8,
                         gl: -0.993,
                     },
                 ),
@@ -142,7 +145,7 @@ impl Default for StringGroupConfigurations {
                     980.0..1500.0,
                     StringGroupConfiguration {
                         detune: 0.02,
-                        ap_num: 6.0,
+                        ap_num: 6,
                         gl: -0.995,
                     },
                 ),
@@ -150,7 +153,7 @@ impl Default for StringGroupConfigurations {
                     1500.0..1800.0,
                     StringGroupConfiguration {
                         detune: 0.01,
-                        ap_num: 4.0,
+                        ap_num: 4,
                         gl: -0.995,
                     },
                 ),
@@ -158,7 +161,7 @@ impl Default for StringGroupConfigurations {
                     1800.0..1900.0,
                     StringGroupConfiguration {
                         detune: 0.005,
-                        ap_num: 3.0,
+                        ap_num: 3,
                         gl: -0.977,
                     },
                 ),
@@ -166,7 +169,7 @@ impl Default for StringGroupConfigurations {
                     1900.0..3000.0,
                     StringGroupConfiguration {
                         detune: 0.005,
-                        ap_num: 2.0,
+                        ap_num: 2,
                         gl: -0.977,
                     },
                 ),
@@ -174,7 +177,7 @@ impl Default for StringGroupConfigurations {
                     3000.0..f64::MAX,
                     StringGroupConfiguration {
                         detune: 0.01,
-                        ap_num: 0.0,
+                        ap_num: 0,
                         gl: -0.977,
                     },
                 ),
@@ -197,14 +200,20 @@ impl StringGroupConfigurations {
 pub const AL: f64 = -0.001;
 pub const AD: f64 = -0.30;
 
+// TODO: PianoNote is a set of strings, wiht a f0 and hammer velocity, input velocities
+// Per string a single filter.
 #[derive(Debug, Default)]
 pub struct PianoNote {
     /// Frequency
     pub f0: f64,
     pub config: StringGroupConfiguration,
     pub c: f64,
-    pub i0: f64,
-    pub m: f64,
+    pub i0: i32,
+    pub m: i32,
+}
+
+pub struct PianoString {
+    filter: Filter,
 }
 
 impl Piano {
@@ -228,6 +237,8 @@ impl Piano {
         };
         result.init();
         result.init_wave_equation();
+
+        // This is already velocity specific.
         result.init_force_out();
         result.init_velocity();
 
@@ -344,11 +355,11 @@ impl Piano {
         let exact_t = TAU * frequency / self.fs;
         let exact_a = (AD.powi(2) - 1.0) * exact_t.sin();
         let exact_b = 2.0 * AD + (AD.powi(2) + 1.0) * exact_t.cos();
-        let n_exact = (TAU + note.config.ap_num * (exact_a / exact_b).atan()) / exact_t;
-        let m = (n_exact / 2.0).floor();
-        let p = n_exact - 2.0 * m;
+        let n_exact = (TAU + note.config.ap_num as f64 * (exact_a / exact_b).atan()) / exact_t;
+        let m = (n_exact / 2.0).floor() as i32;
+        let p = n_exact - 2.0 * m as f64;
         let c = (1.0 - p) / (1.0 + p);
-        let i0 = (self.alpha * m).round();
+        let i0 = (self.alpha * m as f64).round() as i32;
         note.c = c;
         note.i0 = i0;
         note.m = m;
@@ -358,6 +369,30 @@ impl Piano {
         // Will require some discrete time data structures to add, multiply, set the denomater/number of the equation.
         // We can 'optimize' the data structure so all zero data elements are removed.
         // We should implement this in its own library. (audio-engine-discrete-time)
+
+        let z = TransferFunction::new(1.0 / self.fs);
+        let dl1 = z.pow(-(note.m - note.i0));
+        let dl2 = z.pow(-note.i0);
+
+        let hl = note.config.gl * (1.0 + AL) / &(1.0 + AL * z.pow(-1));
+        let hd = (AD + z.pow(-1)) / (1.0 + AD * z.pow(-1));
+
+        let hfd1 = (c + z.pow(-1)) / (1.0 + c * z.pow(-1));
+        let hfd2 = (c * (1.0 + note.config.detune) + z.pow(-1))
+            / (1.0 + c * (1.0 + note.config.detune) * z.pow(-1));
+        let hfd3 = (c * (1.0 - note.config.detune) + z.pow(-1))
+            / (1.0 + c * (1.0 - note.config.detune) * z.pow(-1));
+        let hlhd = &hl * &hd.pow(note.config.ap_num);
+        let h1 = &hlhd * &hfd1;
+        let h2 = &hlhd * &hfd2;
+        let h3 = &hlhd * &hfd3;
+
+        let dl1dl22 = &dl1 * &dl2 * &dl2;
+        let dl12dl22 = &dl1dl22 * &dl1;
+
+        let dw1 = &dl1 / (1.0 + &h1 * &dl12dl22) + -1.0 * &dl1dl22 / (1.0 + &h1 * &dl12dl22);
+        let dw2 = &dl1 / (1.0 + &h2 * &dl12dl22) + -1.0 * &dl1dl22 / (1.0 + &h2 * &dl12dl22);
+        let dw3 = &dl1 / (1.0 + &h3 * &dl12dl22) + -1.0 * &dl1dl22 / (1.0 + &h3 * &dl12dl22);
     }
     // #endregion
 }

@@ -5,7 +5,6 @@ use std::{
 
 use crate::component::Component;
 
-// TODO: should be written as a list of multipliers. index is equal to the power.
 #[derive(Default, Debug, Clone, PartialEq)]
 pub struct Components {
     pub components: Vec<f64>,

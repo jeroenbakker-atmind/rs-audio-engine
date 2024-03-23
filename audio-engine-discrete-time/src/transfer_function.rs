@@ -147,7 +147,8 @@ impl Add<TransferFunction> for TransferFunction {
 
     fn add(self, rhs: TransferFunction) -> Self::Output {
         let new_denominator = &self.denominator * &rhs.denominator;
-        let new_numerator = &self.numerator + &rhs.numerator;
+        let new_numerator =
+            &(&self.numerator * &rhs.denominator) + &(&rhs.numerator * &self.denominator);
         TransferFunction {
             timestep: self.timestep,
             numerator: new_numerator,
