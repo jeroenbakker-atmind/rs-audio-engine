@@ -439,8 +439,11 @@ impl Piano {
 fn piano() {
     let mut piano = Piano::new();
     piano.init_note(440.0);
+    let mut max: f64 = 0.0;
     for i in 0..10000 {
         let sample = piano.sample();
-        println!("{i}: {sample}");
+        //println!("{i}: {sample}");
+        max = max.max(sample.abs());
     }
+    println!("max: {max}");
 }
