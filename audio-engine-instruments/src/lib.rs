@@ -11,7 +11,7 @@ use fm::basic::{
     square::create_fm_basic_square_instrument, triangle::create_fm_basic_triangle_instrument,
 };
 use fm::wip::create_fm_wip_instrument;
-use piano::create_piano_piano_instrument;
+use piano::{create_piano_piano2_instrument, create_piano_piano_instrument};
 use sample::pianos::piano_ax::create_sample_pianos_piano_ax;
 
 mod bowed_string;
@@ -54,6 +54,7 @@ pub enum InstrumentLibrary {
     SamplePianosPianoAX,
 
     PianoPiano,
+    PianoPiano2,
 
     BowedStringCello,
     BowedStringViolin,
@@ -95,6 +96,7 @@ impl InstrumentLibrary {
             Self::FmWIP => create_fm_wip_instrument(),
 
             Self::PianoPiano => create_piano_piano_instrument(),
+            Self::PianoPiano2 => create_piano_piano2_instrument(),
 
             Self::BowedStringCello => create_bowed_string_cello_instrument(),
             Self::BowedStringViolin => create_bowed_string_violin_instrument(),

@@ -11,7 +11,7 @@ mod piano_ir;
 /// Input length of the precalculated forces, before switching to wave guiding.
 const INPUT_LENGTH: usize = 150;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Piano {
     /// Samplerate
     pub fs: f64,
@@ -65,7 +65,7 @@ pub struct Piano {
     pub note: PianoNote,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StringGroupConfigurations {
     pub configurations: Vec<(FrequencyRange, StringGroupConfiguration)>,
 }
@@ -200,7 +200,7 @@ pub const AD: f64 = -0.30;
 
 // TODO: PianoNote is a set of strings, wiht a f0 and hammer velocity, input velocities
 // Per string a single filter.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PianoNote {
     /// Frequency
     pub f0: f64,
@@ -222,7 +222,7 @@ impl PianoNote {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PianoString {
     filter: Filter,
 }
@@ -235,9 +235,9 @@ impl PianoString {
 
 impl Piano {
     // #region Initialization
-    pub fn new() -> Piano {
+    pub fn new(sample_rate: f64) -> Piano {
         let mut result = Piano {
-            fs: 44100.0,
+            fs: sample_rate,
             n: 65,
             length: 0.62,
             mass_string: 3.93 / 1000.0,
@@ -427,17 +427,22 @@ impl Piano {
 
     // #region sample
     pub fn sample(&mut self) -> f64 {
-        let sample_in = self.v[self.note.sample_index];
+        let sample_in = if self.note.sample_index < self.v.len() {
+            self.v[self.note.sample_index]
+        } else {
+            0.0
+        };
         let sample_out = self.note.filter(sample_in);
         self.note.sample_index += 1;
-        sample_out
+        // TODO: 2000 is based on experiments...
+        sample_out / 2000.0
     }
     // #endregion
 }
 
 #[test]
 fn piano() {
-    let mut piano = Piano::new();
+    let mut piano = Piano::new(44100.0);
     piano.init_note(440.0);
     let mut max: f64 = 0.0;
     for i in 0..10000 {

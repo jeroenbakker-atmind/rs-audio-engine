@@ -1,6 +1,6 @@
 use crate::transfer_function::TransferFunction;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Filter {
     pub x: Vec<f64>,
     pub y: Vec<f64>,

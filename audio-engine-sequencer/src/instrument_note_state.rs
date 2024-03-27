@@ -3,7 +3,7 @@ use audio_engine_instrument_bowed_string::{
     instrument_state::BowedStringInstrumentState, processor::DefaultStringProcessor,
 };
 use audio_engine_instrument_fm::instrument::FMInstrumentNoteState;
-use audio_engine_instrument_piano::note_state::PianoNoteState;
+use audio_engine_instrument_piano::{note_state::PianoNoteState, note_state2::PianoNoteState2};
 use audio_engine_instrument_sample::sample_note_state::SampleNoteState;
 
 use crate::instrument::Instrument;
@@ -15,6 +15,7 @@ pub enum InstrumentNoteState {
     FM(FMInstrumentNoteState),
     Sample(SampleNoteState),
     Piano(PianoNoteState),
+    Piano2(PianoNoteState2),
     BowedString(BowedStringInstrumentState<DefaultStringProcessor>),
 }
 
@@ -38,6 +39,7 @@ impl InstrumentNoteState {
                 *self = Self::Sample(instrument.init_sound_state())
             }
             Some(Instrument::Piano(piano)) => *self = Self::Piano(piano.init_sound_state()),
+            Some(Instrument::Piano2(piano)) => *self = Self::Piano2(piano.init_sound_state()),
             Some(Instrument::BowedString(instrument)) => {
                 if self.is_none() {
                     *self = Self::BowedString(instrument.init_sound_state());
