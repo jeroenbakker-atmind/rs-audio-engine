@@ -1,7 +1,5 @@
 use super::PianoString;
 
-// TODO: PianoNote is a set of strings, wiht a f0 and hammer velocity, input velocities
-// Per string a single filter.
 #[derive(Debug, Default, Clone)]
 pub struct PianoNote {
     pub strings: Vec<PianoString>,

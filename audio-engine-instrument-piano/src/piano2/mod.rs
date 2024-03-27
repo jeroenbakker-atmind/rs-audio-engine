@@ -22,28 +22,27 @@ const INPUT_LENGTH: usize = 150;
 #[derive(Debug, Default, Clone)]
 pub struct Piano {
     /// Samplerate
-    pub fs: f64,
+    pub sample_rate: f64,
     /// Number of spatial grid points
-    /// TODO: Make a constant
-    pub n: usize,
+    pub num_spatial_grid_points: usize,
     /// Length of the piano wire
-    pub length: f64,
+    pub string_length: f64,
     /// Mass of the piano wire in Kg
-    pub mass_string: f64,
+    pub string_mass: f64,
     /// Mass of the hammer in Kg
-    pub mass_hammer: f64,
-    /// Hammer stiffness coefficient
-    pub k: f64,
     ///Tension of the wire
-    pub tension: f64,
+    pub string_tension: f64,
     /// Stiffness non-linear coefficient
     pub p: f64,
+    pub hammer_mass: f64,
+    /// Hammer stiffness coefficient
+    pub hammer_stiffness_coefficient: f64,
     /// Relativa striking position
-    pub alpha: f64,
+    pub relative_striking_position: f64,
     /// Damping coefficient
-    pub b1: f64,
+    pub damping_coefficient_a: f64,
     /// Damping coefficient
-    pub b3: f64,
+    pub damping_coefficient_b: f64,
     /// String stiffness parameter
     pub epsilon: f64,
 
@@ -62,7 +61,6 @@ pub struct Piano {
     pub a5: f64,
 
     /// Input velocities
-    /// NOTE: v only contains valid samples, in original paper it would be extended with 0 to fit the number of samples that will be generated.
     pub v: Vec<f64>,
 
     pub string_configurations: StringGroupConfigurations,
@@ -76,17 +74,17 @@ impl Piano {
     // #region Initialization
     pub fn new(sample_rate: f64) -> Piano {
         let mut result = Piano {
-            fs: sample_rate,
-            n: 65,
-            length: 0.62,
-            mass_string: 3.93 / 1000.0,
-            mass_hammer: 2.97 / 1000.0,
-            k: 4.5e9,
-            tension: 670.0,
+            sample_rate,
+            num_spatial_grid_points: 65,
+            string_length: 0.62,
+            string_mass: 3.93 / 1000.0,
+            hammer_mass: 2.97 / 1000.0,
+            hammer_stiffness_coefficient: 4.5e9,
+            string_tension: 670.0,
             p: 2.5,
-            alpha: 0.12,
-            b1: 0.5,
-            b3: 6.25e-9,
+            relative_striking_position: 0.12,
+            damping_coefficient_a: 0.5,
+            damping_coefficient_b: 6.25e-9,
             epsilon: 3.82e-5,
             ..Piano::default()
         };
@@ -97,24 +95,47 @@ impl Piano {
     }
 
     fn init(&mut self) {
-        self.r0 = (self.tension * self.mass_string / self.length).sqrt();
-        self.i0 = (self.alpha * self.n as f64).round() as usize - 1;
-        self.c = (self.tension / (self.mass_string / self.length)).sqrt();
+        self.r0 = (self.string_tension * self.string_mass / self.string_length).sqrt();
+        self.i0 = (self.relative_striking_position * self.num_spatial_grid_points as f64).round()
+            as usize
+            - 1;
+        self.c = (self.string_tension / (self.string_mass / self.string_length)).sqrt();
     }
 
     fn init_wave_equation(&mut self) {
-        self.d = 1.0 + self.b1 / self.fs + 2.0 * self.b3 * self.fs;
-        self.r = self.c * self.n as f64 / (self.fs * self.length);
-        self.a1 = (2.0 - 2.0 * self.r * self.r + self.b3 * self.fs
-            - 6.0 * self.epsilon * self.n as f64 * self.n as f64 * self.r * self.r)
+        self.d = 1.0
+            + self.damping_coefficient_a / self.sample_rate
+            + 2.0 * self.damping_coefficient_b * self.sample_rate;
+        self.r =
+            self.c * self.num_spatial_grid_points as f64 / (self.sample_rate * self.string_length);
+        self.a1 = (2.0 - 2.0 * self.r * self.r + self.damping_coefficient_b * self.sample_rate
+            - 6.0
+                * self.epsilon
+                * self.num_spatial_grid_points as f64
+                * self.num_spatial_grid_points as f64
+                * self.r
+                * self.r)
             / self.d;
-        self.a2 = (-1.0 + self.b1 / self.fs + 2.0 * self.b3 * self.fs) / self.d;
-        self.a3 =
-            (self.r * self.r * (1.0 + 4.0 * self.epsilon * self.n as f64 * self.n as f64)) / self.d;
-        self.a4 = (self.b3 * self.fs
-            - self.epsilon * self.n as f64 * self.n as f64 * self.r * self.r)
+        self.a2 = (-1.0
+            + self.damping_coefficient_a / self.sample_rate
+            + 2.0 * self.damping_coefficient_b * self.sample_rate)
             / self.d;
-        self.a5 = (-self.b3 * self.fs) / self.d;
+        self.a3 = (self.r
+            * self.r
+            * (1.0
+                + 4.0
+                    * self.epsilon
+                    * self.num_spatial_grid_points as f64
+                    * self.num_spatial_grid_points as f64))
+            / self.d;
+        self.a4 = (self.damping_coefficient_b * self.sample_rate
+            - self.epsilon
+                * self.num_spatial_grid_points as f64
+                * self.num_spatial_grid_points as f64
+                * self.r
+                * self.r)
+            / self.d;
+        self.a5 = (-self.damping_coefficient_b * self.sample_rate) / self.d;
     }
 
     /// Initialize the first steps of the simulation.
@@ -123,43 +144,52 @@ impl Piano {
         result.resize(INPUT_LENGTH, 0.0);
 
         // Displacement of the string
-        let mut ys = vec![vec![0.0; INPUT_LENGTH]; self.n];
+        let mut ys = vec![vec![0.0; INPUT_LENGTH]; self.num_spatial_grid_points];
         // Displacement of the hammer
         let mut yh = vec![0.0; INPUT_LENGTH];
 
         // Step 0 Initial state (all zeros)
         // Step 1
-        yh[1] = hammer_velocity / self.fs;
+        yh[1] = hammer_velocity / self.sample_rate;
         ys[0][1] = 0.0;
-        ys[self.n - 1][1] = 0.0;
-        result[1] = self.k * (yh[1] - ys[self.i0][1]).abs().powf(self.p);
+        ys[self.num_spatial_grid_points - 1][1] = 0.0;
+        result[1] = self.hammer_stiffness_coefficient * (yh[1] - ys[self.i0][1]).abs().powf(self.p);
 
         // Step 2
         ys[0][2] = 0.0;
-        ys[self.n - 1][2] = 0.0;
+        ys[self.num_spatial_grid_points - 1][2] = 0.0;
         // Apply hammer. first part of this equation is always 0.0
         ys[self.i0][2] = ys[self.i0 + 1][1] + ys[self.i0 - 1][1] - ys[self.i0][0]
-            + ((1.0 / self.fs).powi(2) * self.n as f64 * result[1]) / self.mass_string;
-        yh[2] = 2.0 * yh[1] - yh[0] - ((1.0 / self.fs).powi(2) * result[1]) / self.mass_hammer;
-        result[2] = self.k * (yh[2] - ys[self.i0][2]).abs().powf(self.p);
+            + ((1.0 / self.sample_rate).powi(2) * self.num_spatial_grid_points as f64 * result[1])
+                / self.string_mass;
+        yh[2] =
+            2.0 * yh[1] - yh[0] - ((1.0 / self.sample_rate).powi(2) * result[1]) / self.hammer_mass;
+        result[2] = self.hammer_stiffness_coefficient * (yh[2] - ys[self.i0][2]).abs().powf(self.p);
 
         for n in 3..INPUT_LENGTH {
             // update string
             ys[0][n] = 0.0;
-            ys[self.n - 1][n] = 0.0;
+            ys[self.num_spatial_grid_points - 1][n] = 0.0;
             ys[1][n] = (self.a1 * ys[1][n - 1])
                 + (self.a2 * ys[1][n - 2])
                 + (self.a3 * (ys[2][n - 1] + ys[0][n - 1]))
                 + (self.a4 * (ys[3][n - 1] - ys[1][n - 1]))
                 + (self.a5 * (ys[2][n - 2] + ys[0][n - 2] + ys[1][n - 3]));
-            ys[self.n - 2][n] = (self.a1 * ys[self.n - 2][n - 1])
-                + (self.a2 * ys[self.n - 2][n - 2])
-                + (self.a3 * (ys[self.n - 1][n - 1] + ys[self.n - 3][n - 1]))
-                + (self.a4 * (ys[self.n - 4][n - 1] - ys[self.n - 2][n - 1]))
+            ys[self.num_spatial_grid_points - 2][n] = (self.a1
+                * ys[self.num_spatial_grid_points - 2][n - 1])
+                + (self.a2 * ys[self.num_spatial_grid_points - 2][n - 2])
+                + (self.a3
+                    * (ys[self.num_spatial_grid_points - 1][n - 1]
+                        + ys[self.num_spatial_grid_points - 3][n - 1]))
+                + (self.a4
+                    * (ys[self.num_spatial_grid_points - 4][n - 1]
+                        - ys[self.num_spatial_grid_points - 2][n - 1]))
                 + (self.a5
-                    * (ys[self.n - 1][n - 2] + ys[self.n - 3][n - 2] + ys[self.n - 2][n - 3]));
+                    * (ys[self.num_spatial_grid_points - 1][n - 2]
+                        + ys[self.num_spatial_grid_points - 3][n - 2]
+                        + ys[self.num_spatial_grid_points - 2][n - 3]));
 
-            for m in 2..self.n - 2 {
+            for m in 2..self.num_spatial_grid_points - 2 {
                 ys[m][n] = (self.a1 * ys[m][n - 1])
                     + (self.a2 * ys[m][n - 2])
                     + (self.a3 * (ys[m + 1][n - 1] + ys[m - 1][n - 1]))
@@ -174,16 +204,20 @@ impl Piano {
                 + (self.a4 * (ys[self.i0 + 2][n - 1] + ys[self.i0 - 2][n - 1]))
                 + (self.a5
                     * (ys[self.i0 + 1][n - 2] + ys[self.i0 - 1][n - 2] + ys[self.i0][n - 3]))
-                + ((1.0 / self.fs).powi(2) * self.n as f64 * result[n - 1]) / self.mass_string;
+                + ((1.0 / self.sample_rate).powi(2)
+                    * self.num_spatial_grid_points as f64
+                    * result[n - 1])
+                    / self.string_mass;
 
             // update hammer displacement
             yh[n] = 2.0 * yh[n - 1]
                 - yh[n - 2]
-                - ((1.0 / self.fs).powi(2) * result[n - 1]) / self.mass_hammer;
+                - ((1.0 / self.sample_rate).powi(2) * result[n - 1]) / self.hammer_mass;
 
             // check hammer still touches string
             if (yh[n] - ys[self.i0][n]) > 0.0 {
-                result[n] = self.k * (yh[n] - ys[self.i0][n]).abs().powf(self.p);
+                result[n] =
+                    self.hammer_stiffness_coefficient * (yh[n] - ys[self.i0][n]).abs().powf(self.p);
             } else {
                 result[n] = 0.0;
             }
@@ -207,14 +241,14 @@ impl Piano {
 
         let config = self.string_configurations.get_configuration(frequency);
 
-        let exact_t = TAU * frequency / self.fs;
+        let exact_t = TAU * frequency / self.sample_rate;
         let exact_a = (AD.powi(2) - 1.0) * exact_t.sin();
         let exact_b = 2.0 * AD + (AD.powi(2) + 1.0) * exact_t.cos();
         let n_exact = (TAU + config.ap_num as f64 * (exact_a / exact_b).atan()) / exact_t;
         let m = (n_exact / 2.0).floor() as i32;
         let p = n_exact - 2.0 * m as f64;
         let c = (1.0 - p) / (1.0 + p);
-        let i0 = (self.alpha * m as f64).round() as i32;
+        let i0 = (self.relative_striking_position * m as f64).round() as i32;
 
         // Init discrete time data. This data is per string and constant for the duration of the note.
         // actual playing will perform a 'filter' for the next sample
@@ -222,7 +256,7 @@ impl Piano {
         // We can 'optimize' the data structure so all zero data elements are removed.
         // We should implement this in its own library. (audio-engine-discrete-time)
 
-        let z = TransferFunction::new(1.0 / self.fs);
+        let z = TransferFunction::new(1.0 / self.sample_rate);
         let dl1 = z.pow(-(m - i0));
         let dl2 = z.pow(-i0);
 
@@ -230,10 +264,10 @@ impl Piano {
         let hd = (AD + z.pow(-1)) / (1.0 + AD * z.pow(-1));
 
         let hfd1 = (c + z.pow(-1)) / (1.0 + c * z.pow(-1));
-        let hfd2 =
-            (c * (1.0 + config.detune) + z.pow(-1)) / (1.0 + c * (1.0 + config.detune) * z.pow(-1));
-        let hfd3 =
-            (c * (1.0 - config.detune) + z.pow(-1)) / (1.0 + c * (1.0 - config.detune) * z.pow(-1));
+        let hfd2 = (c * (1.0 + config.offtune) + z.pow(-1))
+            / (1.0 + c * (1.0 + config.offtune) * z.pow(-1));
+        let hfd3 = (c * (1.0 - config.offtune) + z.pow(-1))
+            / (1.0 + c * (1.0 - config.offtune) * z.pow(-1));
         let hlhd = &hl * &hd.pow(config.ap_num);
         let h1 = &hlhd * &hfd1;
         let h2 = &hlhd * &hfd2;
@@ -263,8 +297,8 @@ impl Piano {
         };
         let sample_out = self.note.filter(sample_in);
         self.note.sample_index += 1;
-        // TODO: 2000 is based on experiments...
-        sample_out / 2000.0
+        // TODO: based on experiments...
+        sample_out / 3000.0
     }
     // #endregion
 }
