@@ -47,21 +47,21 @@ pub struct Piano {
     pub epsilon: f64,
 
     // cached values could be extracted into functions.
-    pub r0: f64,
-    pub i0: usize,
-    pub c: f64,
+    r0: f64,
+    i0: usize,
+    c: f64,
 
     // Coefficient of the wave equation
-    pub d: f64,
-    pub r: f64,
-    pub a1: f64,
-    pub a2: f64,
-    pub a3: f64,
-    pub a4: f64,
-    pub a5: f64,
+    d: f64,
+    r: f64,
+    a1: f64,
+    a2: f64,
+    a3: f64,
+    a4: f64,
+    a5: f64,
 
     /// Input velocities
-    pub v: Vec<f64>,
+    pub input_velocities: Vec<f64>,
 
     pub string_configurations: StringGroupConfigurations,
     pub note: PianoNote,
@@ -230,7 +230,7 @@ impl Piano {
             .iter()
             .map(|force| force / (2.0 * self.r0))
             .collect::<Vec<f64>>();
-        self.v = PIANO_IR_SAMPLES.convolve(&velocities)
+        self.input_velocities = PIANO_IR_SAMPLES.convolve(&velocities)
     }
     // #endregion
 
@@ -290,8 +290,8 @@ impl Piano {
 
     // #region sample
     pub fn sample(&mut self) -> f64 {
-        let sample_in = if self.note.sample_index < self.v.len() {
-            self.v[self.note.sample_index]
+        let sample_in = if self.note.sample_index < self.input_velocities.len() {
+            self.input_velocities[self.note.sample_index]
         } else {
             0.0
         };
