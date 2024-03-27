@@ -26,8 +26,8 @@ impl Filter {
 }
 
 // `see https://github.com/gnu-octave/octave/blob/d373693c1b797ded2ce9068c800563d0ff380406/libinterp/corefcn/filter.cc#L48` for backing function.
-impl From<&TransferFunction> for Filter {
-    fn from(transfer_function: &TransferFunction) -> Self {
+impl From<TransferFunction> for Filter {
+    fn from(transfer_function: TransferFunction) -> Self {
         let n = transfer_function
             .denominator
             .len()
