@@ -109,7 +109,7 @@ pub fn create_song1() -> Song {
     song.tracks[0x00].level = 0.6;
     song.tracks[0x01].level = 0.4;
 
-    song.instruments[0] = InstrumentLibrary::FmWIP.create();
+    song.instruments[0] = InstrumentLibrary::PianoPiano2.create();
 
     song
 }

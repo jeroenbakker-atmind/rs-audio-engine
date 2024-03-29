@@ -109,6 +109,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "audio-engine-discrete-time"
+version = "0.1.0"
+
+[[package]]
 name = "audio-engine-effect"
 version = "0.1.0"
 dependencies = [
@@ -157,6 +161,7 @@ name = "audio-engine-instrument-piano"
 version = "0.1.0"
 dependencies = [
  "audio-engine-common",
+ "audio-engine-discrete-time",
  "audio-engine-notes",
  "cpal",
 ]
