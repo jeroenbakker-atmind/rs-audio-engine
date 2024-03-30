@@ -230,7 +230,8 @@ impl Piano {
             .iter()
             .map(|force| force / (2.0 * self.r0))
             .collect::<Vec<f64>>();
-        self.input_velocities = PIANO_IR_SAMPLES.convolve(&velocities)
+        self.input_velocities = PIANO_IR_SAMPLES.convolve(&velocities);
+        //self.input_velocities = PIANO_IR_SAMPLES.into();
     }
     // #endregion
 
