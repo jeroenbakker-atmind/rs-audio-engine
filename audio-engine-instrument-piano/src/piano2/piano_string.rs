@@ -2,7 +2,7 @@ use audio_engine_discrete_time::filter::Filter;
 
 #[derive(Debug, Clone)]
 pub struct PianoString {
-    filter: Filter,
+    filter: Filter<f64>,
 }
 
 impl PianoString {
@@ -13,7 +13,7 @@ impl PianoString {
 
 impl<F> From<F> for PianoString
 where
-    F: Into<Filter> + Sized,
+    F: Into<Filter<f64>> + Sized,
 {
     fn from(value: F) -> Self {
         PianoString {

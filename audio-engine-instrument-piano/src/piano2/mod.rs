@@ -29,11 +29,11 @@ pub struct Piano {
     pub string_length: f64,
     /// Mass of the piano wire in Kg
     pub string_mass: f64,
-    /// Mass of the hammer in Kg
     ///Tension of the wire
     pub string_tension: f64,
     /// Stiffness non-linear coefficient
     pub p: f64,
+    /// Mass of the hammer in Kg
     pub hammer_mass: f64,
     /// Hammer stiffness coefficient
     pub hammer_stiffness_coefficient: f64,
@@ -59,9 +59,6 @@ pub struct Piano {
     a3: f64,
     a4: f64,
     a5: f64,
-
-    /// Input velocities
-    pub input_velocities: Vec<f64>,
 
     pub string_configurations: StringGroupConfigurations,
     pub note: PianoNote,
@@ -225,21 +222,17 @@ impl Piano {
         result
     }
 
-    fn init_velocity(&mut self, forces: &[f64]) {
+    fn init_velocity(&mut self, forces: &[f64]) -> Vec<f64> {
         let velocities = forces
             .iter()
             .map(|force| force / (2.0 * self.r0))
             .collect::<Vec<f64>>();
-        self.input_velocities = PIANO_IR_SAMPLES.convolve(&velocities);
-        //self.input_velocities = PIANO_IR_SAMPLES.into();
+        PIANO_IR_SAMPLES.convolve(&velocities)
     }
     // #endregion
 
     // #region Start Note
     pub fn init_note(&mut self, frequency: f64, hammer_velocity: f64) {
-        let forces = self.init_force_out(hammer_velocity);
-        self.init_velocity(&forces);
-
         let config = self.string_configurations.get_configuration(frequency);
 
         let exact_t = TAU * frequency / self.sample_rate;
@@ -253,9 +246,6 @@ impl Piano {
 
         // Init discrete time data. This data is per string and constant for the duration of the note.
         // actual playing will perform a 'filter' for the next sample
-        // Will require some discrete time data structures to add, multiply, set the denomater/number of the equation.
-        // We can 'optimize' the data structure so all zero data elements are removed.
-        // We should implement this in its own library. (audio-engine-discrete-time)
 
         let z = TransferFunction::new(1.0 / self.sample_rate);
         let dl1 = z.pow(-(m - i0));
@@ -285,21 +275,15 @@ impl Piano {
         self.note.strings.push(PianoString::from(dw1));
         self.note.strings.push(PianoString::from(dw2));
         self.note.strings.push(PianoString::from(dw3));
+        let forces = self.init_force_out(hammer_velocity);
+        self.note.input_velocities = self.init_velocity(&forces);
         self.note.sample_index = 0;
     }
     // #endregion
 
     // #region sample
     pub fn sample(&mut self) -> f64 {
-        let sample_in = if self.note.sample_index < self.input_velocities.len() {
-            self.input_velocities[self.note.sample_index]
-        } else {
-            0.0
-        };
-        let sample_out = self.note.filter(sample_in);
-        self.note.sample_index += 1;
-        // TODO: based on experiments...
-        sample_out / 3000.0
+        self.note.sample()
     }
     // #endregion
 }
