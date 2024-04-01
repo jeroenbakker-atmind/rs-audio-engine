@@ -46,20 +46,6 @@ pub struct Piano {
     /// String stiffness parameter
     pub epsilon: f64,
 
-    // cached values could be extracted into functions.
-    r0: f64,
-    i0: usize,
-    c: f64,
-
-    // Coefficient of the wave equation
-    d: f64,
-    r: f64,
-    a1: f64,
-    a2: f64,
-    a3: f64,
-    a4: f64,
-    a5: f64,
-
     pub string_configurations: StringGroupConfigurations,
     pub note: PianoNote,
 }
@@ -85,60 +71,52 @@ impl Piano {
             epsilon: 3.82e-5,
             ..Piano::default()
         };
-        result.init();
-        result.init_wave_equation();
 
         result
-    }
-
-    fn init(&mut self) {
-        self.r0 = (self.string_tension * self.string_mass / self.string_length).sqrt();
-        self.i0 = (self.relative_striking_position * self.num_spatial_grid_points as f64).round()
-            as usize
-            - 1;
-        self.c = (self.string_tension / (self.string_mass / self.string_length)).sqrt();
-    }
-
-    fn init_wave_equation(&mut self) {
-        self.d = 1.0
-            + self.damping_coefficient_a / self.sample_rate
-            + 2.0 * self.damping_coefficient_b * self.sample_rate;
-        self.r =
-            self.c * self.num_spatial_grid_points as f64 / (self.sample_rate * self.string_length);
-        self.a1 = (2.0 - 2.0 * self.r * self.r + self.damping_coefficient_b * self.sample_rate
-            - 6.0
-                * self.epsilon
-                * self.num_spatial_grid_points as f64
-                * self.num_spatial_grid_points as f64
-                * self.r
-                * self.r)
-            / self.d;
-        self.a2 = (-1.0
-            + self.damping_coefficient_a / self.sample_rate
-            + 2.0 * self.damping_coefficient_b * self.sample_rate)
-            / self.d;
-        self.a3 = (self.r
-            * self.r
-            * (1.0
-                + 4.0
-                    * self.epsilon
-                    * self.num_spatial_grid_points as f64
-                    * self.num_spatial_grid_points as f64))
-            / self.d;
-        self.a4 = (self.damping_coefficient_b * self.sample_rate
-            - self.epsilon
-                * self.num_spatial_grid_points as f64
-                * self.num_spatial_grid_points as f64
-                * self.r
-                * self.r)
-            / self.d;
-        self.a5 = (-self.damping_coefficient_b * self.sample_rate) / self.d;
     }
 
     /// Initialize the first steps of the simulation.
     fn init_force_out(&mut self, hammer_velocity: f64) -> Vec<f64> {
         let mut result = Vec::new();
         result.resize(INPUT_LENGTH, 0.0);
+
+        // Impact location of the hammer on the string.
+        let i0 = (self.relative_striking_position * self.num_spatial_grid_points as f64).round()
+            as usize
+            - 1;
+        let d = 1.0
+            + self.damping_coefficient_a / self.sample_rate
+            + 2.0 * self.damping_coefficient_b * self.sample_rate;
+        let c = (self.string_tension / (self.string_mass / self.string_length)).sqrt();
+        let r = c * self.num_spatial_grid_points as f64 / (self.sample_rate * self.string_length);
+        let a1 = (2.0 - 2.0 * r * r + self.damping_coefficient_b * self.sample_rate
+            - 6.0
+                * self.epsilon
+                * self.num_spatial_grid_points as f64
+                * self.num_spatial_grid_points as f64
+                * r
+                * r)
+            / d;
+        let a2 = (-1.0
+            + self.damping_coefficient_a / self.sample_rate
+            + 2.0 * self.damping_coefficient_b * self.sample_rate)
+            / d;
+        let a3 = (r
+            * r
+            * (1.0
+                + 4.0
+                    * self.epsilon
+                    * self.num_spatial_grid_points as f64
+                    * self.num_spatial_grid_points as f64))
+            / d;
+        let a4 = (self.damping_coefficient_b * self.sample_rate
+            - self.epsilon
+                * self.num_spatial_grid_points as f64
+                * self.num_spatial_grid_points as f64
+                * r
+                * r)
+            / d;
+        let a5 = (-self.damping_coefficient_b * self.sample_rate) / d;
 
         // Displacement of the string
         let mut ys = vec![vec![0.0; INPUT_LENGTH]; self.num_spatial_grid_points];
@@ -150,57 +128,57 @@ impl Piano {
         yh[1] = hammer_velocity / self.sample_rate;
         ys[0][1] = 0.0;
         ys[self.num_spatial_grid_points - 1][1] = 0.0;
-        result[1] = self.hammer_stiffness_coefficient * (yh[1] - ys[self.i0][1]).abs().powf(self.p);
+        result[1] = self.hammer_stiffness_coefficient * (yh[1] - ys[i0][1]).abs().powf(self.p);
 
         // Step 2
         ys[0][2] = 0.0;
         ys[self.num_spatial_grid_points - 1][2] = 0.0;
         // Apply hammer. first part of this equation is always 0.0
-        ys[self.i0][2] = ys[self.i0 + 1][1] + ys[self.i0 - 1][1] - ys[self.i0][0]
+        ys[i0][2] = ys[i0 + 1][1] + ys[i0 - 1][1] - ys[i0][0]
             + ((1.0 / self.sample_rate).powi(2) * self.num_spatial_grid_points as f64 * result[1])
                 / self.string_mass;
         yh[2] =
             2.0 * yh[1] - yh[0] - ((1.0 / self.sample_rate).powi(2) * result[1]) / self.hammer_mass;
-        result[2] = self.hammer_stiffness_coefficient * (yh[2] - ys[self.i0][2]).abs().powf(self.p);
+        result[2] = self.hammer_stiffness_coefficient * (yh[2] - ys[i0][2]).abs().powf(self.p);
 
+        // All subsequent steps are calculated with previous steps as input.
         for n in 3..INPUT_LENGTH {
             // update string
             ys[0][n] = 0.0;
             ys[self.num_spatial_grid_points - 1][n] = 0.0;
-            ys[1][n] = (self.a1 * ys[1][n - 1])
-                + (self.a2 * ys[1][n - 2])
-                + (self.a3 * (ys[2][n - 1] + ys[0][n - 1]))
-                + (self.a4 * (ys[3][n - 1] - ys[1][n - 1]))
-                + (self.a5 * (ys[2][n - 2] + ys[0][n - 2] + ys[1][n - 3]));
-            ys[self.num_spatial_grid_points - 2][n] = (self.a1
+            ys[1][n] = (a1 * ys[1][n - 1])
+                + (a2 * ys[1][n - 2])
+                + (a3 * (ys[2][n - 1] + ys[0][n - 1]))
+                + (a4 * (ys[3][n - 1] - ys[1][n - 1]))
+                + (a5 * (ys[2][n - 2] + ys[0][n - 2] + ys[1][n - 3]));
+            ys[self.num_spatial_grid_points - 2][n] = (a1
                 * ys[self.num_spatial_grid_points - 2][n - 1])
-                + (self.a2 * ys[self.num_spatial_grid_points - 2][n - 2])
-                + (self.a3
+                + (a2 * ys[self.num_spatial_grid_points - 2][n - 2])
+                + (a3
                     * (ys[self.num_spatial_grid_points - 1][n - 1]
                         + ys[self.num_spatial_grid_points - 3][n - 1]))
-                + (self.a4
+                + (a4
                     * (ys[self.num_spatial_grid_points - 4][n - 1]
                         - ys[self.num_spatial_grid_points - 2][n - 1]))
-                + (self.a5
+                + (a5
                     * (ys[self.num_spatial_grid_points - 1][n - 2]
                         + ys[self.num_spatial_grid_points - 3][n - 2]
                         + ys[self.num_spatial_grid_points - 2][n - 3]));
 
             for m in 2..self.num_spatial_grid_points - 2 {
-                ys[m][n] = (self.a1 * ys[m][n - 1])
-                    + (self.a2 * ys[m][n - 2])
-                    + (self.a3 * (ys[m + 1][n - 1] + ys[m - 1][n - 1]))
-                    + (self.a4 * (ys[m + 2][n - 1] + ys[m - 2][n - 1]))
-                    + (self.a5 * (ys[m + 1][n - 2] + ys[m - 1][n - 2] + ys[m][n - 3]));
+                ys[m][n] = (a1 * ys[m][n - 1])
+                    + (a2 * ys[m][n - 2])
+                    + (a3 * (ys[m + 1][n - 1] + ys[m - 1][n - 1]))
+                    + (a4 * (ys[m + 2][n - 1] + ys[m - 2][n - 1]))
+                    + (a5 * (ys[m + 1][n - 2] + ys[m - 1][n - 2] + ys[m][n - 3]));
             }
             // update string displacement
             // TODO: Use += and only applty the string mass
-            ys[self.i0][n] = (self.a1 * ys[self.i0][n - 1])
-                + (self.a2 * ys[self.i0][n - 2])
-                + (self.a3 * (ys[self.i0 + 1][n - 1] + ys[self.i0 - 1][n - 1]))
-                + (self.a4 * (ys[self.i0 + 2][n - 1] + ys[self.i0 - 2][n - 1]))
-                + (self.a5
-                    * (ys[self.i0 + 1][n - 2] + ys[self.i0 - 1][n - 2] + ys[self.i0][n - 3]))
+            ys[i0][n] = (a1 * ys[i0][n - 1])
+                + (a2 * ys[i0][n - 2])
+                + (a3 * (ys[i0 + 1][n - 1] + ys[i0 - 1][n - 1]))
+                + (a4 * (ys[i0 + 2][n - 1] + ys[i0 - 2][n - 1]))
+                + (a5 * (ys[i0 + 1][n - 2] + ys[i0 - 1][n - 2] + ys[i0][n - 3]))
                 + ((1.0 / self.sample_rate).powi(2)
                     * self.num_spatial_grid_points as f64
                     * result[n - 1])
@@ -212,9 +190,9 @@ impl Piano {
                 - ((1.0 / self.sample_rate).powi(2) * result[n - 1]) / self.hammer_mass;
 
             // check hammer still touches string
-            if (yh[n] - ys[self.i0][n]) > 0.0 {
+            if (yh[n] - ys[i0][n]) > 0.0 {
                 result[n] =
-                    self.hammer_stiffness_coefficient * (yh[n] - ys[self.i0][n]).abs().powf(self.p);
+                    self.hammer_stiffness_coefficient * (yh[n] - ys[i0][n]).abs().powf(self.p);
             } else {
                 result[n] = 0.0;
             }
@@ -223,9 +201,10 @@ impl Piano {
     }
 
     fn init_velocity(&mut self, forces: &[f64]) -> Vec<f64> {
+        let r0 = (self.string_tension * self.string_mass / self.string_length).sqrt();
         let velocities = forces
             .iter()
-            .map(|force| force / (2.0 * self.r0))
+            .map(|force| force / (2.0 * r0))
             .collect::<Vec<f64>>();
         PIANO_IR_SAMPLES.convolve(&velocities)
     }
