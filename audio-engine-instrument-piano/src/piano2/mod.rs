@@ -15,6 +15,8 @@ mod piano_ir;
 mod piano_note;
 mod piano_string;
 mod string_group_configuration;
+#[cfg(test)]
+mod test;
 
 /// Input length of the precalculated forces, before switching to wave guiding.
 const INPUT_LENGTH: usize = 150;
@@ -211,8 +213,9 @@ impl Piano {
     // #endregion
 
     // #region Start Note
-    pub fn init_note(&mut self, frequency: f64, hammer_velocity: f64) {
+    pub fn start_note(&mut self, frequency: f64, hammer_velocity: f64) {
         let config = self.string_configurations.get_configuration(frequency);
+        println!("{frequency}Hz, {hammer_velocity}m/s");
 
         let exact_t = TAU * frequency / self.sample_rate;
         let exact_a = (AD.powi(2) - 1.0) * exact_t.sin();
@@ -270,7 +273,7 @@ impl Piano {
 #[test]
 fn piano() {
     let mut piano = Piano::new(44100.0);
-    piano.init_note(440.0, 4.0);
+    piano.start_note(440.0, 4.0);
     let mut max: f64 = 0.0;
     for i in 0..10000 {
         let sample = piano.sample();

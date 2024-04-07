@@ -31,6 +31,9 @@ impl Tracker {
             sample_number as f32 / self.sample_rate,
             self.sample_rate,
         ) {
+            if !sample.is_normal() && !sample.is_subnormal() {
+                println!("break");
+            }
             result.push(sample);
             sample_number += 1;
         }

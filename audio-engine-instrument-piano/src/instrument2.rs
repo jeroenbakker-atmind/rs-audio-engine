@@ -19,7 +19,7 @@ impl Sound for PianoInstrument2 {
         if state.piano.is_none() {
             let hammer_velocity = parameters.gain as f64 * 10.0;
             let mut piano = Piano::new(parameters.sample_rate as f64);
-            piano.init_note(parameters.note_pitch as f64, hammer_velocity);
+            piano.start_note(parameters.note_pitch as f64, hammer_velocity);
             state.piano = Some(piano);
         }
 

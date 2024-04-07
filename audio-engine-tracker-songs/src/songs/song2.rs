@@ -795,7 +795,7 @@ pub fn create_song2() -> Song {
     song.tracks[0x04].init(&["80", "81", "82"]);
     song.tracks[0x04].level = 0.6;
 
-    song.instruments[0] = InstrumentLibrary::PianoPiano.create();
+    song.instruments[0] = InstrumentLibrary::PianoPiano2.create();
     song.instruments[1] = InstrumentLibrary::BowedStringCello.create();
 
     {
