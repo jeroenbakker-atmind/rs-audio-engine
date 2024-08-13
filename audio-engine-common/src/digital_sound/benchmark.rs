@@ -6,7 +6,7 @@
 //!
 //! This module contains tools that help benchmark the performance of
 //! sound sampling.
-//! 
+//!
 //! Some areas in audio engine will have examples projects that prints out the
 //! real time factor. This is used to optimize parts of the project.
 use std::time::Instant;
@@ -19,7 +19,7 @@ use super::{
 };
 
 /// Benchmark a sound for the given duration.
-/// 
+///
 /// Returns a real-time factor. The factor is how many times faster it evaluates than real-time.
 /// eg when 1 second of sound is evaluated in 0.2 seconds, it will return 5.0. It indicates
 /// that the sound can be evaluated 5 times simultaniously and still be real-time.s

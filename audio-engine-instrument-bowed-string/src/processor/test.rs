@@ -19,7 +19,9 @@ mod validation {
     //! Validate the first 50 samples to be "same" as the output from mathlab.
     use crate::{
         friction::bilboa::Bilbao,
-        processor::{modal::ModalProcessor, modal_optimized::OptimizedModalProcessor, StringProcessor},
+        processor::{
+            modal::ModalProcessor, modal_optimized::OptimizedModalProcessor, StringProcessor,
+        },
         string::CELLO_STRING_G2,
     };
 

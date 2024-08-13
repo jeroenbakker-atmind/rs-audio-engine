@@ -4,14 +4,14 @@ use crate::{level::Level, note_time::NoteTime};
 use super::Envelope;
 
 /// Envelope in the shape of a trapeziod.
-/// 
+///
 /// ```txt
 ///   D----------D
 ///  /            \
 /// C-------------E
-/// 
+///
 /// <A>         <B>
-/// 
+///
 /// A: attack time
 /// B: releae time
 /// C: start level

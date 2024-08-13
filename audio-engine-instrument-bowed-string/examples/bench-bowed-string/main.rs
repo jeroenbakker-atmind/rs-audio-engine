@@ -5,7 +5,9 @@ use audio_engine_instrument_bowed_string::{
     friction::bilboa::Bilbao,
     instrument::BowedStringInstrument,
     processor::modal::ModalProcessor,
-    processor::{modal_optimized::OptimizedModalProcessor, DefaultStringProcessor, StringProcessor},
+    processor::{
+        modal_optimized::OptimizedModalProcessor, DefaultStringProcessor, StringProcessor,
+    },
     string::CELLO_STRING_G2,
 };
 use audio_engine_notes::{ChromaticNote, ChromaticTone};
